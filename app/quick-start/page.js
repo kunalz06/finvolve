@@ -28,30 +28,90 @@ export default function QuickStartPage() {
         setStatus('processing');
         setErrorMessage('');
 
-        try {
-            // Simulate Payment Processing
-            await new Promise(resolve => setTimeout(resolve, 2000));
+        console.log("Client Debug: NEXT_PUBLIC_RAZORPAY_KEY_ID =", process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID);
 
-            if (!db) {
-                throw new Error("Firebase is not initialized.");
+        const loadRazorpayScript = () => {
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.onload = () => resolve(true);
+                script.onerror = () => resolve(false);
+                document.body.appendChild(script);
+            });
+        };
+
+        try {
+            const res = await loadRazorpayScript();
+
+            if (!res) {
+                throw new Error('Razorpay SDK failed to load. Are you online?');
             }
 
-            // Add to Firestore with 'paid' status
-            await addDoc(collection(db, "requests"), {
-                ...formData,
-                createdAt: serverTimestamp(),
-                status: 'paid_priority',
-                isQuickStart: true
+            // Create Order
+            const orderRes = await fetch('/api/create-order', { method: 'POST' });
+            const orderData = await orderRes.json();
+
+            if (orderData.error) {
+                throw new Error(orderData.error);
+            }
+
+            const options = {
+                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                name: "Finvolve",
+                description: "Quick Start Project Fee",
+                order_id: orderData.id,
+                handler: async function (response) {
+                    // Payment Success
+                    try {
+                        if (!db) {
+                            throw new Error("Firebase is not initialized.");
+                        }
+
+                        await addDoc(collection(db, "requests"), {
+                            ...formData,
+                            createdAt: serverTimestamp(),
+                            status: 'paid_priority',
+                            isQuickStart: true,
+                            paymentId: response.razorpay_payment_id,
+                            orderId: response.razorpay_order_id,
+                            signature: response.razorpay_signature
+                        });
+
+                        setStatus('success');
+                        setFormData({
+                            name: '',
+                            email: '',
+                            phone: '',
+                            projectType: 'Web Development',
+                            description: ''
+                        });
+                    } catch (err) {
+                        console.error("Error saving to firebase after payment:", err);
+                        setStatus('error');
+                        setErrorMessage("Payment successful but failed to save request. Please contact support.");
+                    }
+                },
+                prefill: {
+                    name: formData.name,
+                    email: formData.email,
+                    contact: formData.phone,
+                },
+                theme: {
+                    color: "#f59e0b",
+                },
+            };
+
+            const paymentObject = new window.Razorpay(options);
+            paymentObject.open();
+
+            // Reset status if user closes modal without paying
+            paymentObject.on('payment.failed', function (response) {
+                setStatus('error');
+                setErrorMessage(response.error.description);
             });
 
-            setStatus('success');
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                projectType: 'Web Development',
-                description: ''
-            });
         } catch (error) {
             console.error("Error processing quick start: ", error);
             setStatus('error');
@@ -208,7 +268,7 @@ export default function QuickStartPage() {
                             </ul>
                             <div className={styles.priceTag}>
                                 <span>One-time Fee</span>
-                                <strong>₹500</strong>
+                                <strong>₹1</strong>
                             </div>
                         </div>
                     </div>
