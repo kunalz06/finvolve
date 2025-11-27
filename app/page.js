@@ -1,66 +1,73 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from 'next/link';
+import { ArrowRight, Code, Smartphone, Globe, Zap } from 'lucide-react';
+import styles from './page.module.css';
 
 export default function Home() {
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>To get started, edit the page.js file.</h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className={styles.container}>
+      {/* Hero Section */}
+      <section className={styles.hero}>
+        <div className="container">
+          <div className={styles.heroContent}>
+            <h1 className={styles.title}>
+              Building the Future with <span className={styles.highlight}>Finvolve</span>
+            </h1>
+            <p className={styles.subtitle}>
+              Premium software development services tailored to your needs.
+              From Android apps to complex web applications, we bring your ideas to life.
+            </p>
+            <div className={styles.actions}>
+              <Link href="/request" className="btn btn-primary">
+                Start a Project <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+              </Link>
+              <Link href="/about" className={styles.secondaryBtn}>
+                Learn More
+              </Link>
+            </div>
+          </div>
         </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* Services Section */}
+      <section className="section">
+        <div className="container">
+          <h2 className="section-title">Our Expertise</h2>
+          <div className={styles.grid}>
+            <div className="card">
+              <Globe className={styles.icon} size={40} />
+              <h3>Web Development</h3>
+              <p>
+                Modern web applications built with <strong>React.js</strong> and <strong>Next.js</strong>.
+                Fast, SEO-friendly, and scalable.
+              </p>
+            </div>
+            <div className="card">
+              <Smartphone className={styles.icon} size={40} />
+              <h3>Android Apps</h3>
+              <p>
+                Native Android applications developed with <strong>Kotlin</strong>.
+                Smooth performance and intuitive user interfaces.
+              </p>
+            </div>
+            <div className="card">
+              <Code className={styles.icon} size={40} />
+              <h3>Custom Software</h3>
+              <p>
+                Tailored software solutions to solve your unique business challenges.
+                Full-stack development services.
+              </p>
+            </div>
+            <div className="card">
+              <Zap className={styles.icon} size={40} />
+              <h3>High Performance</h3>
+              <p>
+                Optimized for speed and efficiency. We ensure your applications run smoothly
+                under any load.
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
