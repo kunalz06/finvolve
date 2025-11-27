@@ -1,10 +1,13 @@
 :root {
   --background: #0a0a0a;
   --foreground: #ededed;
-  --primary: #3b82f6; /* Blue */
+  --primary: #3b82f6;
+  /* Blue */
   --primary-hover: #2563eb;
-  --secondary: #10b981; /* Emerald */
-  --accent: #8b5cf6; /* Violet */
+  --secondary: #10b981;
+  /* Emerald */
+  --accent: #8b5cf6;
+  /* Violet */
   --card-bg: #171717;
   --card-border: #262626;
   --text-muted: #a1a1aa;
@@ -95,4 +98,18 @@ button {
 .card:hover {
   transform: translateY(-4px);
   border-color: var(--primary);
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 60px 0;
+  }
+
+  .section-title {
+    font-size: 2rem;
+  }
+
+  .container {
+    padding: 0 16px;
+  }
 }
