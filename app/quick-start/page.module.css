@@ -1,0 +1,225 @@
+.wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+    align-items: start;
+}
+
+@media (max-width: 900px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    .infoCard {
+        order: -1;
+    }
+}
+
+.formCard {
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.formCard h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+}
+
+.formGroup {
+    margin-bottom: 20px;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.formGroup label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--foreground);
+}
+
+.formGroup input,
+.formGroup select,
+.formGroup textarea {
+    width: 100%;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    color: var(--foreground);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+.formGroup input:focus,
+.formGroup select:focus,
+.formGroup textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.terms {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.terms a {
+    color: var(--primary);
+    text-decoration: underline;
+}
+
+.payBtn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: linear-gradient(to right, #f59e0b, #d97706);
+    color: white;
+    font-size: 1.1rem;
+}
+
+.payBtn:hover {
+    background: linear-gradient(to right, #d97706, #b45309);
+    transform: translateY(-1px);
+}
+
+.infoCard {
+    background: linear-gradient(to bottom right, #1e1b4b, #171717);
+    border: 1px solid #312e81;
+    border-radius: 12px;
+    padding: 30px;
+}
+
+.infoCard h3 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: white;
+}
+
+.benefits {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 30px;
+}
+
+.benefits li {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: #e0e7ff;
+    line-height: 1.4;
+}
+
+.checkIcon {
+    color: #f59e0b;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.priceTag {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.priceTag span {
+    display: block;
+    color: #a5b4fc;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.priceTag strong {
+    display: block;
+    font-size: 2.5rem;
+    color: white;
+    line-height: 1;
+}
+
+.spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.successMessage {
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+}
+
+.successIcon {
+    color: var(--secondary);
+    margin-bottom: 20px;
+}
+
+.errorAlert {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}

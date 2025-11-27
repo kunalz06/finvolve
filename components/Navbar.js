@@ -27,6 +27,7 @@ export default function Navbar() {
                     <Link href="/" className={styles.link} onClick={() => setIsOpen(false)}>Home</Link>
                     <Link href="/about" className={styles.link} onClick={() => setIsOpen(false)}>About</Link>
                     <Link href="/contact" className={styles.link} onClick={() => setIsOpen(false)}>Contact</Link>
+                    <Link href="/quick-start" className={styles.link} onClick={() => setIsOpen(false)} style={{ color: '#f59e0b' }}>Quick Start</Link>
                     <Link href="/request" className={`btn btn-primary ${styles.cta}`} onClick={() => setIsOpen(false)}>Get Started</Link>
                 </div>
             </div>
