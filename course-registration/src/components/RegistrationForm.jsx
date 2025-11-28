@@ -256,7 +256,7 @@ export default function RegistrationForm() {
                             Processing...
                         </span>
                     ) : (
-                        "Pay ₹5000 and Register"
+                        "Pay ₹1 and Register"
                     )}
                 </button>
             </form>

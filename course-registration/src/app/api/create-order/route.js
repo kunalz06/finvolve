@@ -19,7 +19,7 @@ export async function POST(request) {
         });
 
         const options = {
-            amount: 5000 * 100, // amount in smallest currency unit (paise) -> 5000 INR
+            amount: 1 * 100, // amount in smallest currency unit (paise) -> 1 INR
             currency: "INR",
             receipt: "receipt_" + Math.random().toString(36).substring(7),
         };
