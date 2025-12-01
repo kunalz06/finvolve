@@ -52,6 +52,12 @@
     padding: 30px;
 }
 
+@media (max-width: 600px) {
+    .formCard {
+        padding: 20px;
+    }
+}
+
 .formCard h2 {
     font-size: 1.5rem;
     margin-bottom: 24px;
