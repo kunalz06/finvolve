@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function IemMinorLayout({ children }) {
     return (
-        <div className="min-h-screen flex flex-col bg-slate-50 font-sans text-slate-900">
+        <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900">
             {/* Header - Sky Blue */}
             <header className="bg-sky-500 p-4 shadow-md">
                 <div className="container mx-auto flex items-center gap-4">
