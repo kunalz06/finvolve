@@ -27,6 +27,9 @@ export default function Terms() {
                         <p>
                             The "Quick Start" option is a paid service for expedited project initiation. Payments made for this service are non-refundable once the consultation or development process has commenced.
                         </p>
+                        <p>
+                            <strong>Refund Policy:</strong> There will be no refunds after payment for the quick start program.
+                        </p>
                     </section>
 
                     <section>

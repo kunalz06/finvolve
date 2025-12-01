@@ -268,7 +268,7 @@ export default function QuickStartPage() {
                             </ul>
                             <div className={styles.priceTag}>
                                 <span>One-time Fee</span>
-                                <strong>₹1</strong>
+                                <strong>₹99</strong>
                             </div>
                         </div>
                     </div>

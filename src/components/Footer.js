@@ -14,6 +14,11 @@ export default function Footer() {
                         <a href="mailto:mitraricky06@gmail.com">mitraricky06@gmail.com</a>
                         <a href="tel:+919907958859">+91 99079 58859</a>
                     </div>
+                    <div className={styles.links}>
+                        <h4>Legal</h4>
+                        <a href="/finvolve/terms">Terms & Conditions</a>
+                        <a href="/finvolve/privacy-policy">Privacy Policy</a>
+                    </div>
                 </div>
                 <div className={styles.copyright}>
                     &copy; {new Date().getFullYear()} Finvolve. All rights reserved.
