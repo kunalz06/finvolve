@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { db } from '../../lib/firebase';
+import { db } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { Zap, CreditCard, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 import styles from './page.module.css';
