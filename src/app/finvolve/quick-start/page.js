@@ -48,7 +48,7 @@ export default function QuickStartPage() {
             }
 
             // Create Order
-            const orderRes = await fetch('/api/create-order', { method: 'POST' });
+            const orderRes = await fetch('/finvolve/api/create-order', { method: 'POST' });
             const orderData = await orderRes.json();
 
             if (orderData.error) {
@@ -141,7 +141,7 @@ export default function QuickStartPage() {
                             Your project has been marked as <strong>Priority</strong>.
                             Our team will contact you within 24 hours to kickstart development.
                         </p>
-                        <Link href="/" className="btn btn-primary" style={{ marginTop: '20px' }}>
+                        <Link href="/finvolve" className="btn btn-primary" style={{ marginTop: '20px' }}>
                             Return Home
                         </Link>
                     </div>
@@ -221,7 +221,7 @@ export default function QuickStartPage() {
                                 <div className={styles.terms}>
                                     <input type="checkbox" id="terms" required />
                                     <label htmlFor="terms">
-                                        I agree to the <Link href="/terms">Terms and Conditions</Link>
+                                        I agree to the <Link href="/finvolve/terms">Terms and Conditions</Link>
                                     </label>
                                 </div>
 
