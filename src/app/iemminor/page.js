@@ -139,121 +139,113 @@ export default function IemRegistrationPage() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto mt-8">
-            <div className="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-slate-200">
-                <div className="p-8 md:p-10">
-                    <h2 className="text-3xl font-bold text-center text-slate-800 mb-8 uppercase tracking-wider">
-                        Form
-                    </h2>
+        <div className="w-full max-w-2xl mx-auto">
+            <h2 className="text-2xl md:text-3xl text-center text-slate-800 mb-8 font-normal">
+                Minor Degree Registration
+            </h2>
 
-                    <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
-                        {/* Name */}
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Name of User</label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleChange}
-                                required
-                                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none transition-all"
-                                placeholder="Enter your full name"
-                            />
+            <div className="bg-white rounded-[2rem] border-2 border-sky-400 p-8 md:p-12 shadow-sm">
+                <form onSubmit={handlePaymentAndSubmit} className="space-y-6">
+                    {/* Name */}
+                    <div>
+                        <input
+                            type="text"
+                            name="name"
+                            value={formData.name}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-6 py-3 rounded-full border border-black text-center text-lg placeholder:text-slate-600 focus:ring-2 focus:ring-sky-400 outline-none transition-all"
+                            placeholder="Name of student"
+                        />
+                    </div>
+
+                    {/* Enrollment */}
+                    <div>
+                        <input
+                            type="text"
+                            name="enrollmentNo"
+                            value={formData.enrollmentNo}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-6 py-3 rounded-full border border-black text-center text-lg placeholder:text-slate-600 focus:ring-2 focus:ring-sky-400 outline-none transition-all"
+                            placeholder="Enrollment number"
+                        />
+                    </div>
+
+                    {/* Registration */}
+                    <div>
+                        <input
+                            type="text"
+                            name="registrationNo"
+                            value={formData.registrationNo}
+                            onChange={handleChange}
+                            required
+                            className="w-full px-6 py-3 rounded-full border border-black text-center text-lg placeholder:text-slate-600 focus:ring-2 focus:ring-sky-400 outline-none transition-all"
+                            placeholder="Registration Number"
+                        />
+                    </div>
+
+                    {/* Semester */}
+                    <div className="relative">
+                        <select
+                            name="semester"
+                            value={formData.semester}
+                            onChange={handleChange}
+                            className="w-full px-6 py-3 rounded-full border border-black text-center text-lg appearance-none bg-white focus:ring-2 focus:ring-sky-400 outline-none cursor-pointer"
+                        >
+                            <option value="3rd">Current Semester: 3rd</option>
+                            <option value="5th">Current Semester: 5th</option>
+                            <option value="7th">Current Semester: 7th</option>
+                        </select>
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M6 9l6 6 6-6" />
+                            </svg>
                         </div>
+                    </div>
 
-                        {/* Enrollment & Registration */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Enrollment Number</label>
-                                <input
-                                    type="text"
-                                    name="enrollmentNo"
-                                    value={formData.enrollmentNo}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none"
-                                    placeholder="Enrollment No."
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Registration Number</label>
-                                <input
-                                    type="text"
-                                    name="registrationNo"
-                                    value={formData.registrationNo}
-                                    onChange={handleChange}
-                                    required
-                                    className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none"
-                                    placeholder="Registration No."
-                                />
-                            </div>
+                    {/* File Upload */}
+                    <div className="relative">
+                        <input
+                            type="file"
+                            onChange={handleFileChange}
+                            accept=".pdf,.jpg,.jpeg,.png"
+                            required
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="w-full px-6 py-3 rounded-full border border-black flex items-center justify-between text-lg text-slate-600">
+                            <span className="truncate">
+                                {file ? file.name : "Upload your registration certificate"}
+                            </span>
+                            <Upload size={24} className="text-black shrink-0 ml-2" />
                         </div>
+                    </div>
 
-                        {/* Semester */}
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Semester</label>
-                            <select
-                                name="semester"
-                                value={formData.semester}
-                                onChange={handleChange}
-                                className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 outline-none bg-white"
-                            >
-                                <option value="3rd">3rd Semester</option>
-                                <option value="5th">5th Semester</option>
-                                <option value="7th">7th Semester</option>
-                            </select>
+                    {/* Error Message */}
+                    {status === 'error' && (
+                        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm justify-center">
+                            <AlertCircle size={16} />
+                            {errorMessage}
                         </div>
+                    )}
 
-                        {/* File Upload */}
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Upload Registration Certificate</label>
-                            <div className="relative border-2 border-dashed border-slate-300 rounded-lg p-6 hover:bg-slate-50 transition-colors text-center cursor-pointer">
-                                <input
-                                    type="file"
-                                    onChange={handleFileChange}
-                                    accept=".pdf,.jpg,.jpeg,.png"
-                                    required
-                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                />
-                                <div className="flex flex-col items-center pointer-events-none">
-                                    <Upload className="text-slate-400 mb-2" size={24} />
-                                    <span className="text-sm text-slate-600">
-                                        {file ? file.name : "Click to upload or drag and drop"}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Error Message */}
-                        {status === 'error' && (
-                            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-3 rounded-lg text-sm">
-                                <AlertCircle size={16} />
-                                {errorMessage}
-                            </div>
-                        )}
-
-                        {/* Submit Button */}
-                        <div className="pt-4">
-                            <button
-                                type="submit"
-                                disabled={status === 'processing' || status === 'uploading'}
-                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-full shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide"
-                            >
-                                {status === 'processing' || status === 'uploading' ? (
-                                    <>
-                                        <Loader2 className="animate-spin" size={20} /> Processing...
-                                    </>
-                                ) : (
-                                    "Pay and Register"
-                                )}
-                            </button>
-                            <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
-                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                                Secure Payment via Razorpay
-                            </p>
-                        </div>
-                    </form>
-                </div>
+                    {/* Submit Button */}
+                    <div className="pt-4 flex justify-center">
+                        <button
+                            type="submit"
+                            disabled={status === 'processing' || status === 'uploading'}
+                            className="px-8 py-2 bg-white border-2 border-red-500 text-black text-xl rounded-lg hover:bg-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                            {status === 'processing' || status === 'uploading' ? (
+                                <>
+                                    <Loader2 className="animate-spin" size={20} /> Processing...
+                                </>
+                            ) : (
+                                "Proceed to Pay"
+                            )}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     );
