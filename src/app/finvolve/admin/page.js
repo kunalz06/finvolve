@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { Lock, Calendar, User, Mail, Phone, FileText } from 'lucide-react';
+import { Lock, Calendar, User, Mail, Phone, FileText, Zap } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -84,9 +84,19 @@ export default function AdminPage() {
             ) : (
                 <div className={styles.grid}>
                     {requests.map((req) => (
-                        <div key={req.id} className={styles.card}>
+                        <div
+                            key={req.id}
+                            className={`${styles.card} ${req.isQuickStart ? styles.quickStartCard : ''}`}
+                        >
                             <div className={styles.cardHeader}>
-                                <span className={styles.typeBadge}>{req.projectType}</span>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    {req.isQuickStart && (
+                                        <span className={`${styles.typeBadge} ${styles.quickStartBadge}`}>
+                                            <Zap size={12} fill="currentColor" /> Quick Start
+                                        </span>
+                                    )}
+                                    <span className={styles.typeBadge}>{req.projectType}</span>
+                                </div>
                                 <span className={styles.date}>
                                     <Calendar size={14} />
                                     {req.createdAt?.seconds
