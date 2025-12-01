@@ -233,19 +233,25 @@ export default function IemRegistrationPage() {
                         )}
 
                         {/* Submit Button */}
-                        <button
-                            type="submit"
-                            disabled={status === 'processing' || status === 'uploading'}
-                            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-full shadow-lg transform transition hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide"
-                        >
-                            {status === 'processing' || status === 'uploading' ? (
-                                <>
-                                    <Loader2 className="animate-spin" size={20} /> Processing...
-                                </>
-                            ) : (
-                                "Pay and Register"
-                            )}
-                        </button>
+                        <div className="pt-4">
+                            <button
+                                type="submit"
+                                disabled={status === 'processing' || status === 'uploading'}
+                                className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-full shadow-lg hover:shadow-xl transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 uppercase tracking-wide"
+                            >
+                                {status === 'processing' || status === 'uploading' ? (
+                                    <>
+                                        <Loader2 className="animate-spin" size={20} /> Processing...
+                                    </>
+                                ) : (
+                                    "Pay and Register"
+                                )}
+                            </button>
+                            <p className="text-center text-xs text-slate-400 mt-4 flex items-center justify-center gap-1">
+                                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                Secure Payment via Razorpay
+                            </p>
+                        </div>
                     </form>
                 </div>
             </div>
