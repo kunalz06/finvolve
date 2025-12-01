@@ -13,7 +13,7 @@ export default function Navbar() {
     return (
         <nav className={styles.navbar}>
             <div className={`container ${styles.navContainer}`}>
-                <Link href="/" className={styles.logo}>
+                <Link href="/finvolve" className={styles.logo}>
                     Finvolve
                 </Link>
 
@@ -24,12 +24,12 @@ export default function Navbar() {
 
                 {/* Links */}
                 <div className={`${styles.links} ${isOpen ? styles.active : ''}`}>
-                    <Link href="/" className={styles.link} onClick={() => setIsOpen(false)}>Home</Link>
-                    <Link href="/about" className={styles.link} onClick={() => setIsOpen(false)}>About</Link>
-                    <Link href="/contact" className={styles.link} onClick={() => setIsOpen(false)}>Contact</Link>
-                    <Link href="/quick-start" className={styles.link} onClick={() => setIsOpen(false)} style={{ color: '#f59e0b' }}>Quick Start</Link>
+                    <Link href="/finvolve" className={styles.link} onClick={() => setIsOpen(false)}>Home</Link>
+                    <Link href="/finvolve/about" className={styles.link} onClick={() => setIsOpen(false)}>About</Link>
+                    <Link href="/finvolve/contact" className={styles.link} onClick={() => setIsOpen(false)}>Contact</Link>
+                    <Link href="/finvolve/quick-start" className={styles.link} onClick={() => setIsOpen(false)} style={{ color: '#f59e0b' }}>Quick Start</Link>
 
-                    <Link href="/request" className={`btn btn-primary ${styles.cta}`} onClick={() => setIsOpen(false)}>Get Started</Link>
+                    <Link href="/finvolve/request" className={`btn btn-primary ${styles.cta}`} onClick={() => setIsOpen(false)}>Get Started</Link>
                 </div>
             </div>
         </nav>

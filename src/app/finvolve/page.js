@@ -17,10 +17,10 @@ export default function Home() {
               From Android apps to complex web applications, we bring your ideas to life.
             </p>
             <div className={styles.actions}>
-              <Link href="/request" className="btn btn-primary">
+              <Link href="/finvolve/request" className="btn btn-primary">
                 Start a Project <ArrowRight size={20} style={{ marginLeft: '8px' }} />
               </Link>
-              <Link href="/about" className={styles.secondaryBtn}>
+              <Link href="/finvolve/about" className={styles.secondaryBtn}>
                 Learn More
               </Link>
             </div>
