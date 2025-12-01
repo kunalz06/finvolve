@@ -62,7 +62,7 @@ export default function IemRegistrationPage() {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
                 amount: orderData.amount,
                 currency: orderData.currency,
-                name: "IEM Minor Degree",
+                name: "IEM MINOR DEGREE By FINVOLVE",
                 description: "IEM MINOR DEGREE PAYMENT with FINVOLVE",
                 order_id: orderData.id,
                 handler: async function (response) {
