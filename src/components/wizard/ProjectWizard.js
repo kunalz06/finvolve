@@ -265,7 +265,7 @@ export default function ProjectWizard() {
             </div>
 
             {/* Navigation Buttons */}
-            <div className="flex justify-between items-center mt-12 pt-8 border-t border-white/10">
+            <div className="flex flex-col-reverse sm:flex-row justify-between items-center mt-12 pt-8 border-t border-white/10 gap-4">
                 <button
                     onClick={handleBack}
                     className={cn(

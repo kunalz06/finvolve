@@ -11,10 +11,10 @@ export default function Home() {
       <div className="deep-space-bg" />
 
       {/* Hero Section */}
-      <section className="relative container mx-auto px-6 py-20 flex flex-col lg:flex-row items-center gap-12 lg:min-h-[800px]">
+      <section className="relative container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center gap-12 lg:min-h-[800px]">
         {/* Left Col: Copy */}
         <div className="flex-1 text-center lg:text-left z-10">
-          <h1 className="text-5xl lg:text-7xl font-bold font-heading leading-tight mb-6 tracking-tight">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold font-heading leading-tight mb-6 tracking-tight">
             Build Software <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-pulse-slow">
               That Defies Expectations.

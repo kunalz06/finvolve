@@ -33,12 +33,12 @@ export default function OrbitalAnimation() {
     }, []);
 
     return (
-        <div className="relative w-full h-[500px] flex items-center justify-center perspective-1000">
+        <div className="relative w-full h-[350px] md:h-[500px] flex items-center justify-center perspective-1000 overflow-hidden">
             {/* Background Glows */}
             <div className="absolute inset-0 bg-gradient-radial from-primary/10 via-transparent to-transparent opacity-50 blur-3xl animate-pulse-slow" />
 
             <motion.div
-                className="relative w-[400px] h-[400px] preserve-3d"
+                className="relative w-[400px] h-[400px] preserve-3d scale-[0.6] sm:scale-[0.8] md:scale-100 origin-center"
                 style={{
                     rotateX: mousePos.y,
                     rotateY: mousePos.x,
