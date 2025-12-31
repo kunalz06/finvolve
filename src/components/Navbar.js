@@ -6,6 +6,7 @@ import { Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import GradientButton from './ui/GradientButton';
+import FestiveLogo from './FestiveLogo';
 
 export default function Navbar() {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,8 +31,8 @@ export default function Navbar() {
             transition={{ duration: 0.5 }}
         >
             <div className="container mx-auto px-6 flex items-center justify-between">
-                <Link href="/finvolve" className="text-2xl font-heading font-bold tracking-tighter hover:text-primary transition-colors">
-                    Finvolve
+                <Link href="/finvolve" className="hover:opacity-80 transition-opacity">
+                    <FestiveLogo />
                 </Link>
 
                 {/* Mobile Menu Button */}
