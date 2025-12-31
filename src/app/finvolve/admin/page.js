@@ -108,7 +108,7 @@ export default function AdminPage() {
 
     if (!isAuthenticated) {
         return (
-            <div className={`deep-space-bg ${styles.loginContainer}`}>
+            <div className={styles.loginContainer}>
                 <div className={styles.loginBox}>
                     <Lock size={48} className={styles.lockIcon} />
                     <h1 className="text-2xl font-bold mb-2">Admin Access</h1>
