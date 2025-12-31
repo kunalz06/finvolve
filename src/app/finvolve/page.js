@@ -38,11 +38,16 @@ export default function Home() {
     }, 4000);
   };
 
+  // ... inside default function Home() ... this logic is replacing existing return ...
+  const [fireworksEnabled, setFireworksEnabled] = useState(true);
+
+  // ... (handleNewYearClick logic existing above)
+
   return (
     <div className="min-h-screen pt-20 overflow-hidden relative">
       {/* Background Gradients */}
       <div className="deep-space-bg" />
-      <CodeFireworks ref={fireworksRef} />
+      <CodeFireworks ref={fireworksRef} isActive={fireworksEnabled} />
 
       {/* Celebration Message Overlay */}
       <AnimatePresence>
@@ -65,6 +70,19 @@ export default function Home() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Fireworks Toggle Control */}
+      <motion.button
+        className={`fixed bottom-6 right-6 z-50 p-3 rounded-full backdrop-blur-md border transition-all duration-300 ${fireworksEnabled ? 'bg-primary/20 border-primary/40 text-primary hover:bg-primary/30' : 'bg-gray-800/50 border-white/10 text-gray-400 hover:bg-gray-800/80'}`}
+        onClick={() => setFireworksEnabled(!fireworksEnabled)}
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        title={fireworksEnabled ? "Stop Fireworks" : "Start Fireworks"}
+      >
+        <Zap size={20} className={fireworksEnabled ? "fill-primary" : "fill-none"} />
+      </motion.button>
 
       {/* Hero Section */}
       <section className="relative container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center gap-12 lg:min-h-[800px] z-10">

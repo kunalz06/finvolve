@@ -9,7 +9,7 @@ export default function Contact() {
     return (
         <div className="min-h-screen pt-24 pb-20 relative overflow-hidden">
             {/* Background elements managed by layout/global css, but ensuring container is safe */}
-            <div className="container mx-auto px-6 relative z-10">
+            <div className="container mx-auto px-4 md:px-6 relative z-10">
 
                 <div className="max-w-4xl mx-auto">
                     <motion.div
@@ -18,7 +18,7 @@ export default function Contact() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-16"
                     >
-                        <h1 className="text-4xl md:text-5xl font-bold font-heading mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
+                        <h1 className="text-3xl md:text-5xl font-bold font-heading mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
                             Get in Touch
                         </h1>
                         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
@@ -27,7 +27,7 @@ export default function Contact() {
                         </p>
                     </motion.div>
 
-                    <div className="grid md:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                         {/* Contact Info */}
                         <motion.div
                             initial={{ opacity: 0, x: -20 }}

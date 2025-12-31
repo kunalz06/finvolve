@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 
-const CodeFireworks = forwardRef((props, ref) => {
+const CodeFireworks = forwardRef(({ isActive = true }, ref) => {
     const canvasRef = useRef(null);
     // Use a ref for the particles array so we can access/modify it in the exposed method
     const particlesRef = useRef([]);
@@ -90,7 +90,7 @@ const CodeFireworks = forwardRef((props, ref) => {
         const animate = () => {
             ctx.clearRect(0, 0, width, height);
 
-            if (timer % launchInterval === 0 && Math.random() > 0.5) {
+            if (isActive && timer % launchInterval === 0 && Math.random() > 0.5) {
                 createFirework(
                     Math.random() * width,
                     Math.random() * height * 0.8
@@ -120,7 +120,7 @@ const CodeFireworks = forwardRef((props, ref) => {
             cancelAnimationFrame(animationFrameId);
         };
 
-    }, []);
+    }, [isActive]);
 
     return (
         <canvas
