@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useState, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Code, Smartphone, Globe, Zap, Cpu, Layers } from 'lucide-react';
 import OrbitalAnimation from '@/components/landing/OrbitalAnimation';
 import CodeFireworks from '@/components/landing/CodeFireworks';
@@ -19,11 +20,51 @@ const staggerContainer = {
 };
 
 export default function Home() {
+  const fireworksRef = useRef(null);
+  const [showCelebration, setShowCelebration] = useState(false);
+
+  const handleNewYearClick = () => {
+    // Trigger majestic fireworks
+    if (fireworksRef.current) {
+      fireworksRef.current.launchBurst(300); // Massive burst
+    }
+
+    // Show message
+    setShowCelebration(true);
+
+    // Hide message after a few seconds
+    setTimeout(() => {
+      setShowCelebration(false);
+    }, 4000);
+  };
+
   return (
     <div className="min-h-screen pt-20 overflow-hidden relative">
       {/* Background Gradients */}
       <div className="deep-space-bg" />
-      <CodeFireworks />
+      <CodeFireworks ref={fireworksRef} />
+
+      {/* Celebration Message Overlay */}
+      <AnimatePresence>
+        {showCelebration && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -100 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+          >
+            <div className="bg-black/80 backdrop-blur-xl border border-primary/50 px-8 py-6 rounded-2xl shadow-[0_0_50px_rgba(168,85,247,0.4)] text-center">
+              <h2 className="text-3xl md:text-5xl font-bold font-heading text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 animate-pulse">
+                WISH YOU A HAPPY NEW YEAR
+              </h2>
+              <p className="text-xl md:text-2xl text-white mt-2 font-light tracking-widest uppercase">
+                FROM FINVOLVE
+              </p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Hero Section */}
       <section className="relative container mx-auto px-6 py-12 lg:py-20 flex flex-col lg:flex-row items-center gap-12 lg:min-h-[800px] z-10">
@@ -35,16 +76,18 @@ export default function Home() {
           variants={staggerContainer}
         >
           {/* New Year Badge */}
-          <motion.div
-            className="inline-block mb-6 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-md relative overflow-hidden group"
+          <motion.button
+            onClick={handleNewYearClick}
+            className="inline-block mb-6 px-4 py-1.5 rounded-full border border-purple-500/30 bg-purple-500/10 backdrop-blur-md relative overflow-hidden group cursor-pointer hover:border-purple-500/60 transition-colors"
             variants={fadeInUp}
             whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <span className="absolute inset-0 bg-gradient-to-r from-transparent via-purple-500/20 to-transparent translate-x-[-100%] animate-shimmer" />
             <span className="text-sm font-bold bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent flex items-center gap-2">
               ✨ HAPPY NEW YEAR 2026
             </span>
-          </motion.div>
+          </motion.button>
 
           <motion.h1
             className="text-4xl md:text-5xl lg:text-7xl font-bold font-heading leading-tight mb-6 tracking-tight"
