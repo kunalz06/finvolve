@@ -31,10 +31,10 @@ export default function FestiveLogo() {
         <div className="relative inline-flex items-center justify-center group">
             {/* Santa Hat on 'F' */}
             <motion.div
-                initial={{ rotate: -10, y: -5 }}
-                animate={{ rotate: [-10, 0, -10] }}
+                initial={{ rotate: -15, y: -5 }}
+                animate={{ rotate: [-15, -5, -15] }}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute -top-[22px] -left-[14px] w-12 h-12 z-20 pointer-events-none"
+                className="absolute -top-[18px] -left-[8px] w-10 h-10 z-20 pointer-events-none"
             >
                 {/* Custom Hat Path */}
                 <svg viewBox="0 0 512 512" fill="none" className="w-full h-full drop-shadow-lg">
