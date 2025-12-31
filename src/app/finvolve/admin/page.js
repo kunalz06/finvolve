@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
 import { Lock, Calendar, User, Mail, Phone, FileText, Zap, DollarSign } from 'lucide-react';
 import styles from './page.module.css';
 import GradientButton from '@/components/ui/GradientButton';
@@ -21,10 +21,20 @@ export default function AdminPage() {
     const [creatingPayment, setCreatingPayment] = useState(false);
 
     useEffect(() => {
+        let unsubscribePayments;
+
         if (isAuthenticated) {
             if (activeTab === 'projects') fetchRequests();
-            if (activeTab === 'payments') fetchPayments();
+            if (activeTab === 'payments') {
+                unsubscribePayments = fetchPayments();
+            }
         }
+
+        return () => {
+            if (unsubscribePayments && typeof unsubscribePayments === 'function') {
+                unsubscribePayments();
+            }
+        };
     }, [isAuthenticated, activeTab]);
 
     const handleLogin = (e) => {
@@ -56,20 +66,28 @@ export default function AdminPage() {
         }
     };
 
-    const fetchPayments = async () => {
+    const fetchPayments = () => {
         setLoading(true);
         try {
             if (!db) throw new Error("Firebase not initialized");
             const q = query(collection(db, "payment_requests"), orderBy("createdAt", "desc"));
-            const querySnapshot = await getDocs(q);
-            const pays = [];
-            querySnapshot.forEach((doc) => {
-                pays.push({ id: doc.id, ...doc.data() });
+
+            // Real-time listener
+            const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                const pays = [];
+                querySnapshot.forEach((doc) => {
+                    pays.push({ id: doc.id, ...doc.data() });
+                });
+                setPayments(pays);
+                setLoading(false);
+            }, (error) => {
+                console.error("Error fetching payments:", error);
+                setLoading(false);
             });
-            setPayments(pays);
+
+            return unsubscribe;
         } catch (err) {
-            console.error("Error fetching payments:", err);
-        } finally {
+            console.error("Error setting up payment listener:", err);
             setLoading(false);
         }
     };

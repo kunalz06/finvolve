@@ -28,8 +28,7 @@ service cloud.firestore {
 
     // Payment Requests collection
     match /payment_requests/{payment} {
-      allow create: if true;
-      allow read: if true;
+      allow create, read, update, delete: if true;
     }
   }
 }
