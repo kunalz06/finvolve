@@ -90,12 +90,7 @@ export default function AdminPage() {
                         >
                             <div className={styles.cardHeader}>
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                                    {req.isQuickStart && (
-                                        <span className={`${styles.typeBadge} ${styles.quickStartBadge}`}>
-                                            <Zap size={12} fill="currentColor" /> Quick Start
-                                        </span>
-                                    )}
-                                    <span className={styles.typeBadge}>{req.projectType}</span>
+                                    {/* Moved to Body */}
                                 </div>
                                 <span className={styles.date}>
                                     <Calendar size={14} />
@@ -106,36 +101,51 @@ export default function AdminPage() {
                             </div>
 
                             <div className={styles.cardBody}>
-                                <div className={styles.infoRow}>
-                                    <User size={16} /> <strong>{req.name}</strong>
+                                {/* User Details */}
+                                <div style={{ marginBottom: '16px', paddingBottom: '16px', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                    <div className={styles.infoRow}>
+                                        <User size={16} /> <strong>{req.name}</strong>
+                                    </div>
+                                    <div className={styles.infoRow}>
+                                        <Mail size={16} /> <a href={`mailto:${req.email}`}>{req.email}</a>
+                                    </div>
+                                    {req.phone && (
+                                        <div className={styles.infoRow}>
+                                            <Phone size={16} /> <a href={`tel:${req.phone}`}>{req.phone}</a>
+                                        </div>
+                                    )}
                                 </div>
-                                <div className={styles.infoRow}>
-                                    <Mail size={16} /> <a href={`mailto:${req.email}`}>{req.email}</a>
+
+                                {/* Project Specs */}
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                                    {req.timeline && (
+                                        <div className={styles.infoRow} style={{ marginBottom: 0 }}>
+                                            <Calendar size={16} className="text-primary" />
+                                            <span style={{ fontSize: '0.9rem' }}><strong>{req.timeline} Weeks</strong></span>
+                                        </div>
+                                    )}
+                                    {req.budget && (
+                                        <div className={styles.infoRow} style={{ marginBottom: 0 }}>
+                                            <DollarSign size={16} className="text-green-400" />
+                                            <span style={{ fontSize: '0.9rem' }}><strong>{req.budget}</strong></span>
+                                        </div>
+                                    )}
                                 </div>
-                                {req.phone && (
-                                    <div className={styles.infoRow}>
-                                        <Phone size={16} /> <a href={`tel:${req.phone}`}>{req.phone}</a>
+
+                                {/* Project Concept (The Idea) */}
+                                <div className={styles.description} style={{ marginTop: 0, flexDirection: 'column', gap: '8px' }}>
+                                    <h4 style={{ fontSize: '0.8rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 'bold' }}>The Idea</h4>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                                        <span className={styles.typeBadge} style={{ margin: 0 }}>{req.projectType}</span>
+                                        {req.isQuickStart && req.paymentId && (
+                                            <span style={{ fontSize: '0.75rem', color: '#f59e0b', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                <Zap size={10} /> PAID
+                                            </span>
+                                        )}
                                     </div>
-                                )}
-                                
-                                {req.timeline && (
-                                    <div className={styles.infoRow}>
-                                        <Calendar size={16} /> <span>Est. Timeline: <strong>{req.timeline} Weeks</strong></span>
-                                    </div>
-                                )}
-                                {req.budget && (
-                                    <div className={styles.infoRow}>
-                                        <DollarSign size={16} /> <span>Budget: <strong>{req.budget}</strong></span>
-                                    </div>
-                                )}
-                                {req.isQuickStart && req.paymentId && (
-                                     <div className={styles.infoRow} style={{ color: '#f59e0b' }}>
-                                        <Zap size={16} /> <span>Paid: {req.paymentId}</span>
-                                    </div>
-                                )}
-                                <div className={styles.description}>
-                                    <FileText size={16} className={styles.descIcon} />
-                                    <p>{req.description}</p>
+                                    <p style={{ fontStyle: 'italic', color: '#d1d5db', lineHeight: '1.5' }}>
+                                        "{req.description}"
+                                    </p>
                                 </div>
                             </div>
                         </div>
