@@ -258,7 +258,7 @@ export default function AdminPage() {
                         {/* Create Payment Form */}
                         <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-12 max-w-4xl mx-auto">
                             <h2 className="text-xl font-bold mb-4 flex items-center gap-2"><Lock size={20} className="text-primary" /> Create New Payment Link</h2>
-                            <form onSubmit={handleCreatePayment} className="grid md:grid-cols-4 gap-4 items-end">
+                            <form onSubmit={handleCreatePayment} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                                 <div>
                                     <label className="block text-xs text-gray-400 mb-1">Username</label>
                                     <input

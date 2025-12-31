@@ -8,7 +8,7 @@ import GlassCard from '@/components/ui/GlassCard';
 export default function Terms() {
     return (
         <div className="min-h-screen pt-24 pb-20 relative">
-            <div className="container mx-auto px-6 relative z-10 max-w-4xl">
+            <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-4xl">
 
                 <Link href="/finvolve" className="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors group">
                     <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
