@@ -101,7 +101,7 @@ export default function ProjectWizard() {
 
     if (status === 'success') {
         return (
-            <div className="flex flex-col items-center justify-center h-full text-center p-8">
+            <div className="flex flex-col items-center justify-center h-full text-center p-4 md:p-8">
                 <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
@@ -121,7 +121,7 @@ export default function ProjectWizard() {
     }
 
     return (
-        <div className="w-full max-w-4xl mx-auto">
+        <div className="w-full max-w-4xl mx-auto px-4 md:px-0">
             {/* Progress Bar */}
             <div className="flex items-center justify-between mb-12 relative px-4">
                 <div className="absolute top-1/2 left-0 w-full h-1 bg-white/10 -z-10" />
