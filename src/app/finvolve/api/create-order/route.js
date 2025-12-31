@@ -20,8 +20,13 @@ export async function POST(request) {
             key_secret: key_secret,
         });
 
+        const { amount } = await request.json();
+
+        // Amount must be passed in INR (e.g. 500 for 500 INR). Razorpay expects paisa.
+        const amountInPaisa = (amount || 99) * 100;
+
         const options = {
-            amount: 99 * 100, // amount in smallest currency unit (paise) -> 99 INR
+            amount: amountInPaisa, // amount in smallest currency unit (paise)
             currency: "INR",
             receipt: "receipt_" + Math.random().toString(36).substring(7),
         };

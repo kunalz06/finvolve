@@ -25,5 +25,11 @@ service cloud.firestore {
       allow create: if true;
       allow read: if false; // No public read access found in code
     }
+
+    // Payment Requests collection
+    match /payment_requests/{payment} {
+      allow create: if true;
+      allow read: if true;
+    }
   }
 }
