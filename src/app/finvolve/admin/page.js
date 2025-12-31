@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
-import { Lock, Calendar, User, Mail, Phone, FileText, Zap } from 'lucide-react';
+import { Lock, Calendar, User, Mail, Phone, FileText, Zap, DollarSign } from 'lucide-react';
 import styles from './page.module.css';
 
 export default function AdminPage() {
@@ -115,6 +115,22 @@ export default function AdminPage() {
                                 {req.phone && (
                                     <div className={styles.infoRow}>
                                         <Phone size={16} /> <a href={`tel:${req.phone}`}>{req.phone}</a>
+                                    </div>
+                                )}
+                                
+                                {req.timeline && (
+                                    <div className={styles.infoRow}>
+                                        <Calendar size={16} /> <span>Est. Timeline: <strong>{req.timeline} Weeks</strong></span>
+                                    </div>
+                                )}
+                                {req.budget && (
+                                    <div className={styles.infoRow}>
+                                        <DollarSign size={16} /> <span>Budget: <strong>{req.budget}</strong></span>
+                                    </div>
+                                )}
+                                {req.isQuickStart && req.paymentId && (
+                                     <div className={styles.infoRow} style={{ color: '#f59e0b' }}>
+                                        <Zap size={16} /> <span>Paid: {req.paymentId}</span>
                                     </div>
                                 )}
                                 <div className={styles.description}>

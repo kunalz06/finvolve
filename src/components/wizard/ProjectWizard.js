@@ -186,17 +186,34 @@ export default function ProjectWizard() {
                         {currentStep === 1 && (
                             <div className="py-10">
                                 <label className="block text-lg mb-4">Timeline Estimate: <span className="text-primary font-bold">{formData.timeline} Weeks</span></label>
-                                <input
-                                    type="range"
-                                    min="2"
-                                    max="24"
-                                    step="2"
-                                    value={formData.timeline}
-                                    onChange={(e) => updateData('timeline', parseInt(e.target.value))}
-                                    className="w-full h-2 bg-white/10 rounded-lg appearance-none cursor-pointer accent-primary hover:accent-primary/80"
-                                />
+                                <div className="relative pt-6 pb-2">
+                                    <div className="relative w-full h-4 bg-white/10 rounded-full">
+                                        <div
+                                            className="absolute top-0 left-0 h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                                            style={{ width: `${((formData.timeline - 2) / 22) * 100}%` }}
+                                        />
+                                        <input
+                                            type="range"
+                                            min="2"
+                                            max="24"
+                                            step="2"
+                                            value={formData.timeline}
+                                            onChange={(e) => updateData('timeline', parseInt(e.target.value))}
+                                            className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-10"
+                                        />
+                                        <div
+                                            className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-white rounded-full shadow-lg pointer-events-none transition-all flex items-center justify-center text-xs font-bold text-black"
+                                            style={{
+                                                left: `calc(${((formData.timeline - 2) / 22) * 100}% - 12px)`
+                                            }}
+                                        >
+                                            {formData.timeline}
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="flex justify-between text-xs text-gray-500 mt-2 font-mono uppercase">
                                     <span>2 Weeks (Rush)</span>
+                                    <span>12 Weeks (Standard)</span>
                                     <span>24 Weeks (Long-term)</span>
                                 </div>
 

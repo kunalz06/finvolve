@@ -1,0 +1,29 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Projects/Requests collection
+    // Used by: Project Wizard, Quick Start (Create), Admin Panel (Read)
+    match /requests/{request} {
+      allow create: if true;
+      // WARNING: Currently public because Admin panel uses client-side password check without Firebase Auth.
+      // To secure this, implement Firebase Authentication and restrict read to authenticated admins.
+      allow read: if true;
+    }
+
+    // Registrations collection
+    // Used by: Registration Form (Create only)
+    match /registrations/{registration} {
+      allow create: if true;
+      allow read: if false; // No public read access found in code
+    }
+
+    // IEM Minor Registrations collection
+    // Used by: IEM Minor Page (Create only)
+    match /iem_registrations/{registration} {
+      allow create: if true;
+      allow read: if false; // No public read access found in code
+    }
+  }
+}
