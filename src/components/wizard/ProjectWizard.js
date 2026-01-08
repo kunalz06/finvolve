@@ -10,10 +10,10 @@ import GradientButton from '@/components/ui/GradientButton';
 import { cn } from '@/lib/utils';
 
 const STEPS = [
-    { id: 'idea', title: 'The Idea', subtitle: 'What are we building?' },
+    { id: 'idea', title: 'The Idea', subtitle: 'What are you building?' },
     { id: 'scope', title: 'The Scope', subtitle: 'What is your timeline?' },
-    { id: 'budget', title: 'The Budget', subtitle: 'Ballpark figures help us plan.' },
-    { id: 'contact', title: 'Contact', subtitle: 'How do we reach you?' },
+    { id: 'budget', title: 'The Budget', subtitle: 'Ballpark figures help me plan.' },
+    { id: 'contact', title: 'Contact', subtitle: 'How do I reach you?' },
 ];
 
 const PROJECT_TYPES = [
@@ -111,7 +111,7 @@ export default function ProjectWizard() {
                 </motion.div>
                 <h2 className="text-3xl font-heading font-bold mb-4">Message Received!</h2>
                 <p className="text-gray-400 mb-8 max-w-md">
-                    Our team is already reviewing your concept. expect a response within 24 hours.
+                    I am already reviewing your concept. Expect a response within 24 hours.
                 </p>
                 <GradientButton onClick={() => window.location.reload()}>
                     Start New Project
@@ -272,7 +272,7 @@ export default function ProjectWizard() {
                                     />
                                 </div>
                                 <div className="text-sm text-gray-500 text-center">
-                                    We respect your privacy. No spam, ever.
+                                    I respect your privacy. No spam, ever.
                                 </div>
                             </div>
                         )}

@@ -38,14 +38,14 @@ export default function About() {
                         >
                             I Build <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                The Future.
+                                Reliable Solutions.
                             </span>
                         </motion.h1>
                         <motion.p
                             className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8"
                             variants={fadeInUp}
                         >
-                            Finvolve is my digital playground. I am a <span className="text-white font-semibold">Full Stack Developer</span>. I don't just write code; I architect digital experiences that define brands.
+                            Finvolve represents my commitment to quality engineering. I am a <span className="text-white font-semibold">Full Stack Developer</span> dedicated to building robust applications that solve real-world problems.
                         </motion.p>
                     </motion.div>
 

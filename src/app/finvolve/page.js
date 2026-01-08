@@ -39,15 +39,15 @@ export default function Home() {
           >
             I Build Software <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-pulse-slow">
-              That Defies Expectations.
+              That Driving Business Growth.
             </span>
           </motion.h1>
           <motion.p
             className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
             variants={fadeInUp}
           >
-            I don't just write code. I build scalable, secure, and intuitive digital ecosystems designed for growth.
-            Work with a developer who speaks your language.
+            I deliver scalable, secure, and efficient digital solutions tailored to your needs.
+            Partner with a developer who focuses on your success.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
@@ -68,7 +68,7 @@ export default function Home() {
             className="mt-16 pt-8 border-t border-white/5 flex flex-wrap justify-center lg:justify-start gap-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500"
             variants={fadeInUp}
           >
-            <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Powering Next-Gen Apps With</span>
+            <span className="font-mono text-xs tracking-widest text-white/40 uppercase">Built With Modern Technologies</span>
             {/* Add logos here if available, using text for now */}
           </motion.div>
         </motion.div>

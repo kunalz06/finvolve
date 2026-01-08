@@ -139,7 +139,7 @@ export default function QuickStartPage() {
                         <h2>Payment Successful!</h2>
                         <p>
                             Your project has been marked as <strong>Priority</strong>.
-                            Our team will contact you within 24 hours to kickstart development.
+                            I will contact you within 24 hours to kickstart development.
                         </p>
                         <Link href="/finvolve" className="btn btn-primary" style={{ marginTop: '20px' }}>
                             Return Home
@@ -255,15 +255,15 @@ export default function QuickStartPage() {
                             <ul className={styles.benefits}>
                                 <li>
                                     <CheckCircle size={18} className={styles.checkIcon} />
-                                    <strong>Under 48 Hours:</strong> We start working on your project immediately.
+                                    <strong>Under 48 Hours:</strong> I start working on your project immediately.
                                 </li>
                                 <li>
                                     <CheckCircle size={18} className={styles.checkIcon} />
-                                    <strong>We Contact You:</strong> Personal outreach to discuss details.
+                                    <strong>I Contact You:</strong> Personal outreach to discuss details.
                                 </li>
                                 <li>
                                     <CheckCircle size={18} className={styles.checkIcon} />
-                                    <strong>Skip Queue:</strong> Jump to the front of our development line.
+                                    <strong>Skip Queue:</strong> Jump to the front of the development line.
                                 </li>
                             </ul>
                             <div className={styles.priceTag}>
