@@ -22,26 +22,85 @@ export default function About() {
 
             <div className="container mx-auto px-6 relative z-10">
 
-                {/* Header Section */}
-                <motion.div
-                    className="text-center mb-20"
-                    initial="initial"
-                    animate="animate"
-                    variants={staggerContainer}
-                >
-                    <motion.h1
-                        className="text-5xl md:text-7xl font-bold font-heading mb-6 tracking-tight"
-                        variants={fadeInUp}
+                {/* Hero Section */}
+                <section className="mb-24 flex flex-col md:flex-row items-center gap-12 lg:gap-20">
+                    <motion.div
+                        className="flex-1 text-center md:text-left"
+                        initial="initial"
+                        animate="animate"
+                        variants={staggerContainer}
                     >
-                        About <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">Finvolve</span>
-                    </motion.h1>
-                    <motion.p
-                        className="text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed"
-                        variants={fadeInUp}
+                        <motion.h1
+                            className="text-5xl md:text-7xl font-bold font-heading mb-6 tracking-tight leading-none"
+                            variants={fadeInUp}
+                        >
+                            We Build <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
+                                The Future.
+                            </span>
+                        </motion.h1>
+                        <motion.p
+                            className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8"
+                            variants={fadeInUp}
+                        >
+                            Finvolve is a collective of visionary developers and designers. We don't just write code; we architect digital experiences that define brands.
+                        </motion.p>
+                    </motion.div>
+
+                    {/* Layered Image Reveal */}
+                    <motion.div
+                        className="flex-1 w-full max-w-md relative"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 1 }}
                     >
-                        We are architects of the digital future. A team of passionate developers, designers, and strategists dedicated to building software that matters.
-                    </motion.p>
-                </motion.div>
+                        <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden">
+                            {/* The Image */}
+                            <motion.img
+                                src="/images/profile.jpg"
+                                alt="Founder"
+                                className="w-full h-full object-cover"
+                                initial={{ scale: 1.2, filter: "grayscale(100%)" }}
+                                animate={{ scale: 1, filter: "grayscale(0%)" }}
+                                transition={{ duration: 1.5, ease: "easeOut" }}
+                            />
+
+                            {/* Layer 1: Dark Overlay Fade Out */}
+                            <motion.div
+                                className="absolute inset-0 bg-black/60"
+                                initial={{ opacity: 1 }}
+                                animate={{ opacity: 0 }}
+                                transition={{ duration: 1.5, ease: "easeIn" }}
+                            />
+
+                            {/* Layer 2: Sliding Shutters (Subtle Look) */}
+                            {[0, 1, 2, 3].map((i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute inset-0 bg-black z-10"
+                                    style={{
+                                        clipPath: `inset(0 0 ${i * 25}% 0)`, // Bottom clip
+                                        top: `${i * 25}%`,
+                                        height: '25%'
+                                    }}
+                                    initial={{ scaleX: 1 }}
+                                    animate={{ scaleX: 0 }}
+                                    transition={{ duration: 0.8, delay: 0.5 + (i * 0.1), ease: "circInOut" }}
+                                />
+                            ))}
+
+                            {/* Layer 3: Border Flash */}
+                            <motion.div
+                                className="absolute inset-0 border border-white/20 z-20 rounded-2xl"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                transition={{ delay: 1.2 }}
+                            />
+                        </div>
+                        {/* Decorative background element behind image */}
+                        <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-3xl -z-10 blur-xl opacity-50" />
+                    </motion.div>
+                </section>
 
                 {/* Mission Section */}
                 <section className="mb-24">
@@ -76,6 +135,40 @@ export default function About() {
                             </GlassCard>
                         </div>
                     </motion.div>
+                </section>
+
+                {/* Portfolio Section */}
+                <section className="mb-24">
+                    <motion.div
+                        className="text-center mb-12"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        <h2 className="text-3xl font-bold font-heading mb-4">Selected Works</h2>
+                        <p className="text-gray-400">A showcase of our capabilities.</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <PortfolioCard
+                            title="FinTech Dashboard"
+                            category="Web Application"
+                            desc="Real-time analytics and transaction monitoring platform processing 10k+ events/sec."
+                            gradient="from-blue-500/20 to-cyan-500/20"
+                        />
+                        <PortfolioCard
+                            title="HealthVote"
+                            category="Mobile App"
+                            desc="HIPAA-compliant telemedicine app connecting patients with specialists instantly."
+                            gradient="from-emerald-500/20 to-teal-500/20"
+                        />
+                        <PortfolioCard
+                            title="Nexus CRM"
+                            category="SaaS Platform"
+                            desc="AI-powered customer relationship tool predicting churn and sales opportunities."
+                            gradient="from-purple-500/20 to-pink-500/20"
+                        />
+                    </div>
                 </section>
 
                 {/* Tech Stack Section */}
@@ -201,5 +294,26 @@ function ValueItem({ icon: Icon, title, desc }) {
                 {desc}
             </p>
         </div>
+    );
+}
+
+function PortfolioCard({ title, category, desc, gradient }) {
+    return (
+        <motion.div variants={fadeInUp} initial="initial" whileInView="animate" viewport={{ once: true }}>
+            <GlassCard className="h-full group hover:border-white/30 transition-all duration-500 hover:-translate-y-2 relative overflow-hidden">
+                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
+                <div className="relative z-10 p-2">
+                    <div className="text-xs font-mono text-gray-500 mb-2 uppercase tracking-widest">{category}</div>
+                    <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-colors">{title}</h3>
+                    <p className="text-gray-400 text-sm leading-relaxed mb-6">
+                        {desc}
+                    </p>
+                    <div className="w-full h-[1px] bg-white/10 group-hover:bg-white/30 transition-colors mb-4" />
+                    <div className="flex items-center text-sm font-semibold text-gray-400 group-hover:text-white transition-colors">
+                        View Case Study <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                    </div>
+                </div>
+            </GlassCard>
+        </motion.div>
     );
 }
