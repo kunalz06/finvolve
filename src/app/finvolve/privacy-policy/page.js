@@ -33,21 +33,21 @@ export default function PrivacyPolicy() {
 
                         <div className="space-y-12 text-gray-300 leading-relaxed">
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">1. Information We Collect</h2>
+                                <h2 className="text-xl font-bold text-white mb-4">1. Information I Collect</h2>
                                 <p className="mb-4">
-                                    We collect information you provide directly to us when you use our "Start a Project" form or "Quick Start" service. This includes:
+                                    I collect information you provide directly to me when you use the "Start a Project" form or "Quick Start" service. This includes:
                                 </p>
                                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
                                     <li><strong className="text-white">Personal Information:</strong> Name, email address, and phone number.</li>
                                     <li><strong className="text-white">Project Details:</strong> Project type (e.g., Web Development, Android App) and project description/requirements.</li>
-                                    <li><strong className="text-white">Payment Information:</strong> Transaction details for the "Quick Start" service. Note that we do not store your credit card or bank account details; payments are processed by our third-party payment processor, Razorpay.</li>
+                                    <li><strong className="text-white">Payment Information:</strong> Transaction details for the "Quick Start" service. Note that I do not store your credit card or bank account details; payments are processed by my third-party payment processor, Razorpay.</li>
                                 </ul>
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">2. How We Use Your Information</h2>
+                                <h2 className="text-xl font-bold text-white mb-4">2. How I Use Your Information</h2>
                                 <p className="mb-4">
-                                    We use the information we collect to:
+                                    I use the information I collect to:
                                 </p>
                                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
                                     <li>Provide, maintain, and improve our software development services.</li>
@@ -60,7 +60,7 @@ export default function PrivacyPolicy() {
                             <section>
                                 <h2 className="text-xl font-bold text-white mb-4">3. Sharing of Information</h2>
                                 <p className="mb-4">
-                                    We do not share your personal information with third parties except in the following cases:
+                                    I do not share your personal information with third parties except in the following cases:
                                 </p>
                                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
                                     <li><strong className="text-white">Service Providers:</strong> We may share information with third-party vendors, consultants, and other service providers who need access to such information to carry out work on our behalf (e.g., Razorpay for payment processing, Firebase for data storage).</li>
@@ -71,14 +71,14 @@ export default function PrivacyPolicy() {
                             <section>
                                 <h2 className="text-xl font-bold text-white mb-4">4. Security</h2>
                                 <p>
-                                    We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. We use secure cloud infrastructure (Firebase) to store your project requests.
+                                    I take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. I use secure cloud infrastructure (Firebase) to store your project requests.
                                 </p>
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">5. Contact Us</h2>
+                                <h2 className="text-xl font-bold text-white mb-4">5. Contact Me</h2>
                                 <p>
-                                    If you have any questions about this Privacy Policy, please contact us at <a href="mailto:mitraricky06@gmail.com" className="text-primary hover:underline">mitraricky06@gmail.com</a>.
+                                    If you have any questions about this Privacy Policy, please contact me at <a href="mailto:mitraricky06@gmail.com" className="text-primary hover:underline">mitraricky06@gmail.com</a>.
                                 </p>
                             </section>
                         </div>

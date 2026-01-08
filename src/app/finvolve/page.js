@@ -37,7 +37,7 @@ export default function Home() {
             className="text-4xl md:text-5xl lg:text-7xl font-bold font-heading leading-tight mb-6 tracking-tight"
             variants={fadeInUp}
           >
-            Build Software <br />
+            I Build Software <br />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent animate-pulse-slow">
               That Defies Expectations.
             </span>
@@ -46,8 +46,8 @@ export default function Home() {
             className="text-lg text-gray-400 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed"
             variants={fadeInUp}
           >
-            We don't just write code. We build scalable, secure, and intuitive digital ecosystems designed for growth.
-            Connect with a team that speaks your language.
+            I don't just write code. I build scalable, secure, and intuitive digital ecosystems designed for growth.
+            Work with a developer who speaks your language.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4"
@@ -59,7 +59,7 @@ export default function Home() {
               </GradientButton>
             </Link>
             <Link href="/finvolve/about" className="text-gray-400 hover:text-white transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white">
-              Explore Our Process
+              Explore My Process
             </Link>
           </motion.div>
 
@@ -94,7 +94,7 @@ export default function Home() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl md:text-5xl font-bold font-heading mb-4">Engineering Excellence</h2>
-          <p className="text-gray-400 max-w-2xl mx-auto">Our expertise spans across the entire digital spectrum, delivering high-fidelity solutions for complex problems.</p>
+          <p className="text-gray-400 max-w-2xl mx-auto">My expertise spans across the entire digital spectrum, delivering high-fidelity solutions for complex problems.</p>
         </motion.div>
 
         <motion.div
@@ -130,7 +130,7 @@ export default function Home() {
             color="text-gold"
             bgColor="bg-gold/20"
             title="Performance Tuning"
-            desc="Core Web Vitals optimization. We ensure your applications load in milliseconds, not seconds."
+            desc="Core Web Vitals optimization. I ensure your applications load in milliseconds, not seconds."
           />
           <ServiceCard
             icon={Cpu}

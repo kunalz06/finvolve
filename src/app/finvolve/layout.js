@@ -3,8 +3,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Finvolve - Software Development & Web Services",
-  description: "Premium software development services including Android apps, webapps, and more.",
+  title: "Finvolve - Full Stack Development Services",
+  description: "Premium software solutions including Android apps, web platforms, and custom SaaS tools built by an expert Full Stack Developer.",
 };
 
 export default function FinvolveLayout({ children }) {

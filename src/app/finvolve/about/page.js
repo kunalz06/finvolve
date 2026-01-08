@@ -45,7 +45,7 @@ export default function About() {
                             className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8"
                             variants={fadeInUp}
                         >
-                            Finvolve is my digital playground. I am a visionary developer and designer. I don't just write code; I architect digital experiences that define brands.
+                            Finvolve is my digital playground. I am a <span className="text-white font-semibold">Full Stack Developer</span>. I don't just write code; I architect digital experiences that define brands.
                         </motion.p>
                     </motion.div>
 

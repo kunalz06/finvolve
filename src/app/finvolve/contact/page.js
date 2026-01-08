@@ -22,7 +22,7 @@ export default function Contact() {
                             Get in Touch
                         </h1>
                         <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                            Have a project in mind? We'd love to hear from you.
+                            Have a project in mind? I'd love to hear from you.
                             Let's build something amazing together.
                         </p>
                     </motion.div>
@@ -43,7 +43,7 @@ export default function Contact() {
                                             <Mail size={24} />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-white mb-1">Email Us</h3>
+                                            <h3 className="text-lg font-bold text-white mb-1">Email Me</h3>
                                             <p className="text-gray-400 group-hover/item:text-primary transition-colors">mitraricky06@gmail.com</p>
                                         </div>
                                     </a>
@@ -54,7 +54,7 @@ export default function Contact() {
                                             <Phone size={24} />
                                         </div>
                                         <div>
-                                            <h3 className="text-lg font-bold text-white mb-1">Call Us</h3>
+                                            <h3 className="text-lg font-bold text-white mb-1">Call Me</h3>
                                             <p className="text-gray-400 group-hover/item:text-purple-400 transition-colors">+91 99079 58859</p>
                                         </div>
                                     </a>
@@ -84,7 +84,7 @@ export default function Contact() {
 
                                 <h3 className="text-2xl font-bold font-heading mb-4">Ready to Start?</h3>
                                 <p className="text-gray-400 mb-8 leading-relaxed">
-                                    Skip the email queue and jump straight into building your project with our interactive wizard.
+                                    Skip the email queue and jump straight into building your project with the interactive wizard.
                                 </p>
 
                                 <div className="space-y-4">

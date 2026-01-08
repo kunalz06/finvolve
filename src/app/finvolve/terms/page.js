@@ -35,7 +35,7 @@ export default function Terms() {
                             <section>
                                 <h2 className="text-xl font-bold text-white mb-4">1. Introduction</h2>
                                 <p>
-                                    Welcome to Finvolve. By accessing our website and using our services, you agree to be bound by these Terms and Conditions.
+                                    Welcome to Finvolve. By accessing my website and using my services, you agree to be bound by these Terms and Conditions.
                                     These terms apply to all visitors, users, and others who access or use the Service.
                                 </p>
                             </section>
@@ -44,7 +44,7 @@ export default function Terms() {
                                 <h2 className="text-xl font-bold text-white mb-4">2. Services</h2>
                                 <p>
                                     Finvolve provides software development services, including but not limited to web development, mobile app development,
-                                    and custom software solutions. We are dedicated to delivering high-quality, scalable, and secure digital products.
+                                    and custom software solutions. I am dedicated to delivering high-quality, scalable, and secure digital products.
                                 </p>
                             </section>
 
