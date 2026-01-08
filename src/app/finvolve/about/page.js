@@ -2,6 +2,8 @@
 
 import { motion } from 'framer-motion';
 import { Code, Smartphone, Database, PenTool, Zap, Users, Target, Rocket } from 'lucide-react';
+import { FaReact, FaNodeJs, FaAndroid, FaFigma, FaSwift, FaApple } from 'react-icons/fa';
+import { SiNextdotjs, SiTailwindcss, SiFramer, SiFirebase, SiPostgresql, SiSupabase, SiKotlin, SiFlutter } from 'react-icons/si';
 import GlassCard from '@/components/ui/GlassCard';
 
 const fadeInUp = {
@@ -34,7 +36,7 @@ export default function About() {
                             className="text-5xl md:text-7xl font-bold font-heading mb-6 tracking-tight leading-none"
                             variants={fadeInUp}
                         >
-                            We Build <br />
+                            I Build <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
                                 The Future.
                             </span>
@@ -43,7 +45,7 @@ export default function About() {
                             className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8"
                             variants={fadeInUp}
                         >
-                            Finvolve is a collective of visionary developers and designers. We don't just write code; we architect digital experiences that define brands.
+                            Finvolve is my digital playground. I am a visionary developer and designer. I don't just write code; I architect digital experiences that define brands.
                         </motion.p>
                     </motion.div>
 
@@ -113,14 +115,14 @@ export default function About() {
                     >
                         <div className="space-y-6">
                             <h2 className="text-3xl font-bold font-heading flex items-center gap-3">
-                                <Target className="text-primary" /> Our Mission
+                                <Target className="text-primary" /> My Mission
                             </h2>
                             <p className="text-lg text-gray-300 leading-relaxed">
-                                At Finvolve, our mission is to empower businesses with independent, cutting-edge technology.
-                                We don't just follow trends; we set them.
+                                At Finvolve, my mission is to empower businesses with independent, cutting-edge technology.
+                                I don't just follow trends; I set them.
                             </p>
                             <p className="text-lg text-gray-400 leading-relaxed">
-                                Whether it's a mobile app to reach your customers on the go, or a robust web platform to manage your operations, we have the expertise to deliver solutions that are scalable, secure, and stunning.
+                                Whether it's a mobile app to reach your customers on the go, or a robust web platform to manage your operations, I have the expertise to deliver solutions that are scalable, secure, and stunning.
                             </p>
                         </div>
                         <div className="relative">
@@ -145,8 +147,8 @@ export default function About() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold font-heading mb-4">Selected Works</h2>
-                        <p className="text-gray-400">A showcase of our capabilities.</p>
+                        <h2 className="text-3xl font-bold font-heading mb-4">My Capabilities</h2>
+                        <p className="text-gray-400">A showcase of what I can build for you.</p>
                     </motion.div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -179,45 +181,29 @@ export default function About() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold font-heading mb-4">Our Tech Ecosystem</h2>
-                        <p className="text-gray-400">We use the best tools to build the best products.</p>
+                        <h2 className="text-3xl font-bold font-heading mb-4">My Tech Ecosystem</h2>
+                        <p className="text-gray-400">I use the best tools to build the best products.</p>
                     </motion.div>
 
                     <motion.div
-                        className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+                        className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-items-center"
                         initial="initial"
                         whileInView="animate"
-                        viewport={{ once: true, margin: "-100px" }}
+                        viewport={{ once: true, margin: "-50px" }}
                         variants={staggerContainer}
                     >
-                        <TechCard
-                            icon={Code}
-                            title="Frontend"
-                            skills={["React.js", "Next.js", "TailwindCSS", "Framer Motion"]}
-                            color="text-primary"
-                            bg="bg-primary/10 border-primary/20"
-                        />
-                        <TechCard
-                            icon={Smartphone}
-                            title="Mobile"
-                            skills={["Kotlin (Android)", "React Native", "Flutter", "iOS Swift"]}
-                            color="text-secondary"
-                            bg="bg-secondary/10 border-secondary/20"
-                        />
-                        <TechCard
-                            icon={Database}
-                            title="Backend"
-                            skills={["Node.js", "Firebase", "PostgreSQL", "Supabase"]}
-                            color="text-accent"
-                            bg="bg-accent/10 border-accent/20"
-                        />
-                        <TechCard
-                            icon={PenTool}
-                            title="Design"
-                            skills={["Figma", "UI/UX", "Prototyping", "Design Systems"]}
-                            color="text-pink-400"
-                            bg="bg-pink-500/10 border-pink-500/20"
-                        />
+                        <TechLogo icon={FaReact} name="React" color="text-cyan-400" />
+                        <TechLogo icon={SiNextdotjs} name="Next.js" color="text-white" />
+                        <TechLogo icon={SiTailwindcss} name="Tailwind" color="text-teal-400" />
+                        <TechLogo icon={SiFramer} name="Framer" color="text-pink-500" />
+                        <TechLogo icon={FaNodeJs} name="Node.js" color="text-green-500" />
+                        <TechLogo icon={SiFirebase} name="Firebase" color="text-yellow-500" />
+                        <TechLogo icon={SiPostgresql} name="PostgreSQL" color="text-blue-400" />
+                        <TechLogo icon={SiSupabase} name="Supabase" color="text-emerald-500" />
+                        <TechLogo icon={SiKotlin} name="Kotlin" color="text-purple-500" />
+                        <TechLogo icon={SiFlutter} name="Flutter" color="text-cyan-500" />
+                        <TechLogo icon={FaSwift} name="Swift" color="text-orange-500" />
+                        <TechLogo icon={FaFigma} name="Figma" color="text-red-400" />
                     </motion.div>
                 </section>
 
@@ -233,17 +219,17 @@ export default function About() {
                         <ValueItem
                             icon={Zap}
                             title="Speed & Efficiency"
-                            desc="We build fast, and we build things that run fast. Optimization is at our core."
+                            desc="I build fast, and I build things that run fast. Optimization is at my core."
                         />
                         <ValueItem
                             icon={Users}
                             title="User Centric"
-                            desc="We design with the end-user in mind, ensuring intuitive and engaging experiences."
+                            desc="I design with the end-user in mind, ensuring intuitive and engaging experiences."
                         />
                         <ValueItem
                             icon={Rocket}
                             title="Innovation"
-                            desc="We constantly explore new technologies to keep your business ahead of the curve."
+                            desc="I constantly explore new technologies to keep your business ahead of the curve."
                         />
                     </motion.div>
                 </section>
@@ -294,6 +280,19 @@ function ValueItem({ icon: Icon, title, desc }) {
                 {desc}
             </p>
         </div>
+    );
+}
+
+
+
+function TechLogo({ icon: Icon, name, color }) {
+    return (
+        <motion.div variants={fadeInUp} className="flex flex-col items-center gap-2 group">
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 group-hover:border-white/20 group-hover:bg-white/10 transition-all duration-300">
+                <Icon className={`text-4xl ${color} group-hover:scale-110 transition-transform duration-300`} />
+            </div>
+            <span className="text-gray-400 text-sm font-medium group-hover:text-white transition-colors">{name}</span>
+        </motion.div>
     );
 }
 
