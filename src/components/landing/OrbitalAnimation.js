@@ -1,14 +1,8 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { Code, Database, Globe, Smartphone, Zap } from "lucide-react";
-import { useEffect, useState } from "react";
-
-const OrbitParams = {
-    radiusX: 180,
-    radiusY: 80,
-    speed: 0.1,
-};
+import { useEffect } from "react";
 
 const Nodes = [
     { id: 1, icon: Code, label: "Frontend", color: "#6366F1", delay: 0 },
@@ -19,18 +13,26 @@ const Nodes = [
 ];
 
 export default function OrbitalAnimation() {
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    const springConfig = { damping: 20, stiffness: 50 };
+    const rotateX = useSpring(useTransform(mouseY, [-1, 1], [10, -10]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-1, 1], [-10, 10]), springConfig);
 
     useEffect(() => {
         const handleMouseMove = (e) => {
-            setMousePos({
-                x: (e.clientX / window.innerWidth - 0.5) * 20,
-                y: (e.clientY / window.innerHeight - 0.5) * 20,
-            });
+            // Normalize coordinates to -1 to 1
+            const x = (e.clientX / window.innerWidth) * 2 - 1;
+            const y = (e.clientY / window.innerHeight) * 2 - 1;
+
+            mouseX.set(x);
+            mouseY.set(y);
         };
+
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
-    }, []);
+    }, [mouseX, mouseY]);
 
     return (
         <div className="relative w-full h-[350px] md:h-[500px] flex items-center justify-center perspective-1000 overflow-hidden">
@@ -40,10 +42,9 @@ export default function OrbitalAnimation() {
             <motion.div
                 className="relative w-[400px] h-[400px] preserve-3d scale-[0.6] sm:scale-[0.8] md:scale-100 origin-center"
                 style={{
-                    rotateX: mousePos.y,
-                    rotateY: mousePos.x,
+                    rotateX,
+                    rotateY,
                 }}
-                transition={{ type: "spring", stiffness: 50, damping: 20 }}
             >
                 {/* Central Core */}
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full blur-md opacity-50 animate-pulse" />

@@ -1,18 +1,18 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Shield, ArrowLeft } from 'lucide-react';
+import { Shield, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
-import GlassCard from '@/components/ui/GlassCard';
+import RaceCard from '@/components/ui/RaceCard';
 
 export default function PrivacyPolicy() {
     return (
         <div className="min-h-screen pt-24 pb-20 relative">
             <div className="container mx-auto px-4 md:px-6 relative z-10 max-w-4xl">
 
-                <Link href="/finvolve" className="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors group">
-                    <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-                    Back to Home
+                <Link href="/finvolve" className="inline-flex items-center text-gray-400 hover:text-white mb-8 transition-colors group font-mono uppercase text-xs tracking-widest">
+                    <ChevronLeft size={16} className="mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Return to Pit Lane
                 </Link>
 
                 <motion.div
@@ -20,20 +20,20 @@ export default function PrivacyPolicy() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6 }}
                 >
-                    <GlassCard className="p-8 md:p-12 border-primary/20">
+                    <RaceCard className="p-8 md:p-12 border-primary/20">
                         <div className="flex items-center gap-4 mb-8 pb-8 border-b border-white/10">
-                            <div className="bg-primary/20 p-3 rounded-xl text-primary">
-                                <Shield size={32} />
+                            <div className="bg-primary/20 p-3 rounded-xl text-primary skew-x-[-12deg]">
+                                <Shield size={32} className="skew-x-[12deg]" />
                             </div>
                             <div>
-                                <h1 className="text-3xl md:text-4xl font-bold font-heading text-white">Privacy Policy</h1>
-                                <p className="text-gray-400 mt-1">Last updated: {new Date().toLocaleDateString()}</p>
+                                <h1 className="text-3xl md:text-4xl font-bold font-heading italic uppercase text-white">Data Telemetry Policy</h1>
+                                <p className="text-gray-400 mt-1 font-mono text-xs uppercase tracking-widest">Last updated: {new Date().toLocaleDateString()}</p>
                             </div>
                         </div>
 
                         <div className="space-y-12 text-gray-300 leading-relaxed">
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">1. Information I Collect</h2>
+                                <h2 className="text-xl font-bold font-heading italic uppercase text-white mb-4">1. Information I Collect</h2>
                                 <p className="mb-4">
                                     I collect information you provide directly to me when you use the "Start a Project" form or "Quick Start" service. This includes:
                                 </p>
@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">2. How I Use Your Information</h2>
+                                <h2 className="text-xl font-bold font-heading italic uppercase text-white mb-4">2. How I Use Your Information</h2>
                                 <p className="mb-4">
                                     I use the information I collect to:
                                 </p>
@@ -58,7 +58,7 @@ export default function PrivacyPolicy() {
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">3. Sharing of Information</h2>
+                                <h2 className="text-xl font-bold font-heading italic uppercase text-white mb-4">3. Sharing of Information</h2>
                                 <p className="mb-4">
                                     I do not share your personal information with third parties except in the following cases:
                                 </p>
@@ -69,20 +69,20 @@ export default function PrivacyPolicy() {
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">4. Security</h2>
+                                <h2 className="text-xl font-bold font-heading italic uppercase text-white mb-4">4. Security</h2>
                                 <p>
                                     I take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. I use secure cloud infrastructure (Firebase) to store your project requests.
                                 </p>
                             </section>
 
                             <section>
-                                <h2 className="text-xl font-bold text-white mb-4">5. Contact Me</h2>
+                                <h2 className="text-xl font-bold font-heading italic uppercase text-white mb-4">5. Contact Me</h2>
                                 <p>
                                     If you have any questions about this Privacy Policy, please contact me at <a href="mailto:mitraricky06@gmail.com" className="text-primary hover:underline">mitraricky06@gmail.com</a>.
                                 </p>
                             </section>
                         </div>
-                    </GlassCard>
+                    </RaceCard>
                 </motion.div>
             </div>
         </div>

@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, ArrowRight } from 'lucide-react';
-import GlassCard from '@/components/ui/GlassCard';
-import GradientButton from '@/components/ui/GradientButton';
+import { Mail, Phone, MapPin, ChevronRight, Rocket } from 'lucide-react';
+import RaceCard from '@/components/ui/RaceCard';
+import RaceButton from '@/components/ui/RaceButton';
 
 export default function Contact() {
     return (
@@ -18,12 +18,12 @@ export default function Contact() {
                         transition={{ duration: 0.6 }}
                         className="text-center mb-16"
                     >
-                        <h1 className="text-3xl md:text-5xl font-bold font-heading mb-6 bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-400">
-                            Get in Touch
+                        <h1 className="text-3xl md:text-5xl font-bold font-heading italic uppercase mb-6 text-white">
+                            Initialize <span className="text-primary">Communication</span>
                         </h1>
-                        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed">
-                            Have a project in mind? I'd love to hear from you.
-                            Let's build something amazing together.
+                        <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed border-b-2 border-primary/20 pb-4 inline-block">
+                            Have a project in mind? Use the direct line below.
+                            Let's maximize your velocity.
                         </p>
                     </motion.div>
 
@@ -35,42 +35,42 @@ export default function Contact() {
                             transition={{ duration: 0.6, delay: 0.2 }}
                             className="space-y-6"
                         >
-                            <GlassCard className="p-8 h-full border-primary/10 hover:border-primary/30 transition-colors group">
+                            <RaceCard className="h-full border-primary/10 hover:border-primary/50 transition-colors group">
                                 <div className="flex flex-col gap-8 h-full justify-center">
                                     {/* Email */}
-                                    <a href="mailto:mitraricky06@gmail.com" className="flex items-start gap-4 group/item hover:bg-white/5 p-4 rounded-xl transition-all">
-                                        <div className="bg-primary/20 p-3 rounded-lg text-primary group-hover/item:scale-110 transition-transform">
+                                    <a href="mailto:mitraricky06@gmail.com" className="flex items-start gap-4 group/item hover:bg-white/5 p-4 rounded-xl transition-all skew-x-[-6deg]">
+                                        <div className="bg-primary/20 p-3 rounded-lg text-primary group-hover/item:scale-110 transition-transform skew-x-[6deg]">
                                             <Mail size={24} />
                                         </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-white mb-1">Email Me</h3>
-                                            <p className="text-gray-400 group-hover/item:text-primary transition-colors">mitraricky06@gmail.com</p>
+                                        <div className="skew-x-[6deg]">
+                                            <h3 className="text-lg font-bold font-heading italic uppercase text-white mb-1">Email Relay</h3>
+                                            <p className="text-gray-400 group-hover/item:text-primary transition-colors font-mono">mitraricky06@gmail.com</p>
                                         </div>
                                     </a>
 
                                     {/* Phone */}
-                                    <a href="tel:+919907958859" className="flex items-start gap-4 group/item hover:bg-white/5 p-4 rounded-xl transition-all">
-                                        <div className="bg-purple-500/20 p-3 rounded-lg text-purple-400 group-hover/item:scale-110 transition-transform">
+                                    <a href="tel:+919907958859" className="flex items-start gap-4 group/item hover:bg-white/5 p-4 rounded-xl transition-all skew-x-[-6deg]">
+                                        <div className="bg-primary/20 p-3 rounded-lg text-primary group-hover/item:scale-110 transition-transform skew-x-[6deg]">
                                             <Phone size={24} />
                                         </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-white mb-1">Call Me</h3>
-                                            <p className="text-gray-400 group-hover/item:text-purple-400 transition-colors">+91 99079 58859</p>
+                                        <div className="skew-x-[6deg]">
+                                            <h3 className="text-lg font-bold font-heading italic uppercase text-white mb-1">Direct Line</h3>
+                                            <p className="text-gray-400 group-hover/item:text-primary transition-colors font-mono">+91 99079 58859</p>
                                         </div>
                                     </a>
 
                                     {/* Location */}
-                                    <div className="flex items-start gap-4 p-4">
-                                        <div className="bg-pink-500/20 p-3 rounded-lg text-pink-400">
+                                    <div className="flex items-start gap-4 p-4 skew-x-[-6deg]">
+                                        <div className="bg-gray-800 p-3 rounded-lg text-gray-400 skew-x-[6deg]">
                                             <MapPin size={24} />
                                         </div>
-                                        <div>
-                                            <h3 className="text-lg font-bold text-white mb-1">Location</h3>
-                                            <p className="text-gray-400">India</p>
+                                        <div className="skew-x-[6deg]">
+                                            <h3 className="text-lg font-bold font-heading italic uppercase text-white mb-1">HQ Location</h3>
+                                            <p className="text-gray-400 font-mono">India</p>
                                         </div>
                                     </div>
                                 </div>
-                            </GlassCard>
+                            </RaceCard>
                         </motion.div>
 
                         {/* CTA / Alternative */}
@@ -79,24 +79,24 @@ export default function Contact() {
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.6, delay: 0.4 }}
                         >
-                            <GlassCard className="p-8 h-full border-primary/10 flex flex-col justify-center text-center relative overflow-hidden">
+                            <RaceCard className="h-full border-primary/10 flex flex-col justify-center text-center relative overflow-hidden">
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-[60px] rounded-full -mr-16 -mt-16 pointer-events-none" />
 
-                                <h3 className="text-2xl font-bold font-heading mb-4">Ready to Start?</h3>
+                                <h3 className="text-2xl font-bold font-heading italic uppercase mb-4">Jump the Start?</h3>
                                 <p className="text-gray-400 mb-8 leading-relaxed">
-                                    Skip the email queue and jump straight into building your project with the interactive wizard.
+                                    Skip the warm-up lap and engage launch control with our interactive wizard.
                                 </p>
 
                                 <div className="space-y-4">
-                                    <GradientButton href="/finvolve/request" className="w-full justify-center py-4 text-lg">
-                                        Start Project <ArrowRight className="ml-2" size={20} />
-                                    </GradientButton>
+                                    <RaceButton href="/finvolve/request" variant="primary" className="w-full justify-center py-4 text-lg">
+                                        Launch Project <Rocket className="ml-2" size={20} />
+                                    </RaceButton>
 
-                                    <p className="text-sm text-gray-500">
-                                        Or check out our <a href="/finvolve/quick-start" className="text-primary hover:underline">Quick Start</a> options.
+                                    <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mt-4">
+                                        Or engage <a href="/finvolve/quick-start" className="text-primary hover:underline">Quick Start</a> mode.
                                     </p>
                                 </div>
-                            </GlassCard>
+                            </RaceCard>
                         </motion.div>
                     </div>
 

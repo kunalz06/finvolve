@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Code, Smartphone, Database, PenTool, Zap, Users, Target, Rocket } from 'lucide-react';
 import { FaReact, FaNodeJs, FaAndroid, FaFigma, FaSwift, FaApple } from 'react-icons/fa';
 import { SiNextdotjs, SiTailwindcss, SiFramer, SiFirebase, SiPostgresql, SiSupabase, SiKotlin, SiFlutter } from 'react-icons/si';
-import GlassCard from '@/components/ui/GlassCard';
+import RaceCard from '@/components/ui/RaceCard';
 
 const fadeInUp = {
     initial: { opacity: 0, y: 30 },
@@ -19,8 +19,6 @@ const staggerContainer = {
 export default function About() {
     return (
         <div className="min-h-screen pt-24 pb-20 overflow-hidden">
-            {/* Background Gradients */}
-            <div className="deep-space-bg" />
 
             <div className="container mx-auto px-6 relative z-10">
 
@@ -33,19 +31,19 @@ export default function About() {
                         variants={staggerContainer}
                     >
                         <motion.h1
-                            className="text-5xl md:text-7xl font-bold font-heading mb-6 tracking-tight leading-none"
+                            className="text-5xl md:text-7xl font-bold font-heading italic uppercase mb-6 tracking-tight leading-none"
                             variants={fadeInUp}
                         >
                             I Build <br />
                             <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">
-                                Reliable Solutions.
+                                Fast Machines.
                             </span>
                         </motion.h1>
                         <motion.p
-                            className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8"
+                            className="text-xl text-gray-400 max-w-xl mx-auto md:mx-0 leading-relaxed mb-8 border-l-4 border-primary pl-6"
                             variants={fadeInUp}
                         >
-                            Finvolve represents my commitment to quality engineering. I am a <span className="text-white font-semibold">Full Stack Developer</span> dedicated to building robust applications that solve real-world problems.
+                            Finvolve is the engineering pit crew for your digital product. I am a <span className="text-white font-semibold">Full Stack Engineer</span> obsessed with speed, precision, and reliability.
                         </motion.p>
                     </motion.div>
 
@@ -56,7 +54,7 @@ export default function About() {
                         animate={{ opacity: 1 }}
                         transition={{ duration: 1 }}
                     >
-                        <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden">
+                        <div className="relative w-full aspect-[4/5] rounded-2xl overflow-hidden border-2 border-white/10 skew-x-[-6deg]">
                             {/* The Image */}
                             <motion.img
                                 src="/images/profile.jpg"
@@ -93,14 +91,14 @@ export default function About() {
 
                             {/* Layer 3: Border Flash */}
                             <motion.div
-                                className="absolute inset-0 border border-white/20 z-20 rounded-2xl"
+                                className="absolute inset-0 border border-primary/50 z-20 rounded-2xl"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 1.2 }}
                             />
                         </div>
                         {/* Decorative background element behind image */}
-                        <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-3xl -z-10 blur-xl opacity-50" />
+                        <div className="absolute -inset-4 bg-gradient-to-tr from-primary/20 to-secondary/20 rounded-3xl -z-10 blur-xl opacity-30 skew-x-[-6deg]" />
                     </motion.div>
                 </section>
 
@@ -114,27 +112,27 @@ export default function About() {
                         transition={{ duration: 0.8 }}
                     >
                         <div className="space-y-6">
-                            <h2 className="text-3xl font-bold font-heading flex items-center gap-3">
+                            <h2 className="text-3xl font-bold font-heading italic uppercase flex items-center gap-3">
                                 <Target className="text-primary" /> My Mission
                             </h2>
                             <p className="text-lg text-gray-300 leading-relaxed">
-                                At Finvolve, my mission is to empower businesses with independent, cutting-edge technology.
-                                I don't just follow trends; I set them.
+                                At Finvolve, my mission is to fuel businesses with high-octane technology.
+                                I don't just follow the racing line; I create new overtaking opportunities.
                             </p>
                             <p className="text-lg text-gray-400 leading-relaxed">
-                                Whether it's a mobile app to reach your customers on the go, or a robust web platform to manage your operations, I have the expertise to deliver solutions that are scalable, secure, and stunning.
+                                Whether it's a mobile app to keep you connected on the go, or a robust web platform to manage your operations, I have the engineering pedigree to deliver podium-worthy solutions.
                             </p>
                         </div>
                         <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20 blur-3xl rounded-full" />
-                            <GlassCard className="relative p-8 border-primary/30">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <Stat number="50+" label="Projects Delivered" />
-                                    <Stat number="98%" label="Client Satisfaction" />
-                                    <Stat number="24/7" label="Support" />
-                                    <Stat number="∞" label="Possibilities" />
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-transparent blur-3xl rounded-full" />
+                            <RaceCard className="relative p-8 border-primary/30">
+                                <div className="grid grid-cols-2 gap-8">
+                                    <Stat number="50+" label="Chequered Flags" />
+                                    <Stat number="98%" label="Reliability" />
+                                    <Stat number="24/7" label="Pit Crew" />
+                                    <Stat number="∞" label="Top Speed" />
                                 </div>
-                            </GlassCard>
+                            </RaceCard>
                         </div>
                     </motion.div>
                 </section>
@@ -147,8 +145,8 @@ export default function About() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold font-heading mb-4">My Capabilities</h2>
-                        <p className="text-gray-400">A showcase of what I can build for you.</p>
+                        <h2 className="text-3xl font-bold font-heading italic uppercase mb-4">Track Record</h2>
+                        <p className="text-gray-400 font-mono tracking-widest uppercase text-sm">A showcase of previous wins.</p>
                     </motion.div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -181,8 +179,8 @@ export default function About() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        <h2 className="text-3xl font-bold font-heading mb-4">My Tech Ecosystem</h2>
-                        <p className="text-gray-400">I use the best tools to build the best products.</p>
+                        <h2 className="text-3xl font-bold font-heading italic uppercase mb-4">Under the Hood</h2>
+                        <p className="text-gray-400 font-mono tracking-widest uppercase text-sm">Engine Components & Tools.</p>
                     </motion.div>
 
                     <motion.div
@@ -242,56 +240,33 @@ export default function About() {
 function Stat({ number, label }) {
     return (
         <div className="text-center p-4">
-            <div className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-400 mb-1">{number}</div>
-            <div className="text-sm text-gray-500 uppercase tracking-wider">{label}</div>
+            <div className="text-3xl font-bold font-heading italic text-white mb-1">{number}</div>
+            <div className="text-xs font-mono text-gray-500 uppercase tracking-wider">{label}</div>
         </div>
-    );
-}
-
-function TechCard({ icon: Icon, title, skills, color, bg }) {
-    return (
-        <motion.div variants={fadeInUp} className="h-full">
-            <div className={`h-full p-6 rounded-2xl border backdrop-blur-md ${bg} hover:border-white/20 transition-all duration-300 hover:scale-105`}>
-                <div className={`w-12 h-12 rounded-lg ${bg} flex items-center justify-center mb-4`}>
-                    <Icon className={color} size={24} />
-                </div>
-                <h3 className="text-xl font-bold mb-4">{title}</h3>
-                <ul className="space-y-2">
-                    {skills.map((skill, i) => (
-                        <li key={i} className="flex items-center gap-2 text-gray-400 text-sm">
-                            <div className={`w-1.5 h-1.5 rounded-full ${color.replace('text-', 'bg-')}`} />
-                            {skill}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </motion.div>
     );
 }
 
 function ValueItem({ icon: Icon, title, desc }) {
     return (
-        <div className="flex flex-col items-center text-center p-6">
-            <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6 border border-white/10">
-                <Icon className="text-white" size={32} />
+        <div className="flex flex-col items-center text-center p-6 border border-white/5 rounded-2xl bg-white/5 backdrop-blur-sm skew-x-[-6deg]">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-6 border border-primary/20 text-primary skew-x-[6deg]">
+                <Icon size={32} />
             </div>
-            <h3 className="text-xl font-bold mb-3">{title}</h3>
-            <p className="text-gray-400 leading-relaxed">
+            <h3 className="text-xl font-bold font-heading italic uppercase mb-3 skew-x-[6deg]">{title}</h3>
+            <p className="text-gray-400 leading-relaxed skew-x-[6deg]">
                 {desc}
             </p>
         </div>
     );
 }
 
-
-
 function TechLogo({ icon: Icon, name, color }) {
     return (
         <motion.div variants={fadeInUp} className="flex flex-col items-center gap-2 group">
-            <div className="p-4 rounded-xl bg-white/5 border border-white/10 group-hover:border-white/20 group-hover:bg-white/10 transition-all duration-300">
-                <Icon className={`text-4xl ${color} group-hover:scale-110 transition-transform duration-300`} />
+            <div className="p-4 rounded-xl bg-white/5 border border-white/10 group-hover:border-primary/50 group-hover:bg-primary/10 transition-all duration-300 skew-x-[-6deg]">
+                <Icon className={`text-4xl ${color} group-hover:scale-110 transition-transform duration-300 skew-x-[6deg]`} />
             </div>
-            <span className="text-gray-400 text-sm font-medium group-hover:text-white transition-colors">{name}</span>
+            <span className="text-gray-400 text-sm font-mono uppercase group-hover:text-primary transition-colors">{name}</span>
         </motion.div>
     );
 }
@@ -299,20 +274,19 @@ function TechLogo({ icon: Icon, name, color }) {
 function PortfolioCard({ title, category, desc, gradient }) {
     return (
         <motion.div variants={fadeInUp} initial="initial" whileInView="animate" viewport={{ once: true }}>
-            <GlassCard className="h-full group hover:border-white/30 transition-all duration-500 hover:-translate-y-2 relative overflow-hidden">
-                <div className={`absolute inset-0 bg-gradient-to-br ${gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-                <div className="relative z-10 p-2">
-                    <div className="text-xs font-mono text-gray-500 mb-2 uppercase tracking-widest">{category}</div>
-                    <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-colors">{title}</h3>
+            <RaceCard className="h-full">
+                <div className="relative z-10">
+                    <div className="text-xs font-mono text-primary mb-2 uppercase tracking-widest">{category}</div>
+                    <h3 className="text-2xl font-bold font-heading italic uppercase mb-3 group-hover:text-white transition-colors">{title}</h3>
                     <p className="text-gray-400 text-sm leading-relaxed mb-6">
                         {desc}
                     </p>
                     <div className="w-full h-[1px] bg-white/10 group-hover:bg-white/30 transition-colors mb-4" />
-                    <div className="flex items-center text-sm font-semibold text-gray-400 group-hover:text-white transition-colors">
-                        View Case Study <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
+                    <div className="flex items-center text-sm font-bold font-heading italic uppercase text-gray-400 group-hover:text-primary transition-colors">
+                        View Telemetry <span className="ml-2 group-hover:translate-x-1 transition-transform">→</span>
                     </div>
                 </div>
-            </GlassCard>
+            </RaceCard>
         </motion.div>
     );
 }
