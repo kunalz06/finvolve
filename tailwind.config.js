@@ -12,44 +12,51 @@ module.exports = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 primary: {
-                    DEFAULT: "#FF1801", // Race Red
-                    hover: "#CC1000",
+                    DEFAULT: "#8B5CF6", // Purple
+                    hover: "#7C3AED",
+                    light: "#A78BFA",
+                    dark: "#6D28D9",
                 },
-                secondary: "#101010", // Asphalt Black
-                accent: "#FFF200", // Safety Yellow
-                muted: "#2D2D2D", // Track Gray
-                glass: "rgba(255, 255, 255, 0.05)",
-                "glass-border": "rgba(255, 255, 255, 0.1)",
+                secondary: "#F9FAFB", // Light gray
+                accent: "#3B82F6", // Blue accent
+                muted: "#6B7280", // Gray for body text
+                card: {
+                    bg: "#FFFFFF",
+                    border: "#E5E7EB",
+                },
             },
             fontFamily: {
                 sans: ["Inter", "sans-serif"],
-                heading: ["Space Grotesk", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"], // Telemetry
+                heading: ["Inter", "sans-serif"],
+                mono: ["JetBrains Mono", "monospace"],
             },
             backgroundImage: {
-                "carbon-fiber": "url('https://www.transparenttextures.com/patterns/carbon-fibre.png')",
-                "asphalt": "url('/assets/asphalt-texture.png')", // Ensure you have this or use a CSS pattern
-                "speed-gradient": "linear-gradient(90deg, transparent, rgba(255, 24, 1, 0.1), transparent)",
-                "stadium-gradient": "radial-gradient(circle at center, rgba(28, 93, 156, 0.4) 0%, rgba(10, 10, 10, 0.8) 100%)",
+                "gradient-primary": "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)",
+                "gradient-hero": "linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)",
             },
             animation: {
-                "rev": "rev 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards",
-                "slide-fast": "slideFast 10s linear infinite",
+                "fade-in": "fadeIn 0.5s ease-out",
+                "slide-up": "slideUp 0.5s ease-out",
+                "pulse-soft": "pulseSoft 2s ease-in-out infinite",
             },
             keyframes: {
-                rev: {
-                    "0%": { transform: "scale(1)" },
-                    "50%": { transform: "scale(1.05)" },
-                    "100%": { transform: "scale(1)" },
+                fadeIn: {
+                    "0%": { opacity: "0" },
+                    "100%": { opacity: "1" },
                 },
-                slideFast: {
-                    "0%": { transform: "translateX(0)" },
-                    "100%": { transform: "translateX(-100%)" },
+                slideUp: {
+                    "0%": { opacity: "0", transform: "translateY(20px)" },
+                    "100%": { opacity: "1", transform: "translateY(0)" },
+                },
+                pulseSoft: {
+                    "0%, 100%": { opacity: "1" },
+                    "50%": { opacity: "0.7" },
                 },
             },
             boxShadow: {
-                "neon-red": "0 0 20px rgba(255, 24, 1, 0.5)",
-                "neon-yellow": "0 0 20px rgba(255, 242, 0, 0.5)",
+                "card": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+                "card-hover": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                "button": "0 4px 14px 0 rgba(139, 92, 246, 0.39)",
             },
         },
     },

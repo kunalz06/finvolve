@@ -2,95 +2,95 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Menu, X, Activity } from "lucide-react";
-import RaceButton from "@/components/ui/RaceButton";
+import { Menu, X, Zap } from "lucide-react";
 
 const navLinks = [
-    { name: "Services", href: "/finvolve" },
-    { name: "About", href: "/finvolve/about" },
-    { name: "Contact", href: "/finvolve/contact" },
+  { name: "Services", href: "/finvolve/services" },
+  { name: "About", href: "/finvolve/about" },
+  { name: "Start Project", href: "/finvolve/request" },
 ];
 
 export default function Navbar() {
-    const [scrolled, setScrolled] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    useEffect(() => {
-        const handleScroll = () => setScrolled(window.scrollY > 20);
-        window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-    return (
-        <nav
-            className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 border-b ${scrolled ? "bg-black/90 backdrop-blur-md border-primary/50 py-3" : "bg-transparent border-transparent py-5"
-                }`}
+  return (
+    <nav
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${
+        scrolled 
+          ? "bg-white/95 backdrop-blur-md shadow-sm py-3" 
+          : "bg-white py-4"
+      }`}
+    >
+      <div className="container mx-auto px-6 flex items-center justify-between">
+        {/* Logo */}
+        <Link href="/finvolve" className="flex items-center gap-2 group">
+          <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
+            <Zap className="text-white" size={20} />
+          </div>
+          <span className="text-xl font-bold text-gray-900">
+            Finvolve
+          </span>
+        </Link>
+
+        {/* Desktop Nav */}
+        <div className="hidden md:flex items-center gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium text-gray-600 hover:text-primary transition-colors"
+            >
+              {link.name}
+            </Link>
+          ))}
+          <Link
+            href="/finvolve/contact"
+            className="px-5 py-2.5 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary-hover transition-colors shadow-button"
+          >
+            Contact Us
+          </Link>
+        </div>
+
+        {/* Mobile Menu Toggle */}
+        <button
+          className="md:hidden text-gray-900 hover:text-primary transition-colors"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-            <div className="container mx-auto px-6 flex items-center justify-between">
-                {/* Logo Area - Telemetry Style */}
-                <Link href="/finvolve" className="flex items-center gap-3 group">
-                    <div className="relative w-10 h-10 bg-primary skew-x-[-12deg] flex items-center justify-center border border-white/20 group-hover:bg-white transition-colors duration-300">
-                        <Activity className="text-white skew-x-[12deg] group-hover:text-primary" size={20} />
-                    </div>
-                    <div className="flex flex-col">
-                        <span className="text-2xl font-bold font-heading italic tracking-tighter uppercase leading-none">
-                            Finvolve
-                        </span>
-                        <span className="text-[10px] font-mono text-primary tracking-[0.3em] uppercase opacity-80">
-                            Racing Systems
-                        </span>
-                    </div>
-                </Link>
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
 
-                {/* Desktop Nav - Pit Wall Monitors */}
-                <div className="hidden md:flex items-center gap-8">
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            className="relative text-sm font-mono uppercase tracking-widest text-gray-400 hover:text-white transition-colors group py-2"
-                        >
-                            {link.name}
-                            <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-primary group-hover:w-full transition-all duration-300 ease-out" />
-                        </Link>
-                    ))}
-                    <RaceButton href="/finvolve/request" variant="primary" className="ml-4 text-xs px-6 py-2">
-                        Start Engine
-                    </RaceButton>
-                </div>
-
-                {/* Mobile Menu Toggle */}
-                <button
-                    className="md:hidden text-white hover:text-primary transition-colors"
-                    onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                >
-                    {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-                </button>
-            </div>
-
-            {/* Mobile Menu Overlay */}
-            {mobileMenuOpen && (
-                <motion.div
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="absolute top-full left-0 w-full bg-black border-b border-primary/30 p-6 md:hidden flex flex-col gap-4 shadow-2xl"
-                >
-                    {navLinks.map((link) => (
-                        <Link
-                            key={link.name}
-                            href={link.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="flex items-center gap-4 text-lg font-heading italic text-gray-300 hover:text-primary border-l-2 border-transparent hover:border-primary pl-4 transition-all"
-                        >
-                            {link.name}
-                        </Link>
-                    ))}
-                    <RaceButton href="/finvolve/request" className="w-full text-center mt-4">
-                        Initialize
-                    </RaceButton>
-                </motion.div>
-            )}
-        </nav>
-    );
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="absolute top-full left-0 w-full bg-white border-t border-gray-100 p-6 md:hidden shadow-lg">
+          <div className="flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="text-base font-medium text-gray-600 hover:text-primary transition-colors py-2"
+              >
+                {link.name}
+              </Link>
+            ))}
+            <Link
+              href="/finvolve/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              className="mt-2 px-5 py-3 bg-primary text-white text-sm font-semibold rounded-lg text-center"
+            >
+              Contact Us
+            </Link>
+          </div>
+        </div>
+      )}
+    </nav>
+  );
 }

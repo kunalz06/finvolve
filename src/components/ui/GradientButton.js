@@ -7,12 +7,12 @@ export default function GradientButton({ children, className, onClick, ...props 
     return (
         <motion.button
             className={cn(
-                "relative px-8 py-3 rounded-full font-semibold text-white overflow-hidden group",
-                "bg-gradient-to-r from-primary to-secondary shadow-[0_0_15px_rgba(99,102,241,0.5)]",
+                "relative px-8 py-3 rounded-lg font-semibold text-white overflow-hidden group",
+                "bg-gradient-primary shadow-button",
                 className
             )}
-            whileHover={{ scale: 1.05, boxShadow: "0 0 25px rgba(99, 102, 241, 0.8)" }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02, boxShadow: "0 8px 25px rgba(139, 92, 246, 0.4)" }}
+            whileTap={{ scale: 0.98 }}
             onClick={onClick}
             {...props}
         >

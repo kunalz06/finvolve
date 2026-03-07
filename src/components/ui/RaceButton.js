@@ -1,28 +1,46 @@
+"use client";
+
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function RaceButton({ href, children, className = "", onClick, variant = "primary" }) {
-    const baseStyles = "f1-btn relative inline-flex items-center justify-center px-8 py-3 font-bold text-sm tracking-widest uppercase transition-all duration-300";
+export default function Button({
+    href,
+    children,
+    className = "",
+    onClick,
+    variant = "primary",
+    size = "default",
+    icon: Icon,
+    ...props
+}) {
+    const baseStyles = "relative inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-300";
 
     const variants = {
-        primary: "bg-primary text-white hover:bg-white hover:text-black hover:shadow-neon-red",
-        secondary: "bg-transparent border border-white/20 text-white hover:border-primary hover:text-primary hover:shadow-neon-red",
-        accent: "bg-accent text-black hover:bg-white hover:shadow-neon-yellow"
+        primary: "bg-primary text-white hover:bg-primary-hover shadow-button hover:shadow-lg",
+        secondary: "bg-white text-gray-900 border border-gray-200 hover:border-primary hover:text-primary",
+        outline: "bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white",
+        ghost: "bg-transparent text-gray-600 hover:text-primary hover:bg-gray-100",
+    };
+
+    const sizes = {
+        small: "px-4 py-2 text-sm",
+        default: "px-6 py-3 text-base",
+        large: "px-8 py-4 text-lg",
     };
 
     const content = (
         <>
-            <span className="relative z-10 block skew-x-[12deg]">{children}</span>
-            {/* Speed Line Effect on Hover */}
-            <div className="absolute inset-0 overflow-hidden skew-x-[12deg]">
-                <div className="absolute top-0 left-[-100%] w-full h-full bg-white/20 -skew-x-12 transform group-hover:translate-x-[200%] transition-transform duration-500 ease-out" />
-            </div>
+            {Icon && <Icon size={size === "small" ? 16 : size === "large" ? 24 : 20} />}
+            <span>{children}</span>
         </>
     );
 
+    const combinedClassName = cn(baseStyles, variants[variant], sizes[size], className);
+
     if (href) {
         return (
-            <Link href={href} className={`${baseStyles} ${variants[variant]} ${className} group`}>
+            <Link href={href} className={combinedClassName} {...props}>
                 {content}
             </Link>
         );
@@ -30,9 +48,10 @@ export default function RaceButton({ href, children, className = "", onClick, va
 
     return (
         <motion.button
-            whileTap={{ scale: 0.95 }}
+            whileTap={{ scale: 0.98 }}
             onClick={onClick}
-            className={`${baseStyles} ${variants[variant]} ${className} group`}
+            className={combinedClassName}
+            {...props}
         >
             {content}
         </motion.button>

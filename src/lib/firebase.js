@@ -2,8 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// Your web app's Firebase configuration
-// REPLACE these values with your actual Firebase project configuration
+// Firebase configuration from environment variables
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -13,10 +12,24 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// Check if all required config values are present
+const isConfigValid = Object.values(firebaseConfig).every(val => val !== undefined && val !== '');
 
-const storage = getStorage(app);
+let app = null;
+let db = null;
+let storage = null;
 
-export { db, storage };
+if (isConfigValid) {
+  try {
+    // Initialize Firebase
+    app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    storage = getStorage(app);
+  } catch (error) {
+    console.error("Firebase initialization error:", error);
+  }
+} else {
+  console.warn("Firebase configuration is incomplete. Please check your .env.local file.");
+}
+
+export { db, storage, isConfigValid };
