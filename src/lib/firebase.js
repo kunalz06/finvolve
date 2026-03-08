@@ -12,8 +12,21 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Check if all required config values are present
-const isConfigValid = Object.values(firebaseConfig).every(val => val !== undefined && val !== '');
+// Check if all required config values are present (not undefined, not empty, and not placeholder values)
+const isConfigValid = Object.values(firebaseConfig).every(val => {
+  if (val === undefined || val === '' || val === null) return false;
+  // Check for placeholder values like "your_firebase_api_key_here"
+  if (typeof val === 'string' && val.toLowerCase().includes('your_')) return false;
+  return true;
+});
+
+// Debug logging in development
+if (typeof window !== 'undefined' && !isConfigValid) {
+  const missing = Object.entries(firebaseConfig)
+    .filter(([key, val]) => !val || (typeof val === 'string' && val.toLowerCase().includes('your_')))
+    .map(([key]) => key);
+  console.warn(`Firebase config incomplete. Missing/invalid: ${missing.join(', ')}`);
+}
 
 let app = null;
 let db = null;
@@ -25,11 +38,14 @@ if (isConfigValid) {
     app = initializeApp(firebaseConfig);
     db = getFirestore(app);
     storage = getStorage(app);
+    if (typeof window !== 'undefined') {
+      console.log("Firebase initialized successfully");
+    }
   } catch (error) {
     console.error("Firebase initialization error:", error);
   }
 } else {
-  console.warn("Firebase configuration is incomplete. Please check your .env.local file.");
+  console.warn("Firebase configuration is incomplete. Please update your .env.local file with valid Firebase credentials.");
 }
 
 export { db, storage, isConfigValid };

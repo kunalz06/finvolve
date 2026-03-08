@@ -3,11 +3,6 @@ const nextConfig = {
     reactStrictMode: true,
     poweredByHeader: false,
     compress: true,
-    experimental: {
-        turbo: {
-            root: '.',
-        }
-    },
     async headers() {
         return [
             {

@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { db } from '@/lib/firebase';
+import { db, isConfigValid } from '@/lib/firebase';
 import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { Lock, Calendar, User, Mail, Phone, Zap, DollarSign, LogOut, LayoutDashboard, CreditCard, MessageSquare, CheckCircle, X, AlertCircle, Eye } from 'lucide-react';
+import { Lock, Calendar, User, Mail, Phone, Zap, DollarSign, LogOut, LayoutDashboard, CreditCard, MessageSquare, CheckCircle, X, AlertCircle, Eye, AlertTriangle } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
@@ -19,6 +19,7 @@ export default function AdminPage() {
   const [newPayment, setNewPayment] = useState({ username: '', password: '', amount: '' });
   const [creatingPayment, setCreatingPayment] = useState(false);
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   // Use ref to store unsubscribe functions
   const unsubscribeRef = useRef({});
@@ -217,6 +218,7 @@ export default function AdminPage() {
     try {
       if (!db) throw new Error("Firebase not initialized");
       await deleteDoc(doc(db, "requests", id));
+      setSelectedRequest(null); // Close modal after deletion
     } catch (err) {
       console.error("Delete error:", err);
       alert("Failed to delete: " + err.message);
@@ -272,6 +274,37 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen py-20 bg-gray-50">
       <div className="container mx-auto px-6">
+        {/* Firebase Configuration Warning */}
+        {!isConfigValid && (
+          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
+            <div className="flex items-start gap-4">
+              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                <AlertTriangle className="text-amber-600" size={20} />
+              </div>
+              <div>
+                <h3 className="font-bold text-amber-800 mb-2">Firebase Not Configured</h3>
+                <p className="text-amber-700 text-sm mb-3">
+                  Your Firebase credentials are missing or invalid. The admin dashboard cannot load data without proper Firebase configuration.
+                </p>
+                <div className="bg-amber-100 rounded-lg p-4 text-xs text-amber-800 font-mono">
+                  <p className="mb-2">Please update your <strong>.env.local</strong> file with valid Firebase credentials:</p>
+                  <ul className="space-y-1 ml-4">
+                    <li>NEXT_PUBLIC_FIREBASE_API_KEY</li>
+                    <li>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</li>
+                    <li>NEXT_PUBLIC_FIREBASE_PROJECT_ID</li>
+                    <li>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</li>
+                    <li>NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</li>
+                    <li>NEXT_PUBLIC_FIREBASE_APP_ID</li>
+                  </ul>
+                  <p className="mt-3 text-amber-700">
+                    Get these values from: Firebase Console → Project Settings → Your Apps → Web App
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
           <div>
@@ -359,7 +392,10 @@ export default function AdminPage() {
                 </div>
               ) : (
                 requests.map((req) => (
-                  <Card key={req.id} delay={0} className={req.isQuickStart ? 'ring-2 ring-amber-400' : ''}>
+                  <Card 
+                    key={req.id} 
+                    className={`${req.isQuickStart ? 'ring-2 ring-amber-400' : ''}`}
+                  >
                     <div className="flex justify-between items-start mb-4">
                       <span className="px-3 py-1 bg-purple-100 text-primary text-xs font-semibold rounded-full">
                         {req.projectType || 'Unknown'}
@@ -375,13 +411,13 @@ export default function AdminPage() {
                         <User size={14} /> <strong>{req.name || 'No name'}</strong>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <Mail size={14} /> 
-                        <a href={`mailto:${req.email}`} className="text-primary hover:underline">{req.email || 'No email'}</a>
+                        <Mail size={14} />
+                        <span className="text-primary">{req.email || 'No email'}</span>
                       </div>
                       {req.phone && (
                         <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Phone size={14} /> 
-                          <a href={`tel:${req.phone}`} className="text-primary hover:underline">{req.phone}</a>
+                          <Phone size={14} />
+                          <span className="text-primary">{req.phone}</span>
                         </div>
                       )}
                     </div>
@@ -415,12 +451,20 @@ export default function AdminPage() {
                       </p>
                     </div>
 
-                    <button
-                      onClick={() => handleDeleteRequest(req.id)}
-                      className="w-full py-2 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                    >
-                      Delete Request
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setSelectedRequest(req.id)}
+                        className="flex-1 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                      >
+                        <Eye size={16} /> View Details
+                      </button>
+                      <button
+                        onClick={() => handleDeleteRequest(req.id)}
+                        className="py-2 px-4 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
                   </Card>
                 ))
               )}
@@ -634,6 +678,120 @@ export default function AdminPage() {
             </div>
           </div>
         )}
+
+        {/* Request Detail Modal */}
+        {selectedRequest && (() => {
+          const req = requests.find(r => r.id === selectedRequest);
+          if (!req) return null;
+          return (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedRequest(null)}>
+              <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-6">
+                    <div>
+                      <span className="px-3 py-1 bg-purple-100 text-primary text-xs font-semibold rounded-full">
+                        {req.projectType || 'Unknown'}
+                      </span>
+                      <h3 className="text-xl font-bold text-gray-900 mt-3">Project Request Details</h3>
+                    </div>
+                    <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
+                      <X size={24} />
+                    </button>
+                  </div>
+
+                  <div className="space-y-6">
+                    {/* Client Info */}
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Client Information</h4>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3 text-gray-700">
+                          <User size={18} className="text-primary" />
+                          <div>
+                            <span className="text-xs text-gray-500">Name</span>
+                            <p className="font-medium">{req.name || 'No name provided'}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 text-gray-700">
+                          <Mail size={18} className="text-primary" />
+                          <div>
+                            <span className="text-xs text-gray-500">Email</span>
+                            <p><a href={`mailto:${req.email}`} className="text-primary hover:underline">{req.email || 'No email'}</a></p>
+                          </div>
+                        </div>
+                        {req.phone && (
+                          <div className="flex items-center gap-3 text-gray-700">
+                            <Phone size={18} className="text-primary" />
+                            <div>
+                              <span className="text-xs text-gray-500">Phone</span>
+                              <p><a href={`tel:${req.phone}`} className="text-primary hover:underline">{req.phone}</a></p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Project Details */}
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Project Details</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={18} className="text-primary" />
+                          <div>
+                            <span className="text-xs text-gray-500">Timeline</span>
+                            <p className="font-medium">{req.timeline ? `${req.timeline} Weeks` : 'Not specified'}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <DollarSign size={18} className="text-green-600" />
+                          <div>
+                            <span className="text-xs text-gray-500">Budget</span>
+                            <p className="font-medium">{req.budget || 'Not specified'}</p>
+                          </div>
+                        </div>
+                      </div>
+                      {req.isQuickStart && req.paymentId && (
+                        <div className="mt-4 flex items-center gap-2 text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                          <Zap size={16} />
+                          <span className="text-sm font-medium">Paid Priority Request</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Description */}
+                    <div className="bg-gray-50 rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Project Description</h4>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {req.description || 'No description provided'}
+                      </p>
+                    </div>
+
+                    {/* Timestamp */}
+                    <div className="text-xs text-gray-400 flex items-center gap-2">
+                      <Calendar size={14} />
+                      Submitted: {formatDate(req.createdAt)}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-3 pt-4 border-t border-gray-100">
+                      <a
+                        href={`mailto:${req.email}?subject=Re: Your Project Request&body=Hi ${req.name || 'there'},%0D%0A%0D%0AThank you for your project request.%0D%0A%0D%0ABest regards`}
+                        className="flex-1 py-3 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium text-center"
+                      >
+                        Reply via Email
+                      </a>
+                      <button
+                        onClick={() => handleDeleteRequest(req.id)}
+                        className="py-3 px-6 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })()}
       </div>
     </div>
   );
