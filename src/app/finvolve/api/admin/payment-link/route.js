@@ -5,12 +5,19 @@ import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
 import { createPaymentToken, hashToken } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 
+const optionalTrimmedString = (schema) =>
+    z.preprocess((value) => {
+        if (typeof value !== "string") return value;
+        const trimmed = value.trim();
+        return trimmed.length === 0 ? undefined : trimmed;
+    }, schema.optional());
+
 const payloadSchema = z.object({
-    amount: z.number().int().positive().max(5_00_000),
+    amount: z.coerce.number().int().positive().max(5_00_000),
     clientName: z.string().trim().min(2).max(120),
-    clientEmail: z.string().trim().email().max(255).optional(),
-    notes: z.string().trim().max(500).optional(),
-    expiresInHours: z.number().int().min(1).max(24 * 30).optional(),
+    clientEmail: optionalTrimmedString(z.string().email().max(255)),
+    notes: optionalTrimmedString(z.string().max(500)),
+    expiresInHours: z.coerce.number().int().min(1).max(24 * 30).optional(),
 });
 
 function getSiteUrl(request) {

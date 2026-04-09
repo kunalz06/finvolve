@@ -45,6 +45,18 @@ const formatDate = (timestamp) => {
 
 const formatCurrency = (value) => `INR ${Number(value || 0).toLocaleString()}`;
 
+const formatValidationDetails = (details) => {
+    if (!details?.fieldErrors) return "";
+
+    const messages = Object.entries(details.fieldErrors)
+        .flatMap(([field, errors]) =>
+            (errors || []).map((message) => `${field}: ${message}`),
+        )
+        .filter(Boolean);
+
+    return messages.join(" | ");
+};
+
 const projectFields = (item) => [
     { label: "Project type", value: item.projectType || "Not provided" },
     { label: "Name", value: item.name || "Not provided" },
@@ -201,6 +213,26 @@ export default function AdminPage() {
                 throw new Error("Your admin session has expired. Please sign in again.");
             }
 
+            const payload = {
+                clientName: newPayment.clientName.trim(),
+                clientEmail: newPayment.clientEmail.trim(),
+                amount: Number(newPayment.amount),
+                notes: newPayment.notes.trim(),
+                expiresInHours: Number(newPayment.expiresInHours),
+            };
+
+            if (!payload.clientName) {
+                throw new Error("Client name is required.");
+            }
+
+            if (!Number.isFinite(payload.amount) || payload.amount <= 0) {
+                throw new Error("Enter a valid payment amount.");
+            }
+
+            if (!Number.isFinite(payload.expiresInHours) || payload.expiresInHours < 1) {
+                throw new Error("Enter a valid expiry in hours.");
+            }
+
             const idToken = await auth.currentUser.getIdToken(true);
             const response = await fetch("/finvolve/api/admin/payment-link", {
                 method: "POST",
@@ -208,16 +240,13 @@ export default function AdminPage() {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${idToken}`,
                 },
-                body: JSON.stringify({
-                    clientName: newPayment.clientName,
-                    clientEmail: newPayment.clientEmail || undefined,
-                    amount: Number(newPayment.amount),
-                    notes: newPayment.notes || undefined,
-                    expiresInHours: Number(newPayment.expiresInHours),
-                }),
+                body: JSON.stringify(payload),
             });
             const json = await response.json();
-            if (!response.ok) throw new Error(json.error || "Could not create payment link.");
+            if (!response.ok) {
+                const detailMessage = formatValidationDetails(json.details);
+                throw new Error(detailMessage || json.error || "Could not create payment link.");
+            }
             setGeneratedLink(json);
             setNewPayment({
                 clientName: "",
