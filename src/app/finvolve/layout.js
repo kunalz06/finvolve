@@ -1,18 +1,6 @@
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Inter, JetBrains_Mono } from "next/font/google";
-
-const inter = Inter({ 
-  subsets: ["latin"], 
-  variable: "--font-sans",
-  display: "swap"
-});
-
-const jetbrainsMono = JetBrains_Mono({ 
-  subsets: ["latin"], 
-  variable: "--font-mono" 
-});
 
 export const metadata = {
   title: "Finvolve | Next Gen Engineering",
@@ -21,9 +9,9 @@ export const metadata = {
 
 export default function FinvolveLayout({ children }) {
   return (
-    <div className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased bg-white text-gray-900 min-h-screen`}>
+    <div className="finvolve-shell font-sans antialiased text-gray-900 min-h-screen">
       <Navbar />
-      <main className="min-h-screen pt-[72px]">
+      <main className="min-h-screen pt-[92px] md:pt-[104px]">
         {children}
       </main>
       <Footer />

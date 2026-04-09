@@ -1,36 +1,58 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Finvolve
 
-## Getting Started
+Finvolve is a Next.js App Router project with:
+- Marketing and lead-capture flows under `/finvolve`
+- Tokenized client payment flow under `/finvolve/payments`
+- Admin dashboard under `/finvolve/admin`
+- IEM minor-degree registration flow under `/iemminor`
 
-First, run the development server:
+## Prerequisites
+
+- Node.js 20+
+- Firebase project (Firestore + Auth + Storage)
+- Razorpay account keys
+- Firebase Admin service account credentials for server routes
+
+## Environment Setup
+
+Copy `.env.example` to `.env.local` and fill values:
+
+- Client Firebase keys (`NEXT_PUBLIC_FIREBASE_*`)
+- Razorpay keys:
+  - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
+  - `RAZORPAY_KEY_ID`
+  - `RAZORPAY_KEY_SECRET`
+- Firebase Admin credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or split vars)
+- Optional `NEXT_PUBLIC_SITE_URL` for absolute payment links
+
+## Admin Access
+
+Admin dashboard auth is Firebase Auth based.  
+You must set a custom claim on admin users:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run set-admin -- FIREBASE_UID
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+This repo helper applies:
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```json
+{ "role": "admin", "admin": true }
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+```bash
+npm install
+npm run dev
+npm run lint
+npm run build
+npm run migrate:payments
+npm run set-admin -- FIREBASE_UID
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Security Notes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Firestore rules are deny-by-default for sensitive reads/writes.
+- Payment links are tokenized and server-verified before marking paid.
+- Payment verification happens via `/finvolve/api/verify-payment`.

@@ -1,4 +1,5 @@
-import { initializeApp } from "firebase/app";
+import { getApps, initializeApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
@@ -31,13 +32,15 @@ if (typeof window !== 'undefined' && !isConfigValid) {
 let app = null;
 let db = null;
 let storage = null;
+let auth = null;
 
 if (isConfigValid) {
   try {
     // Initialize Firebase
-    app = initializeApp(firebaseConfig);
+    app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
     db = getFirestore(app);
     storage = getStorage(app);
+    auth = getAuth(app);
     if (typeof window !== 'undefined') {
       console.log("Firebase initialized successfully");
     }
@@ -48,4 +51,4 @@ if (isConfigValid) {
   console.warn("Firebase configuration is incomplete. Please update your .env.local file with valid Firebase credentials.");
 }
 
-export { db, storage, isConfigValid };
+export { db, storage, auth, isConfigValid };

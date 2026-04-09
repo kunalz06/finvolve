@@ -2,33 +2,38 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    // Projects/Requests collection
-    // Used by: Project Wizard, Quick Start (Create), Admin Panel (Read)
-    match /requests/{request} {
-      allow create: if true;
-      // WARNING: Currently public because Admin panel uses client-side password check without Firebase Auth.
-      // To secure this, implement Firebase Authentication and restrict read to authenticated admins.
-      allow read: if true;
+    function isAdmin() {
+      return request.auth != null &&
+        (request.auth.token.role == "admin" || request.auth.token.admin == true);
     }
 
-    // Registrations collection
-    // Used by: Registration Form (Create only)
-    match /registrations/{registration} {
+    // Public intake, admin reads.
+    match /requests/{requestId} {
       allow create: if true;
-      allow read: if false; // No public read access found in code
+      allow read, update, delete: if isAdmin();
     }
 
-    // IEM Minor Registrations collection
-    // Used by: IEM Minor Page (Create only)
-    match /iem_registrations/{registration} {
+    // Public intake, admin triage.
+    match /contact_messages/{messageId} {
       allow create: if true;
-      allow read: if false; // No public read access found in code
+      allow read, update, delete: if isAdmin();
     }
 
-    // Payment Requests collection
-    match /payment_requests/{payment} {
-      allow create, read, update, delete: if true;
+    // Admin-only payments collection.
+    match /payment_requests/{paymentId} {
+      allow create, read, update, delete: if isAdmin();
+    }
+
+    // Public registration submission.
+    match /registrations/{registrationId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Public IEM registration submission.
+    match /iem_registrations/{registrationId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
     }
   }
 }

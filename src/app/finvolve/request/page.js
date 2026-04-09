@@ -4,8 +4,8 @@ import ProjectWizard from '@/components/wizard/ProjectWizard';
 
 export default function RequestPage() {
   return (
-    <div className="min-h-screen py-20 bg-gray-50">
-      <div className="container mx-auto px-6">
+    <div className="min-h-screen px-6 py-12">
+      <div className="container">
         <ProjectWizard />
       </div>
     </div>

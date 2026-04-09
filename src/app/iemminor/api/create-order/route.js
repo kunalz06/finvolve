@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 
 export async function POST(request) {
     try {
-        const key_id = process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID;
+        const key_id = process.env.RAZORPAY_KEY_ID;
         const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
         if (!key_id || !key_secret) {
@@ -27,7 +27,7 @@ export async function POST(request) {
         const order = await razorpay.orders.create(options);
         return NextResponse.json(order);
     } catch (error) {
-        console.error("Error creating Razorpay order:", error);
+        console.error("Error creating Razorpay order:", error.message);
         return NextResponse.json(
             { error: "Error creating order" },
             { status: 500 }

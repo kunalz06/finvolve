@@ -1,798 +1,481 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { db, isConfigValid } from '@/lib/firebase';
-import { collection, query, orderBy, addDoc, serverTimestamp, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { Lock, Calendar, User, Mail, Phone, Zap, DollarSign, LogOut, LayoutDashboard, CreditCard, MessageSquare, CheckCircle, X, AlertCircle, Eye, AlertTriangle } from 'lucide-react';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+    collection,
+    deleteDoc,
+    doc,
+    onSnapshot,
+    orderBy,
+    query,
+    updateDoc,
+} from "firebase/firestore";
+import {
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    signOut,
+} from "firebase/auth";
+import {
+    AlertCircle,
+    CheckCircle,
+    CreditCard,
+    Eye,
+    LayoutDashboard,
+    Lock,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Phone,
+    Sparkles,
+    Trash2,
+    X,
+} from "lucide-react";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import { auth, db, isConfigValid } from "@/lib/firebase";
+
+const isAdmin = (claims) => claims?.role === "admin" || claims?.admin === true;
+
+const formatDate = (timestamp) => {
+    if (!timestamp) return "Not available";
+    if (timestamp.seconds) return new Date(timestamp.seconds * 1000).toLocaleString();
+    if (timestamp instanceof Date) return timestamp.toLocaleString();
+    return "Not available";
+};
+
+const formatCurrency = (value) => `INR ${Number(value || 0).toLocaleString()}`;
+
+const projectFields = (item) => [
+    { label: "Project type", value: item.projectType || "Not provided" },
+    { label: "Name", value: item.name || "Not provided" },
+    { label: "Email", value: item.email || "Not provided" },
+    { label: "Phone", value: item.phone || "Not provided" },
+    { label: "Timeline", value: item.timeline ? `${item.timeline} weeks` : "Not provided" },
+    { label: "Budget", value: item.budget || "Not provided" },
+    { label: "Status", value: item.status || "new" },
+    { label: "Quick Start", value: item.quickStart ? "Yes" : "No" },
+    { label: "Payment marker", value: item.paymentStatus || item.razorpayPaymentId || "Not provided" },
+    { label: "Submitted", value: formatDate(item.createdAt) },
+];
+
+function EmptyState({ title, copy }) {
+    return (
+        <Card hover={false} className="md:col-span-2 lg:col-span-3 text-center">
+            <div className="glass-icon-plate mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full">
+                <Sparkles className="text-primary" size={22} />
+            </div>
+            <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-slate-600">{copy}</p>
+        </Card>
+    );
+}
 
 export default function AdminPage() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [activeTab, setActiveTab] = useState('projects');
-  const [requests, setRequests] = useState([]);
-  const [payments, setPayments] = useState([]);
-  const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [newPayment, setNewPayment] = useState({ username: '', password: '', amount: '' });
-  const [creatingPayment, setCreatingPayment] = useState(false);
-  const [selectedMessage, setSelectedMessage] = useState(null);
-  const [selectedRequest, setSelectedRequest] = useState(null);
-
-  // Use ref to store unsubscribe functions
-  const unsubscribeRef = useRef({});
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      // Fetch all data when authenticated
-      const unsubRequests = fetchRequests();
-      const unsubPayments = fetchPayments();
-      const unsubMessages = fetchMessages();
-      
-      unsubscribeRef.current = {
-        requests: unsubRequests,
-        payments: unsubPayments,
-        messages: unsubMessages
-      };
-    }
-
-    return () => {
-      // Cleanup all listeners on unmount
-      Object.values(unsubscribeRef.current).forEach(unsub => {
-        if (typeof unsub === 'function') unsub();
-      });
-    };
-  }, [isAuthenticated]);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    const adminPassword = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || 'admin123';
-    
-    if (password === adminPassword) {
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('Invalid password');
-    }
-  };
-
-  const handleLogout = () => {
-    // Cleanup listeners
-    Object.values(unsubscribeRef.current).forEach(unsub => {
-      if (typeof unsub === 'function') unsub();
+    const [authState, setAuthState] = useState("checking");
+    const [error, setError] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [activeTab, setActiveTab] = useState("projects");
+    const [requests, setRequests] = useState([]);
+    const [messages, setMessages] = useState([]);
+    const [payments, setPayments] = useState([]);
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [deletingRequestId, setDeletingRequestId] = useState("");
+    const [newPayment, setNewPayment] = useState({
+        clientName: "",
+        clientEmail: "",
+        amount: "",
+        notes: "",
+        expiresInHours: "72",
     });
-    unsubscribeRef.current = {};
-    setIsAuthenticated(false);
-    setRequests([]);
-    setPayments([]);
-    setMessages([]);
-  };
+    const [creatingPayment, setCreatingPayment] = useState(false);
+    const [generatedLink, setGeneratedLink] = useState(null);
+    const listenersRef = useRef({});
 
-  // Fetch project requests
-  const fetchRequests = () => {
-    setLoading(true);
-    try {
-      if (!db) {
-        console.error("Firebase not initialized");
-        setLoading(false);
-        return;
-      }
-
-      const q = query(collection(db, "requests"), orderBy("createdAt", "desc"));
-      
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const reqs = [];
-        querySnapshot.forEach((doc) => {
-          reqs.push({ id: doc.id, ...doc.data() });
+    const stopListeners = () => {
+        Object.values(listenersRef.current).forEach((fn) => {
+            if (typeof fn === "function") fn();
         });
-        setRequests(reqs);
-        setLoading(false);
-      }, (error) => {
-        console.error("Error fetching requests:", error);
-        setLoading(false);
-      });
+        listenersRef.current = {};
+    };
 
-      return unsubscribe;
-    } catch (err) {
-      console.error("Error setting up requests listener:", err);
-      setLoading(false);
-    }
-  };
+    useEffect(() => {
+        if (!auth) {
+            setAuthState("unauthorized");
+            setError("Firebase Auth is not configured.");
+            return;
+        }
 
-  // Fetch payments
-  const fetchPayments = () => {
-    try {
-      if (!db) {
-        console.error("Firebase not initialized");
-        return;
-      }
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                stopListeners();
+                setAuthState("signed_out");
+                return;
+            }
 
-      const q = query(collection(db, "payment_requests"), orderBy("createdAt", "desc"));
+            try {
+                const tokenResult = await user.getIdTokenResult(true);
+                if (!isAdmin(tokenResult.claims)) {
+                    await signOut(auth);
+                    setAuthState("unauthorized");
+                    setError("This account does not have admin role claims.");
+                    return;
+                }
 
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const pays = [];
-        querySnapshot.forEach((doc) => {
-          pays.push({ id: doc.id, ...doc.data() });
+                setAuthState("authenticated");
+            } catch (claimError) {
+                console.error("Admin auth check failed:", claimError);
+                setAuthState("unauthorized");
+                setError("Unable to verify admin role.");
+            }
         });
-        setPayments(pays);
-      }, (error) => {
-        console.error("Error fetching payments:", error);
-      });
 
-      return unsubscribe;
-    } catch (err) {
-      console.error("Error setting up payment listener:", err);
+        return () => {
+            unsubscribe();
+            stopListeners();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (authState !== "authenticated" || !db) return;
+
+        listenersRef.current.requests = onSnapshot(
+            query(collection(db, "requests"), orderBy("createdAt", "desc")),
+            (snap) => setRequests(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
+        listenersRef.current.messages = onSnapshot(
+            query(collection(db, "contact_messages"), orderBy("createdAt", "desc")),
+            (snap) => setMessages(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
+        listenersRef.current.payments = onSnapshot(
+            query(collection(db, "payment_requests"), orderBy("createdAt", "desc")),
+            (snap) => setPayments(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
+
+        return stopListeners;
+    }, [authState]);
+
+    useEffect(() => {
+        if (!selectedRequest) return undefined;
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                setSelectedRequest(null);
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => window.removeEventListener("keydown", handleKeyDown);
+    }, [selectedRequest]);
+
+    const handleLogin = async (event) => {
+        event.preventDefault();
+        setError("");
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            setPassword("");
+        } catch (loginError) {
+            console.error("Login failed:", loginError);
+            setError("Invalid admin credentials.");
+        }
+    };
+
+    const handleLogout = async () => {
+        try {
+            stopListeners();
+            await signOut(auth);
+        } catch (logoutError) {
+            setError("Unable to sign out.");
+            console.error("Logout failed:", logoutError);
+        }
+    };
+
+    const handleCreatePayment = async (event) => {
+        event.preventDefault();
+        setCreatingPayment(true);
+        setGeneratedLink(null);
+        setError("");
+
+        try {
+            const idToken = await auth.currentUser.getIdToken();
+            const response = await fetch("/finvolve/api/admin/payment-link", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({
+                    clientName: newPayment.clientName,
+                    clientEmail: newPayment.clientEmail || undefined,
+                    amount: Number(newPayment.amount),
+                    notes: newPayment.notes || undefined,
+                    expiresInHours: Number(newPayment.expiresInHours),
+                }),
+            });
+            const json = await response.json();
+            if (!response.ok) throw new Error(json.error || "Could not create payment link.");
+            setGeneratedLink(json);
+            setNewPayment({
+                clientName: "",
+                clientEmail: "",
+                amount: "",
+                notes: "",
+                expiresInHours: "72",
+            });
+        } catch (createError) {
+            setError(createError.message || "Could not create payment link.");
+        } finally {
+            setCreatingPayment(false);
+        }
+    };
+
+    const handleDeleteRequest = async (requestId) => {
+        setDeletingRequestId(requestId);
+        try {
+            await deleteDoc(doc(db, "requests", requestId));
+            if (selectedRequest?.id === requestId) {
+                setSelectedRequest(null);
+            }
+        } catch (deleteError) {
+            console.error("Delete failed:", deleteError);
+            setError("Unable to delete this request.");
+        } finally {
+            setDeletingRequestId("");
+        }
+    };
+
+    const unreadCount = messages.filter((item) => item.status === "unread").length;
+    const paidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const revenue = payments
+        .filter((item) => item.status === "paid")
+        .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const stats = useMemo(() => ([
+        { label: "Requests", value: requests.length, tone: "text-slate-900" },
+        { label: "Unread", value: unreadCount, tone: "text-primary" },
+        { label: "Paid", value: paidPaymentsCount, tone: "text-emerald-600" },
+        { label: "Revenue", value: formatCurrency(revenue), tone: "text-slate-900" },
+    ]), [requests.length, unreadCount, paidPaymentsCount, revenue]);
+
+    if (authState !== "authenticated") {
+        return (
+            <div className="min-h-screen px-6 py-16">
+                <div className="container">
+                    <Card hover={false} className="glass-surface-strong mx-auto max-w-md overflow-hidden p-0">
+                        <div className="border-b border-white/45 px-8 py-8 text-center">
+                            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.8))] shadow-[0_18px_48px_rgba(103,88,255,0.3)]">
+                                <Lock className="text-white" size={28} />
+                            </div>
+                            <p className="glass-chip-strong mb-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+                                <Sparkles size={14} />
+                                Admin Access
+                            </p>
+                            <h1 className="text-3xl font-bold text-slate-950">Sign in to Mission Control</h1>
+                            <p className="mt-3 text-sm text-slate-600">Use a Firebase account that already has the admin custom claim.</p>
+                        </div>
+                        <form onSubmit={handleLogin} className="space-y-4 px-8 py-8">
+                            <input className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="email" placeholder="Admin email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                            <input className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                            {error && <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700"><AlertCircle size={16} />{error}</div>}
+                            <Button type="submit" variant="primary" className="w-full">Sign In</Button>
+                        </form>
+                    </Card>
+                </div>
+            </div>
+        );
     }
-  };
 
-  // Fetch contact messages
-  const fetchMessages = () => {
-    try {
-      if (!db) {
-        console.error("Firebase not initialized");
-        return;
-      }
-
-      const q = query(collection(db, "contact_messages"), orderBy("createdAt", "desc"));
-
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        const msgs = [];
-        querySnapshot.forEach((doc) => {
-          msgs.push({ id: doc.id, ...doc.data() });
-        });
-        setMessages(msgs);
-      }, (error) => {
-        console.error("Error fetching messages:", error);
-      });
-
-      return unsubscribe;
-    } catch (err) {
-      console.error("Error setting up messages listener:", err);
-    }
-  };
-
-  // Create new payment link
-  const handleCreatePayment = async (e) => {
-    e.preventDefault();
-    setCreatingPayment(true);
-    try {
-      if (!db) throw new Error("Firebase not initialized");
-      
-      await addDoc(collection(db, "payment_requests"), {
-        username: newPayment.username,
-        password: newPayment.password,
-        amount: Number(newPayment.amount),
-        status: 'pending',
-        createdAt: serverTimestamp()
-      });
-      setNewPayment({ username: '', password: '', amount: '' });
-    } catch (err) {
-      console.error("Error creating payment:", err);
-      alert("Failed to create payment link: " + err.message);
-    } finally {
-      setCreatingPayment(false);
-    }
-  };
-
-  // Delete payment
-  const handleDeletePayment = async (id) => {
-    if (!confirm("Are you sure you want to delete this payment request?")) return;
-    try {
-      if (!db) throw new Error("Firebase not initialized");
-      await deleteDoc(doc(db, "payment_requests", id));
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Failed to delete: " + err.message);
-    }
-  };
-
-  // Mark message as read
-  const handleMarkMessageRead = async (id) => {
-    try {
-      if (!db) throw new Error("Firebase not initialized");
-      await updateDoc(doc(db, "contact_messages", id), {
-        status: 'read'
-      });
-    } catch (err) {
-      console.error("Error marking message as read:", err);
-    }
-  };
-
-  // Delete message
-  const handleDeleteMessage = async (id) => {
-    if (!confirm("Are you sure you want to delete this message?")) return;
-    try {
-      if (!db) throw new Error("Firebase not initialized");
-      await deleteDoc(doc(db, "contact_messages", id));
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Failed to delete: " + err.message);
-    }
-  };
-
-  // Delete request
-  const handleDeleteRequest = async (id) => {
-    if (!confirm("Are you sure you want to delete this request?")) return;
-    try {
-      if (!db) throw new Error("Firebase not initialized");
-      await deleteDoc(doc(db, "requests", id));
-      setSelectedRequest(null); // Close modal after deletion
-    } catch (err) {
-      console.error("Delete error:", err);
-      alert("Failed to delete: " + err.message);
-    }
-  };
-
-  // Format date
-  const formatDate = (timestamp) => {
-    if (!timestamp) return 'Just now';
-    if (timestamp.seconds) {
-      return new Date(timestamp.seconds * 1000).toLocaleString();
-    }
-    return 'Just now';
-  };
-
-  const unreadCount = messages.filter(m => m.status === 'unread').length;
-  const paidPaymentsCount = payments.filter(p => p.status === 'paid').length;
-  const totalPaidAmount = payments.filter(p => p.status === 'paid').reduce((sum, p) => sum + (Number(p.amount) || 0), 0);
-
-  // Login screen
-  if (!isAuthenticated) {
     return (
-      <div className="min-h-screen py-20 bg-gray-50 flex items-center justify-center">
-        <Card hover={false} className="w-full max-w-md p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-6">
-            <Lock className="text-primary" size={28} />
-          </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-          <p className="text-gray-500 mb-6">Enter admin password to access the dashboard.</p>
-          <form onSubmit={handleLogin} className="space-y-4">
-            <input
-              type="password"
-              placeholder="Enter Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-              required
-            />
-            {error && (
-              <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 p-3 rounded-xl">
-                <AlertCircle size={16} /> {error}
-              </div>
-            )}
-            <Button type="submit" variant="primary" className="w-full">
-              Unlock Dashboard
-            </Button>
-          </form>
-        </Card>
-      </div>
-    );
-  }
+        <div className="min-h-screen px-6 py-12">
+            <div className="container">
+                {!isConfigValid && <div className="mb-6 rounded-[22px] border border-amber-200 bg-amber-50/85 px-4 py-3 text-sm text-amber-700">Firebase public config appears incomplete.</div>}
+                {error && <div className="mb-6 rounded-[22px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-  return (
-    <div className="min-h-screen py-20 bg-gray-50">
-      <div className="container mx-auto px-6">
-        {/* Firebase Configuration Warning */}
-        {!isConfigValid && (
-          <div className="mb-8 bg-amber-50 border border-amber-200 rounded-xl p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="text-amber-600" size={20} />
-              </div>
-              <div>
-                <h3 className="font-bold text-amber-800 mb-2">Firebase Not Configured</h3>
-                <p className="text-amber-700 text-sm mb-3">
-                  Your Firebase credentials are missing or invalid. The admin dashboard cannot load data without proper Firebase configuration.
-                </p>
-                <div className="bg-amber-100 rounded-lg p-4 text-xs text-amber-800 font-mono">
-                  <p className="mb-2">Please update your <strong>.env.local</strong> file with valid Firebase credentials:</p>
-                  <ul className="space-y-1 ml-4">
-                    <li>NEXT_PUBLIC_FIREBASE_API_KEY</li>
-                    <li>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</li>
-                    <li>NEXT_PUBLIC_FIREBASE_PROJECT_ID</li>
-                    <li>NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET</li>
-                    <li>NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID</li>
-                    <li>NEXT_PUBLIC_FIREBASE_APP_ID</li>
-                  </ul>
-                  <p className="mt-3 text-amber-700">
-                    Get these values from: Firebase Console → Project Settings → Your Apps → Web App
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Admin Dashboard</h1>
-            <p className="text-gray-500 text-sm">Manage projects, messages, and payments</p>
-          </div>
-          <div className="flex gap-3">
-            <div className="flex bg-white border border-gray-200 rounded-xl p-1">
-              <button
-                onClick={() => setActiveTab('projects')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === 'projects' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <LayoutDashboard size={16} />
-                Projects
-                <span className="bg-white/20 px-2 py-0.5 rounded-full text-xs">{requests.length}</span>
-              </button>
-              <button
-                onClick={() => setActiveTab('messages')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors relative flex items-center gap-2 ${activeTab === 'messages' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <MessageSquare size={16} />
-                Messages
-                {unreadCount > 0 && (
-                  <span className="bg-red-500 text-white px-2 py-0.5 rounded-full text-xs">
-                    {unreadCount}
-                  </span>
-                )}
-              </button>
-              <button
-                onClick={() => setActiveTab('payments')}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${activeTab === 'payments' ? 'bg-primary text-white' : 'text-gray-600 hover:bg-gray-100'}`}
-              >
-                <CreditCard size={16} />
-                Payments
-              </button>
-            </div>
-            <button 
-              onClick={handleLogout} 
-              className="px-4 py-2 text-gray-600 hover:text-primary transition-colors border border-gray-200 rounded-xl hover:border-primary"
-              title="Logout"
-            >
-              <LogOut size={20} />
-            </button>
-          </div>
-        </div>
-
-        {/* Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card hover={false} className="p-4">
-            <div className="text-sm text-gray-500">Total Requests</div>
-            <div className="text-2xl font-bold text-gray-900">{requests.length}</div>
-          </Card>
-          <Card hover={false} className="p-4">
-            <div className="text-sm text-gray-500">Unread Messages</div>
-            <div className="text-2xl font-bold text-primary">{unreadCount}</div>
-          </Card>
-          <Card hover={false} className="p-4">
-            <div className="text-sm text-gray-500">Paid Payments</div>
-            <div className="text-2xl font-bold text-green-600">{paidPaymentsCount}</div>
-          </Card>
-          <Card hover={false} className="p-4">
-            <div className="text-sm text-gray-500">Total Revenue</div>
-            <div className="text-2xl font-bold text-gray-900">₹{totalPaidAmount.toLocaleString()}</div>
-          </Card>
-        </div>
-
-        {loading && (
-          <div className="flex justify-center p-12">
-            <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          </div>
-        )}
-
-        {/* Projects Tab */}
-        {!loading && activeTab === 'projects' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Project Requests</h2>
-              <span className="text-sm text-gray-500">{requests.length} total</span>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {requests.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl border border-gray-200">
-                  <LayoutDashboard size={48} className="mx-auto mb-4 text-gray-300" />
-                  No project requests found.
-                </div>
-              ) : (
-                requests.map((req) => (
-                  <Card 
-                    key={req.id} 
-                    className={`${req.isQuickStart ? 'ring-2 ring-amber-400' : ''}`}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <span className="px-3 py-1 bg-purple-100 text-primary text-xs font-semibold rounded-full">
-                        {req.projectType || 'Unknown'}
-                      </span>
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
-                        <Calendar size={12} />
-                        {formatDate(req.createdAt)}
-                      </span>
-                    </div>
-
-                    <div className="mb-4 pb-4 border-b border-gray-100">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <User size={14} /> <strong>{req.name || 'No name'}</strong>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <Mail size={14} />
-                        <span className="text-primary">{req.email || 'No email'}</span>
-                      </div>
-                      {req.phone && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Phone size={14} />
-                          <span className="text-primary">{req.phone}</span>
+                <section className="glass-surface-strong page-section rounded-[34px] px-6 py-8 md:px-8 md:py-10">
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                        <div className="max-w-2xl">
+                            <p className="glass-chip-strong mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                                <Sparkles size={14} />
+                                Admin Dashboard
+                            </p>
+                            <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">Mission control for requests, messages, and payments.</h1>
+                            <p className="mt-4 max-w-xl text-base text-slate-600">Review incoming project requests, open complete request details in-place, and keep payment links moving without leaving the dashboard.</p>
                         </div>
-                      )}
+                        <Button onClick={handleLogout} variant="secondary" className="w-full sm:w-auto">
+                            Sign Out
+                            <LogOut size={18} />
+                        </Button>
                     </div>
+                </section>
 
-                    <div className="grid grid-cols-2 gap-4 mb-4">
-                      {req.timeline && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <Calendar size={14} className="text-primary" />
-                          <span className="font-medium">{req.timeline} Weeks</span>
-                        </div>
-                      )}
-                      {req.budget && (
-                        <div className="flex items-center gap-2 text-sm">
-                          <DollarSign size={14} className="text-green-600" />
-                          <span className="font-medium">{req.budget}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-xs font-semibold text-gray-500 uppercase">Description</span>
-                        {req.isQuickStart && req.paymentId && (
-                          <span className="text-xs text-amber-600 flex items-center gap-1">
-                            <Zap size={10} /> PAID PRIORITY
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-600 text-sm italic line-clamp-3">
-                        &quot;{req.description || 'No description provided'}&quot;
-                      </p>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setSelectedRequest(req.id)}
-                        className="flex-1 py-2 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                      >
-                        <Eye size={16} /> View Details
-                      </button>
-                      <button
-                        onClick={() => handleDeleteRequest(req.id)}
-                        className="py-2 px-4 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Messages Tab */}
-        {!loading && activeTab === 'messages' && (
-          <div>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Contact Messages</h2>
-              <span className="text-sm text-gray-500">{messages.length} total, {unreadCount} unread</span>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {messages.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl border border-gray-200">
-                  <MessageSquare size={48} className="mx-auto mb-4 text-gray-300" />
-                  No messages found.
-                </div>
-              ) : (
-                messages.map((msg) => (
-                  <Card 
-                    key={msg.id} 
-                    delay={0} 
-                    className={msg.status === 'unread' ? 'ring-2 ring-primary bg-primary/5' : ''}
-                  >
-                    <div className="flex justify-between items-start mb-4">
-                      <span className={`px-3 py-1 text-xs font-semibold rounded-full ${msg.status === 'unread' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600'}`}>
-                        {msg.status === 'unread' ? 'New' : 'Read'}
-                      </span>
-                      <span className="text-xs text-gray-400 flex items-center gap-1">
-                        <Calendar size={12} />
-                        {formatDate(msg.createdAt)}
-                      </span>
-                    </div>
-
-                    <h3 className="text-lg font-bold text-gray-900 mb-1 line-clamp-1">{msg.subject || 'No Subject'}</h3>
-
-                    <div className="mb-4 pb-4 border-b border-gray-100">
-                      <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
-                        <User size={14} /> <strong>{msg.name || 'Anonymous'}</strong>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <Mail size={14} /> 
-                        <a href={`mailto:${msg.email}`} className="text-primary hover:underline">{msg.email || 'No email'}</a>
-                      </div>
-                    </div>
-
-                    <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                      <p className="text-gray-600 text-sm leading-relaxed line-clamp-4">
-                        {msg.message || 'No message content'}
-                      </p>
-                    </div>
-
-                    {selectedMessage === msg.id && (
-                      <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedMessage(null)}>
-                        <Card hover={false} className="max-w-lg w-full max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-                          <div className="flex justify-between items-start mb-4">
-                            <h3 className="text-xl font-bold text-gray-900">{msg.subject}</h3>
-                            <button onClick={() => setSelectedMessage(null)} className="text-gray-400 hover:text-gray-600">
-                              <X size={20} />
-                            </button>
-                          </div>
-                          <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <User size={14} /> <strong>{msg.name}</strong>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-gray-600">
-                              <Mail size={14} /> <a href={`mailto:${msg.email}`} className="text-primary hover:underline">{msg.email}</a>
-                            </div>
-                            <div className="text-xs text-gray-400">
-                              {formatDate(msg.createdAt)}
-                            </div>
-                            <div className="bg-gray-50 rounded-xl p-4">
-                              <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">{msg.message}</p>
-                            </div>
-                          </div>
+                <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                    {stats.map((stat) => (
+                        <Card key={stat.label} hover={false} className="admin-grid-card flex min-h-[148px] flex-col justify-between p-5">
+                            <div className="text-sm font-medium text-slate-500">{stat.label}</div>
+                            <div className={`text-3xl font-bold ${stat.tone}`}>{stat.value}</div>
                         </Card>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => setSelectedMessage(msg.id)}
-                        className="flex-1 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors text-sm font-medium flex items-center justify-center gap-2"
-                      >
-                        <Eye size={16} /> View
-                      </button>
-                      {msg.status === 'unread' && (
-                        <button
-                          onClick={() => handleMarkMessageRead(msg.id)}
-                          className="py-2 px-4 rounded-xl border border-primary text-primary hover:bg-primary/10 transition-colors text-sm font-medium"
-                        >
-                          <CheckCircle size={16} />
-                        </button>
-                      )}
-                      <button
-                        onClick={() => handleDeleteMessage(msg.id)}
-                        className="py-2 px-4 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                      >
-                        <X size={16} />
-                      </button>
-                    </div>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Payments Tab */}
-        {!loading && activeTab === 'payments' && (
-          <div>
-            {/* Create Payment Form */}
-            <Card hover={false} className="mb-8">
-              <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <CreditCard size={20} className="text-primary" /> Create New Payment Link
-              </h2>
-              <form onSubmit={handleCreatePayment} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Username</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                    placeholder="e.g. client_abc"
-                    value={newPayment.username}
-                    onChange={(e) => setNewPayment({ ...newPayment, username: e.target.value })}
-                  />
+                    ))}
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Password</label>
-                  <input
-                    type="text"
-                    required
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 px-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                    placeholder="Secure Password"
-                    value={newPayment.password}
-                    onChange={(e) => setNewPayment({ ...newPayment, password: e.target.value })}
-                  />
+
+                <div className="glass-chip-strong mt-8 inline-flex flex-wrap gap-2 rounded-full p-2 backdrop-blur-xl">
+                    {[
+                        { id: "projects", label: "Projects", icon: LayoutDashboard },
+                        { id: "messages", label: "Messages", icon: MessageSquare },
+                        { id: "payments", label: "Payments", icon: CreditCard },
+                    ].map((tab) => {
+                        const Icon = tab.icon;
+                        const active = activeTab === tab.id;
+                        return (
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${active ? "border border-white/40 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))] text-white shadow-[0_18px_40px_rgba(103,88,255,0.25)]" : "text-slate-600 hover:bg-white/45 hover:text-slate-900"}`}>
+                                <Icon size={16} />
+                                {tab.label}
+                            </button>
+                        );
+                    })}
                 </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Amount (INR)</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">₹</span>
-                    <input
-                      type="number"
-                      required
-                      min="1"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-3 pl-8 pr-4 text-gray-900 focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 transition-all"
-                      placeholder="5000"
-                      value={newPayment.amount}
-                      onChange={(e) => setNewPayment({ ...newPayment, amount: e.target.value })}
-                    />
-                  </div>
-                </div>
-                <Button type="submit" variant="primary" disabled={creatingPayment}>
-                  {creatingPayment ? 'Creating...' : 'Generate Link'}
-                </Button>
-              </form>
-            </Card>
 
-            {/* Payments List */}
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-lg font-bold text-gray-900">Payment Requests</h2>
-              <span className="text-sm text-gray-500">{payments.length} total, {paidPaymentsCount} paid</span>
-            </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {payments.length === 0 ? (
-                <div className="col-span-full text-center py-12 text-gray-500 bg-white rounded-xl border border-dashed border-gray-300">
-                  <CreditCard size={48} className="mx-auto mb-4 text-gray-300" />
-                  No payment links created yet.
-                </div>
-              ) : (
-                payments.map((pay) => (
-                  <Card key={pay.id} delay={0} className={pay.status === 'paid' ? 'ring-2 ring-green-500' : ''}>
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h4 className="font-bold text-gray-900 text-lg mb-1">{pay.username}</h4>
-                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                          <span className="bg-gray-100 px-2 py-1 rounded font-mono text-xs">Pass: {pay.password}</span>
-                        </div>
-                      </div>
-                      <div className={`px-3 py-1 rounded-full text-xs font-semibold uppercase ${pay.status === 'paid' ? 'bg-green-100 text-green-600' : 'bg-amber-100 text-amber-600'}`}>
-                        {pay.status || 'pending'}
-                      </div>
-                    </div>
-
-                    <div className="text-3xl font-bold text-gray-900 mb-2">₹{Number(pay.amount).toLocaleString()}</div>
-                    <div className="text-xs text-gray-400 mb-4">
-                      Created: {formatDate(pay.createdAt)}
-                    </div>
-
-                    {pay.status === 'paid' && pay.razorpayPaymentId && (
-                      <div className="bg-green-50 rounded-lg p-3 mb-4 text-xs">
-                        <div className="text-gray-500">Payment ID</div>
-                        <div className="font-mono text-green-700 break-all">{pay.razorpayPaymentId}</div>
-                      </div>
-                    )}
-
-                    <button
-                      onClick={() => handleDeletePayment(pay.id)}
-                      className="w-full py-2 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                    >
-                      Delete
-                    </button>
-                  </Card>
-                ))
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Request Detail Modal */}
-        {selectedRequest && (() => {
-          const req = requests.find(r => r.id === selectedRequest);
-          if (!req) return null;
-          return (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setSelectedRequest(null)}>
-              <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl" onClick={e => e.stopPropagation()}>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-6">
-                    <div>
-                      <span className="px-3 py-1 bg-purple-100 text-primary text-xs font-semibold rounded-full">
-                        {req.projectType || 'Unknown'}
-                      </span>
-                      <h3 className="text-xl font-bold text-gray-900 mt-3">Project Request Details</h3>
-                    </div>
-                    <button onClick={() => setSelectedRequest(null)} className="text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100">
-                      <X size={24} />
-                    </button>
-                  </div>
-
-                  <div className="space-y-6">
-                    {/* Client Info */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Client Information</h4>
-                      <div className="space-y-3">
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <User size={18} className="text-primary" />
-                          <div>
-                            <span className="text-xs text-gray-500">Name</span>
-                            <p className="font-medium">{req.name || 'No name provided'}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3 text-gray-700">
-                          <Mail size={18} className="text-primary" />
-                          <div>
-                            <span className="text-xs text-gray-500">Email</span>
-                            <p><a href={`mailto:${req.email}`} className="text-primary hover:underline">{req.email || 'No email'}</a></p>
-                          </div>
-                        </div>
-                        {req.phone && (
-                          <div className="flex items-center gap-3 text-gray-700">
-                            <Phone size={18} className="text-primary" />
-                            <div>
-                              <span className="text-xs text-gray-500">Phone</span>
-                              <p><a href={`tel:${req.phone}`} className="text-primary hover:underline">{req.phone}</a></p>
-                            </div>
-                          </div>
+                {activeTab === "projects" && (
+                    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {requests.length === 0 && (
+                            <EmptyState title="No project requests yet" copy="New inquiries will show up here as soon as clients submit the Finvolve request flow." />
                         )}
-                      </div>
+                        {requests.map((item) => (
+                            <Card key={item.id} className="admin-grid-card flex flex-col justify-between p-6">
+                                <div>
+                                    <div className="mb-4 flex items-start justify-between gap-3">
+                                        <div>
+                                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{item.projectType || "Project request"}</p>
+                                            <h3 className="mt-2 text-xl font-bold text-slate-950">{item.name || "Unnamed lead"}</h3>
+                                        </div>
+                                        {item.quickStart && <span className="glass-chip-strong rounded-full px-3 py-1 text-xs font-semibold text-primary">Quick Start</span>}
+                                    </div>
+                                    <div className="space-y-2 text-sm text-slate-600">
+                                        <div className="flex items-center gap-2"><Mail size={14} className="text-slate-400" />{item.email || "No email"}</div>
+                                        <div className="flex items-center gap-2"><Phone size={14} className="text-slate-400" />{item.phone || "No phone"}</div>
+                                    </div>
+                                    <p className="mt-5 line-clamp-4 text-sm leading-6 text-slate-600">{item.description || "No description provided."}</p>
+                                </div>
+                                <div className="mt-6">
+                                    <div className="mb-4 flex flex-wrap gap-2 text-xs text-slate-500">
+                                        {item.timeline && <span className="glass-chip rounded-full px-3 py-1">{item.timeline} weeks</span>}
+                                        {item.budget && <span className="glass-chip rounded-full px-3 py-1">{item.budget}</span>}
+                                        <span className="glass-chip rounded-full px-3 py-1">{formatDate(item.createdAt)}</span>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <Button type="button" variant="secondary" className="flex-1" onClick={() => setSelectedRequest(item)}>View<Eye size={18} /></Button>
+                                        <button type="button" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => handleDeleteRequest(item.id)} disabled={deletingRequestId === item.id}><Trash2 size={16} />{deletingRequestId === item.id ? "Deleting..." : "Delete"}</button>
+                                    </div>
+                                </div>
+                            </Card>
+                        ))}
                     </div>
+                )}
 
-                    {/* Project Details */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Project Details</h4>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="flex items-center gap-2">
-                          <Calendar size={18} className="text-primary" />
-                          <div>
-                            <span className="text-xs text-gray-500">Timeline</span>
-                            <p className="font-medium">{req.timeline ? `${req.timeline} Weeks` : 'Not specified'}</p>
-                          </div>
+                {activeTab === "messages" && (
+                    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {messages.length === 0 && (
+                            <EmptyState title="No contact messages" copy="Your contact inbox is empty right now. New messages will appear here automatically." />
+                        )}
+                        {messages.map((item) => (
+                            <Card key={item.id} className={item.status === "unread" ? "border-primary/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_24px_60px_rgba(103,88,255,0.16)]" : ""}>
+                                <div className="mb-3 flex items-start justify-between gap-3">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-950">{item.subject || "No subject"}</h3>
+                                        <p className="mt-1 text-sm text-slate-600">{item.name || "Anonymous"} · {item.email || "No email"}</p>
+                                    </div>
+                                    {item.status === "unread" && <span className="glass-chip-strong rounded-full px-3 py-1 text-xs font-semibold text-primary">Unread</span>}
+                                </div>
+                                <p className="line-clamp-5 text-sm leading-6 text-slate-600">{item.message || "No content."}</p>
+                                <div className="mt-5 text-xs text-slate-500">{formatDate(item.createdAt)}</div>
+                                <div className="mt-5 flex gap-3">
+                                    {item.status === "unread" && <Button type="button" variant="secondary" className="flex-1" onClick={() => updateDoc(doc(db, "contact_messages", item.id), { status: "read" })}>Mark Read<CheckCircle size={18} /></Button>}
+                                    <button type="button" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "contact_messages", item.id))}><Trash2 size={16} />Delete</button>
+                                </div>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+
+                {activeTab === "payments" && (
+                    <div className="mt-8 space-y-8">
+                        <Card hover={false} className="glass-surface-strong p-6 md:p-8">
+                            <div className="mb-6 max-w-2xl">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Secure Links</p>
+                                <h2 className="mt-3 text-2xl font-bold text-slate-950">Create a tokenized payment request</h2>
+                                <p className="mt-2 text-sm text-slate-600">Generate a secure, expiring payment link without storing reusable credentials.</p>
+                            </div>
+                            <form onSubmit={handleCreatePayment} className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
+                                <input className="rounded-[20px] px-4 py-3 text-slate-900" placeholder="Client name" value={newPayment.clientName} onChange={(event) => setNewPayment({ ...newPayment, clientName: event.target.value })} required />
+                                <input className="rounded-[20px] px-4 py-3 text-slate-900" placeholder="Client email" value={newPayment.clientEmail} onChange={(event) => setNewPayment({ ...newPayment, clientEmail: event.target.value })} />
+                                <input className="rounded-[20px] px-4 py-3 text-slate-900" type="number" min="1" placeholder="Amount (INR)" value={newPayment.amount} onChange={(event) => setNewPayment({ ...newPayment, amount: event.target.value })} required />
+                                <input className="rounded-[20px] px-4 py-3 text-slate-900" type="number" min="1" max="720" placeholder="Expiry hours" value={newPayment.expiresInHours} onChange={(event) => setNewPayment({ ...newPayment, expiresInHours: event.target.value })} required />
+                                <Button type="submit" variant="primary" disabled={creatingPayment}>{creatingPayment ? "Creating..." : "Generate Link"}</Button>
+                            </form>
+                            <textarea className="mt-4 min-h-[110px] w-full rounded-[24px] px-4 py-3 text-slate-900" rows={3} placeholder="Notes for the client (optional)" value={newPayment.notes} onChange={(event) => setNewPayment({ ...newPayment, notes: event.target.value })} />
+                            {generatedLink && (
+                                <div className="mt-5 rounded-[24px] border border-emerald-200 bg-emerald-50/85 p-4 text-sm text-emerald-800">
+                                    <div className="font-semibold">Payment link ready</div>
+                                    <div className="mt-2 break-all">{generatedLink.paymentUrl}</div>
+                                    <button type="button" className="mt-3 rounded-full border border-emerald-300 bg-white/70 px-4 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-white" onClick={() => navigator.clipboard.writeText(generatedLink.paymentUrl)}>Copy link</button>
+                                </div>
+                            )}
+                        </Card>
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {payments.length === 0 && (
+                                <EmptyState title="No payment requests yet" copy="Create a tokenized payment link and your payment requests will begin showing up here." />
+                            )}
+                            {payments.map((item) => (
+                                <Card key={item.id} className={item.status === "paid" ? "border-emerald-300/70 shadow-[inset_0_1px_0_rgba(255,255,255,0.75),0_24px_60px_rgba(16,185,129,0.16)]" : ""}>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="text-xl font-bold text-slate-950">{item.clientName || item.username || "Client"}</h3>
+                                            <p className="mt-1 text-sm text-slate-600">{item.clientEmail || item.email || "No email"}</p>
+                                        </div>
+                                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${item.status === "paid" ? "border border-emerald-200 bg-emerald-50/80 text-emerald-700" : "glass-chip-strong text-slate-600"}`}>{item.status || "pending"}</span>
+                                    </div>
+                                    <div className="mt-5 text-4xl font-bold text-slate-950">{formatCurrency(item.amount)}</div>
+                                    {item.tokenExpiresAt && <div className="mt-2 text-xs text-slate-500">Expires: {formatDate(item.tokenExpiresAt)}</div>}
+                                    {item.razorpayPaymentId && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">Payment ID: {item.razorpayPaymentId}</div>}
+                                    <button type="button" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</button>
+                                </Card>
+                            ))}
                         </div>
-                        <div className="flex items-center gap-2">
-                          <DollarSign size={18} className="text-green-600" />
-                          <div>
-                            <span className="text-xs text-gray-500">Budget</span>
-                            <p className="font-medium">{req.budget || 'Not specified'}</p>
-                          </div>
-                        </div>
-                      </div>
-                      {req.isQuickStart && req.paymentId && (
-                        <div className="mt-4 flex items-center gap-2 text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-                          <Zap size={16} />
-                          <span className="text-sm font-medium">Paid Priority Request</span>
-                        </div>
-                      )}
                     </div>
-
-                    {/* Description */}
-                    <div className="bg-gray-50 rounded-xl p-4">
-                      <h4 className="text-sm font-semibold text-gray-500 uppercase mb-3">Project Description</h4>
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {req.description || 'No description provided'}
-                      </p>
-                    </div>
-
-                    {/* Timestamp */}
-                    <div className="text-xs text-gray-400 flex items-center gap-2">
-                      <Calendar size={14} />
-                      Submitted: {formatDate(req.createdAt)}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="flex gap-3 pt-4 border-t border-gray-100">
-                      <a
-                        href={`mailto:${req.email}?subject=Re: Your Project Request&body=Hi ${req.name || 'there'},%0D%0A%0D%0AThank you for your project request.%0D%0A%0D%0ABest regards`}
-                        className="flex-1 py-3 rounded-xl bg-primary text-white hover:bg-primary/90 transition-colors text-sm font-medium text-center"
-                      >
-                        Reply via Email
-                      </a>
-                      <button
-                        onClick={() => handleDeleteRequest(req.id)}
-                        className="py-3 px-6 rounded-xl border border-red-200 text-red-500 hover:bg-red-50 transition-colors text-sm font-medium"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
+                )}
             </div>
-          );
-        })()}
-      </div>
-    </div>
-  );
+            {selectedRequest && (
+                <div className="glass-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-8" onClick={() => setSelectedRequest(null)}>
+                    <div className="glass-surface-strong max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-[34px]" onClick={(event) => event.stopPropagation()}>
+                        <div className="flex items-start justify-between gap-4 border-b border-white/45 px-6 py-5 md:px-8">
+                            <div>
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Full Request</p>
+                                <h2 className="mt-2 text-2xl font-bold text-slate-950">{selectedRequest.name || "Unnamed lead"}</h2>
+                                <p className="mt-1 text-sm text-slate-600">{selectedRequest.projectType || "Project request"}</p>
+                            </div>
+                            <button type="button" className="glass-chip-strong inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-white/85 hover:text-slate-900" onClick={() => setSelectedRequest(null)} aria-label="Close request modal"><X size={18} /></button>
+                        </div>
+                        <div className="max-h-[calc(90vh-144px)] overflow-y-auto px-6 py-6 md:px-8">
+                            <div className="grid gap-4 md:grid-cols-2">
+                                {projectFields(selectedRequest).map((field) => (
+                                    <div key={field.label} className="glass-chip rounded-[24px] px-4 py-4">
+                                        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">{field.label}</div>
+                                        <div className="mt-2 text-sm font-medium leading-6 text-slate-900">{field.value}</div>
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="glass-chip mt-6 rounded-[28px] p-5">
+                                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">Full description</div>
+                                <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{selectedRequest.description || "No description provided."}</p>
+                            </div>
+                            {selectedRequest.service && <div className="glass-chip mt-4 rounded-[22px] px-4 py-3 text-sm text-slate-600">Requested service: <span className="font-semibold text-slate-900">{selectedRequest.service}</span></div>}
+                        </div>
+                        <div className="flex flex-col gap-3 border-t border-white/45 px-6 py-5 sm:flex-row sm:justify-end md:px-8">
+                            <Button type="button" variant="secondary" onClick={() => setSelectedRequest(null)}>Close</Button>
+                            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/80 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => handleDeleteRequest(selectedRequest.id)} disabled={deletingRequestId === selectedRequest.id}><Trash2 size={16} />{deletingRequestId === selectedRequest.id ? "Deleting..." : "Delete Request"}</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
+
