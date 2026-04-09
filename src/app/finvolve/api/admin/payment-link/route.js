@@ -121,7 +121,7 @@ export async function POST(request) {
         }
 
         return NextResponse.json(
-            { error: "Unable to create payment link." },
+            { error: message || "Unable to create payment link." },
             { status: 500 },
         );
     }

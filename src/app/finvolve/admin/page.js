@@ -46,7 +46,7 @@ const formatDate = (timestamp) => {
 const formatCurrency = (value) => `INR ${Number(value || 0).toLocaleString()}`;
 
 const formatValidationDetails = (details) => {
-    if (!details?.fieldErrors) return "";
+    if (!details) return "";
 
     const messages = Object.entries(details.fieldErrors)
         .flatMap(([field, errors]) =>
@@ -54,7 +54,8 @@ const formatValidationDetails = (details) => {
         )
         .filter(Boolean);
 
-    return messages.join(" | ");
+    const formMessages = details.formErrors || [];
+    return [...messages, ...formMessages].join(" | ");
 };
 
 const projectFields = (item) => [
