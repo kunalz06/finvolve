@@ -443,6 +443,11 @@ export default function AdminPage() {
                                 <input className="rounded-[20px] px-4 py-3 text-slate-900" type="number" min="1" max="720" placeholder="Expiry hours" value={newPayment.expiresInHours} onChange={(event) => setNewPayment({ ...newPayment, expiresInHours: event.target.value })} required />
                                 <Button type="submit" variant="primary" disabled={creatingPayment}>{creatingPayment ? "Creating..." : "Generate Link"}</Button>
                             </form>
+                            {error && (
+                                <div className="mt-4 rounded-[20px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700">
+                                    {error}
+                                </div>
+                            )}
                             <textarea className="mt-4 min-h-[110px] w-full rounded-[24px] px-4 py-3 text-slate-900" rows={3} placeholder="Notes for the client (optional)" value={newPayment.notes} onChange={(event) => setNewPayment({ ...newPayment, notes: event.target.value })} />
                             {generatedLink && (
                                 <div className="mt-5 rounded-[24px] border border-emerald-200 bg-emerald-50/85 p-4 text-sm text-emerald-800">

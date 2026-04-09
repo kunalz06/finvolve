@@ -53,6 +53,10 @@ export async function POST(request) {
         const json = await request.json();
         const parsed = payloadSchema.safeParse(json);
         if (!parsed.success) {
+            console.error(
+                "Invalid admin payment-link payload:",
+                JSON.stringify(parsed.error.flatten()),
+            );
             return NextResponse.json(
                 { error: "Invalid payload.", details: parsed.error.flatten() },
                 { status: 400 },
