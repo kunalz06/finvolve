@@ -81,6 +81,25 @@ export async function verifyAdminFromRequest(request) {
         return { ok: true, decoded };
     } catch (error) {
         console.error("Admin token verification failed:", error.message);
+
+        const message = String(error?.message || "");
+        const code = String(error?.code || "");
+        const isServerConfigIssue =
+            code === "app/invalid-credential" ||
+            message.includes("Unable to detect a Project Id") ||
+            message.includes("Failed to determine project ID") ||
+            message.includes("credential implementation") ||
+            message.includes("Could not load the default credentials") ||
+            message.includes("Failed to fetch a valid Google OAuth2 access token");
+
+        if (isServerConfigIssue) {
+            return {
+                ok: false,
+                status: 500,
+                error: "Firebase Admin is not configured correctly on the server.",
+            };
+        }
+
         return { ok: false, status: 401, error: "Invalid or expired token." };
     }
 }

@@ -197,7 +197,11 @@ export default function AdminPage() {
         setError("");
 
         try {
-            const idToken = await auth.currentUser.getIdToken();
+            if (!auth?.currentUser) {
+                throw new Error("Your admin session has expired. Please sign in again.");
+            }
+
+            const idToken = await auth.currentUser.getIdToken(true);
             const response = await fetch("/finvolve/api/admin/payment-link", {
                 method: "POST",
                 headers: {
