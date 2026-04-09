@@ -75,6 +75,13 @@ export async function POST(request) {
         });
 
         const siteUrl = getSiteUrl(request);
+        if (!siteUrl) {
+            return NextResponse.json(
+                { error: "Site URL is not configured on the server." },
+                { status: 500 },
+            );
+        }
+
         const paymentUrl = `${siteUrl}/finvolve/payments?token=${token}`;
 
         return NextResponse.json({
@@ -85,6 +92,23 @@ export async function POST(request) {
         });
     } catch (error) {
         console.error("Payment link creation failed:", error.message);
+
+        const message = String(error?.message || "");
+        const code = String(error?.code || "");
+        const isFirebaseAdminConfigIssue =
+            code === "app/invalid-credential" ||
+            message.includes("Unable to detect a Project Id") ||
+            message.includes("Failed to determine project ID") ||
+            message.includes("Could not load the default credentials") ||
+            message.includes("Failed to fetch a valid Google OAuth2 access token");
+
+        if (isFirebaseAdminConfigIssue) {
+            return NextResponse.json(
+                { error: "Firebase Admin is not configured correctly on the server." },
+                { status: 500 },
+            );
+        }
+
         return NextResponse.json(
             { error: "Unable to create payment link." },
             { status: 500 },

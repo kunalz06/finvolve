@@ -26,13 +26,13 @@ export default function Navbar() {
         <div className="relative">
           <div className="glass-orb glass-orb-violet right-12 top-2 h-16 w-28" />
           <div className="glass-orb glass-orb-cyan left-24 top-1 h-14 w-24" />
-          <div className={`glass-surface-strong glass-spectrum flex items-center justify-between rounded-[30px] px-4 py-3 md:px-6 ${scrolled ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_28px_72px_rgba(27,38,68,0.22)]" : ""}`}>
+          <div className={`glass-surface-strong glass-spectrum flex items-center justify-between rounded-[24px] px-3 py-3 md:rounded-[30px] md:px-6 ${scrolled ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_28px_72px_rgba(27,38,68,0.22)]" : ""}`}>
           <Link href="/finvolve" className="flex items-center gap-3 group">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(124,92,255,0.96),rgba(105,183,255,0.82),rgba(82,215,183,0.72))] shadow-[0_14px_30px_rgba(103,88,255,0.28)] transition-transform duration-300 group-hover:scale-105">
               <Zap className="text-white" size={20} />
             </div>
-            <div>
-              <div className="text-xl font-semibold tracking-tight text-slate-900">Finvolve</div>
+            <div className="min-w-0">
+              <div className="text-lg font-semibold tracking-tight text-slate-900 md:text-xl">Finvolve</div>
               <div className="hidden text-[11px] uppercase tracking-[0.25em] text-slate-500 md:block">
                 Software Builders
               </div>
@@ -58,7 +58,7 @@ export default function Navbar() {
           </div>
 
           <button
-            className="glass-surface flex h-11 w-11 items-center justify-center rounded-2xl text-slate-900 transition-colors hover:text-primary md:hidden"
+            className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-slate-900 transition-colors hover:text-primary md:hidden"
             onClick={() => setMobileMenuOpen((open) => !open)}
             aria-label="Toggle navigation"
           >
@@ -70,7 +70,7 @@ export default function Navbar() {
 
       {mobileMenuOpen && (
         <div className="container mx-auto mt-3 md:hidden">
-          <div className="glass-surface-strong rounded-[30px] p-5">
+          <div className="glass-surface-strong rounded-[26px] p-4">
             <div className="flex flex-col gap-3">
               {navLinks.map((link) => (
                 <Link
