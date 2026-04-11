@@ -111,7 +111,8 @@ export async function POST(request) {
             message.includes("Unable to detect a Project Id") ||
             message.includes("Failed to determine project ID") ||
             message.includes("Could not load the default credentials") ||
-            message.includes("Failed to fetch a valid Google OAuth2 access token");
+            message.includes("Failed to fetch a valid Google OAuth2 access token") ||
+            message.includes("DECODER routines::unsupported");
 
         if (isFirebaseAdminConfigIssue) {
             return NextResponse.json(

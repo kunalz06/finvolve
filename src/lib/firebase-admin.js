@@ -4,19 +4,64 @@ import { getFirestore } from "firebase-admin/firestore";
 
 let cachedApp = null;
 
+function stripWrappingQuotes(value) {
+    const trimmed = String(value || "").trim();
+    if (
+        (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("'") && trimmed.endsWith("'"))
+    ) {
+        return trimmed.slice(1, -1);
+    }
+
+    return trimmed;
+}
+
+function normalizePrivateKey(value) {
+    if (!value) return "";
+
+    const withoutQuotes = stripWrappingQuotes(value).replace(/\\"/g, '"');
+    const withNewlines = withoutQuotes.replace(/\\n/g, "\n");
+
+    if (withNewlines.includes("-----BEGIN PRIVATE KEY-----")) {
+        return withNewlines;
+    }
+
+    try {
+        const decoded = Buffer.from(withoutQuotes, "base64").toString("utf8");
+        if (decoded.includes("-----BEGIN PRIVATE KEY-----")) {
+            return decoded.replace(/\\n/g, "\n");
+        }
+    } catch {
+        // Keep the original value below so Firebase Admin returns a useful error.
+    }
+
+    return withNewlines;
+}
+
+function parseServiceAccountJson(rawJson) {
+    const normalized = stripWrappingQuotes(rawJson).replace(/\\"/g, '"');
+
+    try {
+        return JSON.parse(normalized);
+    } catch {
+        const decoded = Buffer.from(normalized, "base64").toString("utf8");
+        return JSON.parse(decoded);
+    }
+}
+
 function parseServiceAccountFromEnv() {
     const rawJson = process.env.FIREBASE_SERVICE_ACCOUNT_KEY;
     if (rawJson) {
-        const parsed = JSON.parse(rawJson);
+        const parsed = parseServiceAccountJson(rawJson);
         if (parsed.private_key) {
-            parsed.private_key = parsed.private_key.replace(/\\n/g, "\n");
+            parsed.private_key = normalizePrivateKey(parsed.private_key);
         }
         return parsed;
     }
 
     const projectId = process.env.FIREBASE_PROJECT_ID;
     const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-    const privateKey = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n");
+    const privateKey = normalizePrivateKey(process.env.FIREBASE_PRIVATE_KEY);
 
     if (!projectId || !clientEmail || !privateKey) {
         return null;
@@ -90,7 +135,8 @@ export async function verifyAdminFromRequest(request) {
             message.includes("Failed to determine project ID") ||
             message.includes("credential implementation") ||
             message.includes("Could not load the default credentials") ||
-            message.includes("Failed to fetch a valid Google OAuth2 access token");
+            message.includes("Failed to fetch a valid Google OAuth2 access token") ||
+            message.includes("DECODER routines::unsupported");
 
         if (isServerConfigIssue) {
             return {
