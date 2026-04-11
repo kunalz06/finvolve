@@ -24,6 +24,17 @@ Copy `.env.example` to `.env.local` and fill values:
   - `RAZORPAY_KEY_SECRET`
 - Firebase Admin credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or split vars)
 - Optional `NEXT_PUBLIC_SITE_URL` for absolute payment links
+- Newsletter SMTP credentials for personal-mail sending:
+  - `NEWSLETTER_SMTP_HOST`
+  - `NEWSLETTER_SMTP_PORT`
+  - `NEWSLETTER_SMTP_SECURE`
+  - `NEWSLETTER_SMTP_USER`
+  - `NEWSLETTER_SMTP_PASS`
+  - `NEWSLETTER_FROM_EMAIL`
+  - `NEWSLETTER_FROM_NAME`
+  - `NEWSLETTER_REPLY_TO`
+
+For Gmail, enable 2-step verification and use a Gmail App Password for `NEWSLETTER_SMTP_PASS`. Do not use your normal Gmail password.
 
 ## Admin Access
 

@@ -24,6 +24,18 @@ service cloud.firestore {
       allow create, read, update, delete: if isAdmin();
     }
 
+    // Newsletter records are written by server routes through the Admin SDK.
+    match /newsletter_subscribers/{subscriberId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
+
+    // Newsletter campaign audit records are admin-only.
+    match /newsletter_campaigns/{campaignId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
+
     // Public registration submission.
     match /registrations/{registrationId} {
       allow create: if true;

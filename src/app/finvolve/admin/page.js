@@ -26,8 +26,10 @@ import {
     Mail,
     MessageSquare,
     Phone,
+    Send,
     Sparkles,
     Trash2,
+    Users,
     X,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -92,6 +94,7 @@ export default function AdminPage() {
     const [requests, setRequests] = useState([]);
     const [messages, setMessages] = useState([]);
     const [payments, setPayments] = useState([]);
+    const [newsletterSubscribers, setNewsletterSubscribers] = useState([]);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [deletingRequestId, setDeletingRequestId] = useState("");
     const [newPayment, setNewPayment] = useState({
@@ -103,6 +106,12 @@ export default function AdminPage() {
     });
     const [creatingPayment, setCreatingPayment] = useState(false);
     const [generatedLink, setGeneratedLink] = useState(null);
+    const [newsletterDraft, setNewsletterDraft] = useState({
+        subject: "",
+        body: "",
+    });
+    const [sendingNewsletter, setSendingNewsletter] = useState(false);
+    const [newsletterResult, setNewsletterResult] = useState(null);
     const listenersRef = useRef({});
 
     const stopListeners = () => {
@@ -163,6 +172,10 @@ export default function AdminPage() {
         listenersRef.current.payments = onSnapshot(
             query(collection(db, "payment_requests"), orderBy("createdAt", "desc")),
             (snap) => setPayments(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
+        listenersRef.current.newsletter = onSnapshot(
+            query(collection(db, "newsletter_subscribers"), orderBy("createdAt", "desc")),
+            (snap) => setNewsletterSubscribers(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
         );
 
         return stopListeners;
@@ -278,8 +291,50 @@ export default function AdminPage() {
         }
     };
 
+    const handleSendNewsletter = async (event) => {
+        event.preventDefault();
+        setSendingNewsletter(true);
+        setNewsletterResult(null);
+        setError("");
+
+        try {
+            if (!auth?.currentUser) {
+                throw new Error("Your admin session has expired. Please sign in again.");
+            }
+
+            const idToken = await auth.currentUser.getIdToken(true);
+            const response = await fetch("/finvolve/api/admin/newsletter/send", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${idToken}`,
+                },
+                body: JSON.stringify({
+                    subject: newsletterDraft.subject,
+                    body: newsletterDraft.body,
+                }),
+            });
+            const json = await response.json();
+            if (!response.ok) throw new Error(json.error || "Could not send newsletter.");
+
+            setNewsletterResult({
+                type: json.failureCount > 0 ? "warning" : "success",
+                message: `Sent to ${json.sentCount} subscriber${json.sentCount === 1 ? "" : "s"}${json.failureCount ? ` with ${json.failureCount} failure${json.failureCount === 1 ? "" : "s"}` : ""}.`,
+            });
+            setNewsletterDraft({ subject: "", body: "" });
+        } catch (sendError) {
+            setNewsletterResult({
+                type: "error",
+                message: sendError.message || "Could not send newsletter.",
+            });
+        } finally {
+            setSendingNewsletter(false);
+        }
+    };
+
     const unreadCount = messages.filter((item) => item.status === "unread").length;
     const paidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const activeSubscriberCount = newsletterSubscribers.filter((item) => item.status === "active").length;
     const revenue = payments
         .filter((item) => item.status === "paid")
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
@@ -288,7 +343,8 @@ export default function AdminPage() {
         { label: "Unread", value: unreadCount, tone: "text-primary" },
         { label: "Paid", value: paidPaymentsCount, tone: "text-emerald-600" },
         { label: "Revenue", value: formatCurrency(revenue), tone: "text-slate-900" },
-    ]), [requests.length, unreadCount, paidPaymentsCount, revenue]);
+        { label: "Subscribers", value: activeSubscriberCount, tone: "text-primary" },
+    ]), [requests.length, unreadCount, paidPaymentsCount, revenue, activeSubscriberCount]);
 
     if (authState !== "authenticated") {
         return (
@@ -341,7 +397,7 @@ export default function AdminPage() {
                     </div>
                 </section>
 
-                <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
                     {stats.map((stat) => (
                         <Card key={stat.label} hover={false} className="admin-grid-card flex min-h-[148px] flex-col justify-between p-5">
                             <div className="text-sm font-medium text-slate-500">{stat.label}</div>
@@ -355,6 +411,7 @@ export default function AdminPage() {
                         { id: "projects", label: "Projects", icon: LayoutDashboard },
                         { id: "messages", label: "Messages", icon: MessageSquare },
                         { id: "payments", label: "Payments", icon: CreditCard },
+                        { id: "newsletter", label: "Newsletter", icon: Users },
                     ].map((tab) => {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
@@ -475,6 +532,59 @@ export default function AdminPage() {
                                     {item.tokenExpiresAt && <div className="mt-2 text-xs text-slate-500">Expires: {formatDate(item.tokenExpiresAt)}</div>}
                                     {item.razorpayPaymentId && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">Payment ID: {item.razorpayPaymentId}</div>}
                                     <button type="button" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</button>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === "newsletter" && (
+                    <div className="mt-8 space-y-8">
+                        <Card hover={false} className="glass-surface-strong p-6 md:p-8">
+                            <div className="mb-6 max-w-2xl">
+                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Newsletter</p>
+                                <h2 className="mt-3 text-2xl font-bold text-slate-950">Send an update from your personal mail</h2>
+                                <p className="mt-2 text-sm text-slate-600">This sends one email per active subscriber and includes an unsubscribe link automatically.</p>
+                            </div>
+                            <form onSubmit={handleSendNewsletter} className="space-y-4">
+                                <input className="w-full rounded-[20px] px-4 py-3 text-slate-900" placeholder="Newsletter subject" value={newsletterDraft.subject} onChange={(event) => setNewsletterDraft({ ...newsletterDraft, subject: event.target.value })} required />
+                                <textarea className="min-h-[180px] w-full rounded-[24px] px-4 py-3 text-slate-900" placeholder="Write the newsletter body..." value={newsletterDraft.body} onChange={(event) => setNewsletterDraft({ ...newsletterDraft, body: event.target.value })} required />
+                                <Button type="submit" variant="primary" disabled={sendingNewsletter}>
+                                    {sendingNewsletter ? "Sending..." : "Send Newsletter"}
+                                    <Send size={18} />
+                                </Button>
+                            </form>
+                            {newsletterResult && (
+                                <div className={`mt-5 rounded-[24px] p-4 text-sm ${
+                                    newsletterResult.type === "error"
+                                        ? "border border-red-200 bg-red-50/85 text-red-700"
+                                        : newsletterResult.type === "warning"
+                                            ? "border border-amber-200 bg-amber-50/85 text-amber-700"
+                                            : "border border-emerald-200 bg-emerald-50/85 text-emerald-700"
+                                }`}>
+                                    {newsletterResult.message}
+                                </div>
+                            )}
+                        </Card>
+
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {newsletterSubscribers.length === 0 && (
+                                <EmptyState title="No newsletter subscribers yet" copy="Subscribers from the site footer will show up here automatically." />
+                            )}
+                            {newsletterSubscribers.map((item) => (
+                                <Card key={item.id} className={item.status === "active" ? "border-emerald-300/60" : "opacity-75"}>
+                                    <div className="flex items-start justify-between gap-4">
+                                        <div>
+                                            <h3 className="text-lg font-bold text-slate-950">{item.name || item.email || "Subscriber"}</h3>
+                                            <p className="mt-1 break-all text-sm text-slate-600">{item.email || "No email"}</p>
+                                        </div>
+                                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${item.status === "active" ? "border border-emerald-200 bg-emerald-50/80 text-emerald-700" : "glass-chip-strong text-slate-600"}`}>{item.status || "active"}</span>
+                                    </div>
+                                    <div className="mt-5 space-y-2 text-xs text-slate-500">
+                                        <div>Subscribed: {formatDate(item.subscribedAt || item.createdAt)}</div>
+                                        {item.lastNewsletterSentAt && <div>Last sent: {formatDate(item.lastNewsletterSentAt)}</div>}
+                                        {item.lastEmailError && <div className="rounded-[18px] border border-red-200 bg-red-50/80 px-3 py-2 text-red-700">Last error: {item.lastEmailError}</div>}
+                                    </div>
                                 </Card>
                             ))}
                         </div>
