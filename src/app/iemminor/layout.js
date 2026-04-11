@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import "../finvolve/globals.css"; // Reuse globals for Tailwind
+import "../dev/globals.css"; // Reuse globals for Tailwind
 
 export const metadata = {
     title: "IEM Minor Degree Registration",

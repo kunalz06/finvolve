@@ -1,5 +1,5 @@
-const store = globalThis.__finvolveRateLimitStore || new Map();
-globalThis.__finvolveRateLimitStore = store;
+const store = globalThis.__devInfinityRateLimitStore || new Map();
+globalThis.__devInfinityRateLimitStore = store;
 
 export function getRequestIp(request) {
     const forwardedFor = request.headers.get("x-forwarded-for");

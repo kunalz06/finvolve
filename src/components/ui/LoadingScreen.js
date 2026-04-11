@@ -40,7 +40,7 @@ export default function LoadingScreen() {
                             transition={{ delay: 0.3 }}
                             className="text-2xl font-bold text-gray-900"
                         >
-                            Finvolve
+                            DEV♾️
                         </motion.span>
                     </motion.div>
 

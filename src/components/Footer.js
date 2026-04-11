@@ -16,7 +16,7 @@ export default function Footer() {
     setNewsletterLoading(true);
 
     try {
-      const response = await fetch("/finvolve/api/newsletter/subscribe", {
+      const response = await fetch("/dev/api/newsletter/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newsletterEmail }),
@@ -47,11 +47,11 @@ export default function Footer() {
           <div className="glass-orb glass-orb-mint left-12 bottom-10 h-24 w-24" />
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
-              <Link href="/finvolve" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
+              <Link href="/dev" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
                 <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(124,92,255,0.96),rgba(105,183,255,0.82),rgba(82,215,183,0.74))] shadow-[0_14px_28px_rgba(103,88,255,0.24)]">
                   <Zap className="text-white" size={20} />
                 </div>
-                <span className="text-xl font-semibold text-slate-900">Finvolve</span>
+                <span className="font-code-brand text-xl font-semibold text-slate-900">DEV♾️</span>
               </Link>
               <p className="mb-6 text-center text-sm leading-relaxed text-slate-600 md:text-left">
                 Accelerating the digital future through elite engineering and design thinking.
@@ -65,18 +65,18 @@ export default function Footer() {
             <div className="text-center md:text-left">
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-900">Services</h4>
               <ul className="space-y-3">
-                <FooterLink href="/finvolve/services">Web Development</FooterLink>
-                <FooterLink href="/finvolve/services">Mobile Apps</FooterLink>
-                <FooterLink href="/finvolve/services">AI Solutions</FooterLink>
-                <FooterLink href="/finvolve/services">Custom Software</FooterLink>
+                <FooterLink href="/dev/services">Web Development</FooterLink>
+                <FooterLink href="/dev/services">Mobile Apps</FooterLink>
+                <FooterLink href="/dev/services">AI Solutions</FooterLink>
+                <FooterLink href="/dev/services">Custom Software</FooterLink>
               </ul>
             </div>
 
             <div className="text-center md:text-left">
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-[0.22em] text-slate-900">Company</h4>
               <ul className="space-y-3">
-                <FooterLink href="/finvolve/about">About Us</FooterLink>
-                <FooterLink href="/finvolve/contact">Careers</FooterLink>
+                <FooterLink href="/dev/about">About Us</FooterLink>
+                <FooterLink href="/dev/contact">Careers</FooterLink>
               </ul>
             </div>
 
@@ -122,12 +122,12 @@ export default function Footer() {
           </div>
 
           <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/40 pt-6 text-center text-sm text-slate-500 md:flex-row md:text-left">
-            <p>&copy; {currentYear} Finvolve Engineering Agency. All rights reserved.</p>
+            <p>&copy; {currentYear} DEV Infinity Software Studio. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end md:gap-6">
-              <Link href="/finvolve/privacy-policy" className="transition-colors hover:text-primary">
+              <Link href="/dev/privacy-policy" className="transition-colors hover:text-primary">
                 Privacy Policy
               </Link>
-              <Link href="/finvolve/terms" className="transition-colors hover:text-primary">
+              <Link href="/dev/terms" className="transition-colors hover:text-primary">
                 Terms of Service
               </Link>
             </div>

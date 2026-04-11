@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -25,10 +25,10 @@ const PROJECT_TYPES = [
 ];
 
 const BUDGET_RANGES = [
-  { id: 'starter', label: '< ₹5k', desc: 'MVP / Prototype' },
-  { id: 'standard', label: '₹5k - ₹20k', desc: 'Full Production Build' },
-  { id: 'premium', label: '₹20k - ₹50k', desc: 'Enterprise Scale' },
-  { id: 'custom', label: '₹50k+', desc: 'Complex Ecosystem' },
+  { id: 'starter', label: '< ?5k', desc: 'MVP / Prototype' },
+  { id: 'standard', label: '?5k - ?20k', desc: 'Full Production Build' },
+  { id: 'premium', label: '?20k - ?50k', desc: 'Enterprise Scale' },
+  { id: 'custom', label: '?50k+', desc: 'Complex Ecosystem' },
 ];
 
 export default function ProjectWizard() {
@@ -134,7 +134,7 @@ export default function ProjectWizard() {
             </div>
           </div>
           <Link
-            href="/finvolve/quick-start"
+            href="/dev/quick-start"
             className="inline-flex whitespace-nowrap rounded-full border border-white/40 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(103,88,255,0.25)] transition-transform hover:-translate-y-0.5"
           >
             Quick Start - INR 99

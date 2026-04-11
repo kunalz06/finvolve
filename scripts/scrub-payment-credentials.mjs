@@ -53,7 +53,7 @@ async function main() {
             generatedLinks.push({
                 id: docSnap.id,
                 clientName: update.clientName,
-                url: `${siteUrl}/finvolve/payments?token=${token}`,
+                url: `${siteUrl}/dev/payments?token=${token}`,
                 expiresAt: expiresAt.toISOString(),
             });
         }

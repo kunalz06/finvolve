@@ -26,9 +26,10 @@ module.exports = {
                 },
             },
             fontFamily: {
-                sans: ["Inter", "sans-serif"],
-                heading: ["Inter", "sans-serif"],
-                mono: ["JetBrains Mono", "monospace"],
+                sans: ["SF Pro Display", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+                heading: ["SF Pro Display", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
+                mono: ["Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Consolas", "monospace"],
+                code: ["Cascadia Code", "Cascadia Mono", "Consolas", "Courier New", "monospace"],
             },
             backgroundImage: {
                 "gradient-primary": "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)",

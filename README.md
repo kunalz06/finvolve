@@ -1,9 +1,9 @@
-# Finvolve
+# DEV♾️
 
-Finvolve is a Next.js App Router project with:
-- Marketing and lead-capture flows under `/finvolve`
-- Tokenized client payment flow under `/finvolve/payments`
-- Admin dashboard under `/finvolve/admin`
+DEV♾️ is a Next.js App Router project with:
+- Marketing and lead-capture flows under `/dev`
+- Tokenized client payment flow under `/dev/payments`
+- Admin dashboard under `/dev/admin`
 - IEM minor-degree registration flow under `/iemminor`
 
 ## Prerequisites
@@ -66,4 +66,4 @@ npm run set-admin -- FIREBASE_UID
 
 - Firestore rules are deny-by-default for sensitive reads/writes.
 - Payment links are tokenized and server-verified before marking paid.
-- Payment verification happens via `/finvolve/api/verify-payment`.
+- Payment verification happens via `/dev/api/verify-payment`.

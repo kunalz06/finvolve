@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
 
 const navLinks = [
-  { name: "Services", href: "/finvolve/services" },
-  { name: "About", href: "/finvolve/about" },
-  { name: "Start Project", href: "/finvolve/request" },
+  { name: "Services", href: "/dev/services" },
+  { name: "About", href: "/dev/about" },
+  { name: "Start Project", href: "/dev/request" },
 ];
 
 export default function Navbar() {
@@ -27,13 +27,13 @@ export default function Navbar() {
           <div className="glass-orb glass-orb-violet right-12 top-2 h-16 w-28" />
           <div className="glass-orb glass-orb-cyan left-24 top-1 h-14 w-24" />
           <div className={`glass-surface-strong glass-spectrum flex items-center justify-between rounded-[24px] px-3 py-3 md:rounded-[30px] md:px-6 ${scrolled ? "shadow-[inset_0_1px_0_rgba(255,255,255,0.82),0_28px_72px_rgba(27,38,68,0.22)]" : ""}`}>
-          <Link href="/finvolve" className="flex items-center gap-3 group">
+          <Link href="/dev" className="flex items-center gap-3 group">
             <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,rgba(124,92,255,0.96),rgba(105,183,255,0.82),rgba(82,215,183,0.72))] shadow-[0_14px_30px_rgba(103,88,255,0.28)] transition-transform duration-300 group-hover:scale-105">
               <Zap className="text-white" size={20} />
             </div>
             <div className="min-w-0">
-              <div className="text-lg font-semibold tracking-tight text-slate-900 md:text-xl">Finvolve</div>
-              <div className="hidden text-[11px] uppercase tracking-[0.25em] text-slate-500 md:block">
+              <div className="font-code-brand text-lg font-semibold text-slate-900 md:text-xl">DEV♾️</div>
+              <div className="hidden font-code-brand text-[11px] uppercase tracking-[0.25em] text-slate-500 md:block">
                 Software Builders
               </div>
             </div>
@@ -50,7 +50,7 @@ export default function Navbar() {
               </Link>
             ))}
             <Link
-              href="/finvolve/contact"
+              href="/dev/contact"
               className="rounded-full border border-white/35 bg-[linear-gradient(135deg,rgba(124,92,255,0.96),rgba(105,183,255,0.78),rgba(255,180,84,0.8))] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_16px_30px_rgba(103,88,255,0.3)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_20px_40px_rgba(103,88,255,0.34)]"
             >
               Contact Us
@@ -83,7 +83,7 @@ export default function Navbar() {
                 </Link>
               ))}
               <Link
-                href="/finvolve/contact"
+                href="/dev/contact"
                 onClick={() => setMobileMenuOpen(false)}
                 className="mt-2 rounded-full border border-white/35 bg-[linear-gradient(135deg,rgba(124,92,255,0.96),rgba(124,92,255,0.8))] px-5 py-3 text-center text-sm font-semibold text-white"
               >

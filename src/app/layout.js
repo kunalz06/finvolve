@@ -1,7 +1,7 @@
-import "./finvolve/globals.css";
+import "./dev/globals.css";
 
 export const metadata = {
-    title: "Finvolve",
+    title: "DEV♾️",
     description: "Business Solutions",
 };
 

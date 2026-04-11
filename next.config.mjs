@@ -3,6 +3,20 @@ const nextConfig = {
     reactStrictMode: true,
     poweredByHeader: false,
     compress: true,
+    async redirects() {
+        return [
+            {
+                source: '/finvolve',
+                destination: '/dev',
+                permanent: true,
+            },
+            {
+                source: '/finvolve/:path*',
+                destination: '/dev/:path*',
+                permanent: true,
+            },
+        ];
+    },
     async headers() {
         return [
             {
