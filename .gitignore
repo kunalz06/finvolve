@@ -38,6 +38,7 @@ yarn-error.log*
 
 # netlify
 .netlify
+.tmp-netlify-api-routes
 
 # typescript
 *.tsbuildinfo

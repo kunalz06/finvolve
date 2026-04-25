@@ -51,6 +51,8 @@ npm run set-admin -- FIREBASE_UID
 
 This app can be deployed to Netlify as a static frontend while Vercel continues to host the API routes for Razorpay, Firebase Admin, and newsletter email.
 
+Netlify uses `npm run build:netlify`, which temporarily excludes App Router API route folders so `output: "export"` can produce the static `out` directory. The normal `npm run build` still includes API routes for Vercel.
+
 Keep `.firebaserc` placeholder-only in this repository. Use Firebase CLI `--project your-project-id` or a local untracked Firebase config when deploying Firebase rules.
 
 Set these environment variables on Netlify:

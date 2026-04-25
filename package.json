@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:netlify": "node scripts/build-netlify-frontend.mjs",
     "start": "next start",
     "lint": "eslint",
     "migrate:payments": "node scripts/scrub-payment-credentials.mjs",
