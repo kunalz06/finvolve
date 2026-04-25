@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Mail, ArrowRight, Github, Linkedin, Zap } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -16,7 +17,7 @@ export default function Footer() {
     setNewsletterLoading(true);
 
     try {
-      const response = await fetch("/dev/api/newsletter/subscribe", {
+      const response = await fetch(apiUrl("/dev/api/newsletter/subscribe"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: newsletterEmail }),

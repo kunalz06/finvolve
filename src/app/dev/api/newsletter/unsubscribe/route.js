@@ -1,10 +1,11 @@
 import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { NEWSLETTER_COLLECTION } from "@/lib/server/newsletter";
+import { NEWSLETTER_COLLECTION, getNewsletterSiteUrl } from "@/lib/server/newsletter";
 
 function redirectToStatus(request, status) {
-    return NextResponse.redirect(new URL(`/dev/newsletter/unsubscribe?status=${status}`, request.url));
+    const siteUrl = getNewsletterSiteUrl(request);
+    return NextResponse.redirect(`${siteUrl}/dev/newsletter/unsubscribe?status=${status}`);
 }
 
 export async function GET(request) {

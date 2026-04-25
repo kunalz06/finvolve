@@ -1,8 +1,8 @@
 import Razorpay from "razorpay";
-import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
 import {
     PAYMENT_SOURCE,
     QUICK_START_AMOUNT_PAISE,
@@ -30,6 +30,10 @@ const payloadSchema = z.object({
     quickStartData: quickStartDataSchema.optional(),
 });
 
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
+
 export async function POST(request) {
     const ip = getRequestIp(request);
     const limit = checkRateLimit(`verify-payment:${ip}`, {
@@ -37,7 +41,8 @@ export async function POST(request) {
         maxRequests: 20,
     });
     if (!limit.allowed) {
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Too many requests. Please retry shortly." },
             { status: 429 },
         );
@@ -47,7 +52,8 @@ export async function POST(request) {
         const json = await request.json();
         const parsed = payloadSchema.safeParse(json);
         if (!parsed.success) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid payload.", details: parsed.error.flatten() },
                 { status: 400 },
             );
@@ -64,7 +70,8 @@ export async function POST(request) {
         });
 
         if (!signatureValid) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid payment signature." },
                 { status: 400 },
             );
@@ -78,20 +85,23 @@ export async function POST(request) {
 
         if (data.source === PAYMENT_SOURCE.QUICK_START) {
             if (!data.quickStartData) {
-                return NextResponse.json(
+                return corsJson(
+                    request,
                     { error: "Quick start details are missing." },
                     { status: 400 },
                 );
             }
 
             if (Number(order.amount) !== QUICK_START_AMOUNT_PAISE) {
-                return NextResponse.json(
+                return corsJson(
+                    request,
                     { error: "Order amount mismatch." },
                     { status: 400 },
                 );
             }
             if (order?.notes?.source !== PAYMENT_SOURCE.QUICK_START) {
-                return NextResponse.json(
+                return corsJson(
+                    request,
                     { error: "Order source mismatch." },
                     { status: 400 },
                 );
@@ -105,7 +115,7 @@ export async function POST(request) {
                 .get();
 
             if (!existing.empty) {
-                return NextResponse.json({
+                return corsJson(request, {
                     success: true,
                     alreadyProcessed: true,
                     requestId: existing.docs[0].id,
@@ -123,14 +133,15 @@ export async function POST(request) {
                 wizardSubmission: false,
             });
 
-            return NextResponse.json({
+            return corsJson(request, {
                 success: true,
                 requestId: quickStartRequest.id,
             });
         }
 
         if (!data.paymentRequestId || !data.token) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Missing payment request id/token." },
                 { status: 400 },
             );
@@ -141,7 +152,8 @@ export async function POST(request) {
         const paymentSnap = await paymentRef.get();
 
         if (!paymentSnap.exists) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Payment request not found." },
                 { status: 404 },
             );
@@ -152,7 +164,8 @@ export async function POST(request) {
         const tokenMatches = payment.tokenHash && payment.tokenHash === tokenHash;
         const expiresAtMs = payment.tokenExpiresAt?.toMillis?.() ?? 0;
         if (!tokenMatches || !expiresAtMs || Date.now() > expiresAtMs) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Payment link is invalid or expired." },
                 { status: 401 },
             );
@@ -160,26 +173,29 @@ export async function POST(request) {
 
         const expectedAmountPaise = Number(payment.amount) * 100;
         if (!Number.isFinite(expectedAmountPaise) || Number(order.amount) !== expectedAmountPaise) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Order amount mismatch." },
                 { status: 400 },
             );
         }
         if (order?.notes?.source !== PAYMENT_SOURCE.PAYMENT_PORTAL) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Order source mismatch." },
                 { status: 400 },
             );
         }
         if (order?.notes?.paymentRequestId !== data.paymentRequestId) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Payment request mismatch." },
                 { status: 400 },
             );
         }
 
         if (payment.status === "paid") {
-            return NextResponse.json({
+            return corsJson(request, {
                 success: true,
                 alreadyProcessed: true,
                 paymentRequestId: paymentSnap.id,
@@ -194,13 +210,14 @@ export async function POST(request) {
             updatedAt: FieldValue.serverTimestamp(),
         });
 
-        return NextResponse.json({
+        return corsJson(request, {
             success: true,
             paymentRequestId: paymentSnap.id,
         });
     } catch (error) {
         console.error("Payment verification failed:", error.message);
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Unable to verify payment right now." },
             { status: 500 },
         );

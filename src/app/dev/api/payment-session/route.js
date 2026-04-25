@@ -1,12 +1,16 @@
-import { NextResponse } from "next/server";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { hashToken } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 
 const sessionSchema = z.object({
     token: z.string().min(16),
 });
+
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
 
 export async function POST(request) {
     const ip = getRequestIp(request);
@@ -15,7 +19,8 @@ export async function POST(request) {
         maxRequests: 20,
     });
     if (!limit.allowed) {
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Too many requests. Please retry shortly." },
             { status: 429 },
         );
@@ -25,7 +30,8 @@ export async function POST(request) {
         const json = await request.json();
         const parsed = sessionSchema.safeParse(json);
         if (!parsed.success) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid token payload.", details: parsed.error.flatten() },
                 { status: 400 },
             );
@@ -40,7 +46,8 @@ export async function POST(request) {
             .get();
 
         if (snap.empty) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid payment link." },
                 { status: 404 },
             );
@@ -50,13 +57,14 @@ export async function POST(request) {
         const payment = doc.data();
         const expiresAtMs = payment.tokenExpiresAt?.toMillis?.() ?? 0;
         if (!expiresAtMs || Date.now() > expiresAtMs) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Payment link has expired." },
                 { status: 410 },
             );
         }
 
-        return NextResponse.json({
+        return corsJson(request, {
             id: doc.id,
             amount: Number(payment.amount),
             currency: payment.currency || "INR",
@@ -67,7 +75,8 @@ export async function POST(request) {
         });
     } catch (error) {
         console.error("Payment session load failed:", error.message);
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Could not load payment session." },
             { status: 500 },
         );

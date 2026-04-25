@@ -24,6 +24,8 @@ Copy `.env.example` to `.env.local` and fill values:
   - `RAZORPAY_KEY_SECRET`
 - Firebase Admin credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or split vars)
 - Optional `NEXT_PUBLIC_SITE_URL` for absolute payment links
+- Optional `NEXT_PUBLIC_API_BASE_URL` for frontend-only hosts such as Netlify to call the Vercel backend
+- Optional `CORS_ALLOWED_ORIGINS` on Vercel to allow Netlify/custom frontend domains to call API routes
 - Newsletter SMTP credentials for personal-mail sending:
   - `NEWSLETTER_SMTP_HOST`
   - `NEWSLETTER_SMTP_PORT`
@@ -43,6 +45,38 @@ You must set a custom claim on admin users:
 
 ```bash
 npm run set-admin -- FIREBASE_UID
+```
+
+## Netlify Frontend Deployment
+
+This app can be deployed to Netlify as a static frontend while Vercel continues to host the API routes for Razorpay, Firebase Admin, and newsletter email.
+
+Keep `.firebaserc` placeholder-only in this repository. Use Firebase CLI `--project your-project-id` or a local untracked Firebase config when deploying Firebase rules.
+
+Set these environment variables on Netlify:
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
+NEXT_PUBLIC_RAZORPAY_KEY_ID=...
+NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
+NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
+```
+
+Do not set server secrets on Netlify, including `RAZORPAY_KEY_SECRET`, Firebase Admin private keys, or SMTP passwords.
+
+The public browser keys are intentionally bundled into the frontend, so `netlify.toml` omits the `NEXT_PUBLIC_*` keys from Netlify secret scanning. Do not add private server credentials to that omit list.
+
+Set this on Vercel so Netlify can call the backend:
+
+```bash
+CORS_ALLOWED_ORIGINS=https://your-netlify-site.netlify.app,https://your-custom-domain.com
+NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
+NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 ```
 
 This repo helper applies:

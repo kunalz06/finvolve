@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AlertCircle, CheckCircle, ChevronLeft, CreditCard, Loader2, Zap } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { apiUrl } from "@/lib/api";
 
 export default function QuickStartPage() {
   const [formData, setFormData] = useState({
@@ -39,7 +40,7 @@ export default function QuickStartPage() {
       const res = await loadRazorpayScript();
       if (!res) throw new Error("Razorpay SDK failed to load. Are you online?");
 
-      const orderRes = await fetch("/dev/api/create-order", {
+      const orderRes = await fetch(apiUrl("/dev/api/create-order"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ source: "quick_start", amount: 99 }),
@@ -58,7 +59,7 @@ export default function QuickStartPage() {
         order_id: orderData.id,
         handler: async (response) => {
           try {
-            const verifyRes = await fetch("/dev/api/verify-payment", {
+            const verifyRes = await fetch(apiUrl("/dev/api/verify-payment"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

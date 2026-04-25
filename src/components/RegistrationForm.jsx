@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { db, storage } from '@/lib/firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { apiUrl } from '@/lib/api';
 
 export default function RegistrationForm() {
     const [formData, setFormData] = useState({
@@ -54,7 +55,7 @@ export default function RegistrationForm() {
             }
 
             // 1. Create Order
-            const orderResponse = await fetch('/api/create-order', {
+            const orderResponse = await fetch(apiUrl('/iemminor/api/create-order'), {
                 method: 'POST',
             });
 

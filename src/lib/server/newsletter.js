@@ -20,8 +20,17 @@ export function getNewsletterSiteUrl(request) {
     return host ? `${proto}://${host}` : "";
 }
 
+export function getNewsletterApiUrl(request) {
+    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL;
+    if (envUrl) return envUrl.replace(/\/$/, "");
+
+    const proto = request?.headers?.get("x-forwarded-proto") || "https";
+    const host = request?.headers?.get("host");
+    return host ? `${proto}://${host}` : "";
+}
+
 export function getUnsubscribeUrl({ request, token }) {
-    return `${getNewsletterSiteUrl(request)}/dev/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
+    return `${getNewsletterApiUrl(request)}/dev/api/newsletter/unsubscribe?token=${encodeURIComponent(token)}`;
 }
 
 function getBooleanEnv(value, fallback = false) {

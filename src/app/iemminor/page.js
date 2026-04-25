@@ -5,6 +5,7 @@ import { db, storage } from '@/lib/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Loader2, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { apiUrl } from '@/lib/api';
 
 export default function IemRegistrationPage() {
     const [formData, setFormData] = useState({
@@ -54,7 +55,7 @@ export default function IemRegistrationPage() {
             if (!res) throw new Error('Razorpay SDK failed to load.');
 
             // 1. Create Order
-            const orderRes = await fetch('/iemminor/api/create-order', { method: 'POST' });
+            const orderRes = await fetch(apiUrl('/iemminor/api/create-order'), { method: 'POST' });
             const orderData = await orderRes.json();
             if (orderData.error) throw new Error(orderData.error);
 

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { AlertCircle, CheckCircle, CreditCard, Loader2, Lock } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import { apiUrl } from "@/lib/api";
 
 function loadRazorpayScript() {
   return new Promise((resolve) => {
@@ -41,7 +42,7 @@ function PaymentPortalContent() {
       setLoading(true);
       setError("");
       try {
-        const response = await fetch("/dev/api/payment-session", {
+        const response = await fetch(apiUrl("/dev/api/payment-session"), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token }),
@@ -69,7 +70,7 @@ function PaymentPortalContent() {
       const loaded = await loadRazorpayScript();
       if (!loaded) throw new Error("Failed to load Razorpay checkout.");
 
-      const orderResponse = await fetch("/dev/api/create-order", {
+      const orderResponse = await fetch(apiUrl("/dev/api/create-order"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ source: "payment_portal", amount: Number(session.amount), paymentRequestId: session.id, token }),
@@ -86,7 +87,7 @@ function PaymentPortalContent() {
         order_id: order.id,
         handler: async (response) => {
           try {
-            const verifyResponse = await fetch("/dev/api/verify-payment", {
+            const verifyResponse = await fetch(apiUrl("/dev/api/verify-payment"), {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({

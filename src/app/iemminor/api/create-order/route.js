@@ -1,5 +1,9 @@
 import Razorpay from "razorpay";
-import { NextResponse } from "next/server";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
+
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
 
 export async function POST(request) {
     try {
@@ -7,7 +11,8 @@ export async function POST(request) {
         const key_secret = process.env.RAZORPAY_KEY_SECRET;
 
         if (!key_id || !key_secret) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Razorpay keys are missing" },
                 { status: 500 }
             );
@@ -25,10 +30,11 @@ export async function POST(request) {
         };
 
         const order = await razorpay.orders.create(options);
-        return NextResponse.json(order);
+        return corsJson(request, order);
     } catch (error) {
         console.error("Error creating Razorpay order:", error.message);
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Error creating order" },
             { status: 500 }
         );

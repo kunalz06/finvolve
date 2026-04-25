@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { createPaymentToken, hashToken } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 
@@ -31,6 +31,10 @@ function getSiteUrl(request) {
     return host ? `${proto}://${host}` : "";
 }
 
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
+
 export async function POST(request) {
     const ip = getRequestIp(request);
     const limit = checkRateLimit(`admin-payment-link:${ip}`, {
@@ -38,7 +42,8 @@ export async function POST(request) {
         maxRequests: 30,
     });
     if (!limit.allowed) {
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Too many requests. Please retry shortly." },
             { status: 429 },
         );
@@ -46,7 +51,7 @@ export async function POST(request) {
 
     const adminAuth = await verifyAdminFromRequest(request);
     if (!adminAuth.ok) {
-        return NextResponse.json({ error: adminAuth.error }, { status: adminAuth.status });
+        return corsJson(request, { error: adminAuth.error }, { status: adminAuth.status });
     }
 
     try {
@@ -57,7 +62,8 @@ export async function POST(request) {
                 "Invalid admin payment-link payload:",
                 JSON.stringify(parsed.error.flatten()),
             );
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid payload.", details: parsed.error.flatten() },
                 { status: 400 },
             );
@@ -87,7 +93,8 @@ export async function POST(request) {
 
         const siteUrl = getSiteUrl(request);
         if (!siteUrl) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Site URL is not configured on the server." },
                 { status: 500 },
             );
@@ -95,7 +102,7 @@ export async function POST(request) {
 
         const paymentUrl = `${siteUrl}/dev/payments?token=${token}`;
 
-        return NextResponse.json({
+        return corsJson(request, {
             success: true,
             paymentRequestId: docRef.id,
             paymentUrl,
@@ -115,13 +122,15 @@ export async function POST(request) {
             message.includes("DECODER routines::unsupported");
 
         if (isFirebaseAdminConfigIssue) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Firebase Admin is not configured correctly on the server." },
                 { status: 500 },
             );
         }
 
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: message || "Unable to create payment link." },
             { status: 500 },
         );

@@ -35,6 +35,7 @@ import {
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { auth, db, isConfigValid } from "@/lib/firebase";
+import { apiUrl } from "@/lib/api";
 
 const isAdmin = (claims) => claims?.role === "admin" || claims?.admin === true;
 
@@ -248,7 +249,7 @@ export default function AdminPage() {
             }
 
             const idToken = await auth.currentUser.getIdToken(true);
-            const response = await fetch("/dev/api/admin/payment-link", {
+            const response = await fetch(apiUrl("/dev/api/admin/payment-link"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -303,7 +304,7 @@ export default function AdminPage() {
             }
 
             const idToken = await auth.currentUser.getIdToken(true);
-            const response = await fetch("/dev/api/admin/newsletter/send", {
+            const response = await fetch(apiUrl("/dev/api/admin/newsletter/send"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

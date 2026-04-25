@@ -1,3 +1,7 @@
+"use client";
+
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 
@@ -16,9 +20,9 @@ const copyByStatus = {
   },
 };
 
-export default async function NewsletterUnsubscribePage({ searchParams }) {
-  const params = await searchParams;
-  const status = params?.status || "success";
+function NewsletterUnsubscribeContent() {
+  const searchParams = useSearchParams();
+  const status = searchParams.get("status") || "success";
   const copy = copyByStatus[status] || copyByStatus.success;
 
   return (
@@ -36,5 +40,13 @@ export default async function NewsletterUnsubscribePage({ searchParams }) {
         </Card>
       </div>
     </div>
+  );
+}
+
+export default function NewsletterUnsubscribePage() {
+  return (
+    <Suspense fallback={null}>
+      <NewsletterUnsubscribeContent />
+    </Suspense>
   );
 }

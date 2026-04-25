@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import {
     NEWSLETTER_COLLECTION,
@@ -17,6 +17,10 @@ const subscribeSchema = z.object({
     name: z.string().trim().max(120).optional(),
 });
 
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
+
 export async function POST(request) {
     const ip = getRequestIp(request);
     const limit = checkRateLimit(`newsletter-subscribe:${ip}`, {
@@ -25,7 +29,8 @@ export async function POST(request) {
     });
 
     if (!limit.allowed) {
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Too many signup attempts. Please retry shortly." },
             { status: 429 },
         );
@@ -35,7 +40,8 @@ export async function POST(request) {
         const json = await request.json();
         const parsed = subscribeSchema.safeParse(json);
         if (!parsed.success) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Enter a valid email address.", details: parsed.error.flatten() },
                 { status: 400 },
             );
@@ -86,7 +92,7 @@ export async function POST(request) {
         }
 
         if (!shouldSendWelcome) {
-            return NextResponse.json({
+            return corsJson(request, {
                 success: true,
                 emailSent: false,
                 message: "You are already subscribed.",
@@ -120,21 +126,22 @@ export async function POST(request) {
                 lastEmailError: mailError.message || "Welcome email failed.",
             });
 
-            return NextResponse.json({
+            return corsJson(request, {
                 success: true,
                 emailSent: false,
                 message: "You are subscribed, but the welcome email could not be sent right now.",
             });
         }
 
-        return NextResponse.json({
+        return corsJson(request, {
             success: true,
             emailSent: true,
             message: "You are subscribed. Please check your email.",
         });
     } catch (error) {
         console.error("Newsletter subscribe failed:", error.message);
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: error.message || "Unable to subscribe right now." },
             { status: 500 },
         );

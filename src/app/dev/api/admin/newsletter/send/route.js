@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
+import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import {
     NEWSLETTER_COLLECTION,
@@ -15,6 +15,10 @@ const payloadSchema = z.object({
     body: z.string().trim().min(10).max(5000),
 });
 
+export function OPTIONS(request) {
+    return corsPreflight(request);
+}
+
 export async function POST(request) {
     const ip = getRequestIp(request);
     const limit = checkRateLimit(`admin-newsletter-send:${ip}`, {
@@ -23,7 +27,8 @@ export async function POST(request) {
     });
 
     if (!limit.allowed) {
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: "Too many newsletter send attempts. Please retry shortly." },
             { status: 429 },
         );
@@ -31,14 +36,15 @@ export async function POST(request) {
 
     const adminAuth = await verifyAdminFromRequest(request);
     if (!adminAuth.ok) {
-        return NextResponse.json({ error: adminAuth.error }, { status: adminAuth.status });
+        return corsJson(request, { error: adminAuth.error }, { status: adminAuth.status });
     }
 
     try {
         const json = await request.json();
         const parsed = payloadSchema.safeParse(json);
         if (!parsed.success) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "Invalid newsletter payload.", details: parsed.error.flatten() },
                 { status: 400 },
             );
@@ -52,7 +58,8 @@ export async function POST(request) {
             .get();
 
         if (subscribers.empty) {
-            return NextResponse.json(
+            return corsJson(
+                request,
                 { error: "No active newsletter subscribers yet." },
                 { status: 400 },
             );
@@ -110,14 +117,15 @@ export async function POST(request) {
             createdByEmail: adminAuth.decoded.email || "",
         });
 
-        return NextResponse.json({
+        return corsJson(request, {
             success: true,
             sentCount,
             failureCount: failures.length,
         });
     } catch (error) {
         console.error("Newsletter send failed:", error.message);
-        return NextResponse.json(
+        return corsJson(
+            request,
             { error: error.message || "Unable to send newsletter right now." },
             { status: 500 },
         );
