@@ -1,8 +1,8 @@
 import "./dev/globals.css";
 
 export const metadata = {
-    title: "DEV♾️",
-    description: "Business Solutions",
+    title: "IEM Minor",
+    description: "IEM Minor Degree Registration Portal",
 };
 
 export default function RootLayout({ children }) {
