@@ -93,65 +93,70 @@ async function downloadAdmitCard(card) {
     const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
     const navy = "#252052";
     const blue = "#1f7ae0";
+    const pageMargin = 12;
 
     pdf.setFillColor(255, 255, 255);
     pdf.rect(0, 0, 210, 297, "F");
-    pdf.addImage(logoDataUrl, "PNG", 17, 13, 29, 23);
-    pdf.addImage(logoDataUrl, "PNG", 164, 13, 29, 23);
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setLineWidth(0.35);
+    pdf.rect(pageMargin, pageMargin, 210 - pageMargin * 2, 297 - pageMargin * 2);
+    pdf.addImage(logoDataUrl, "PNG", 17, 17, 30, 22);
+    pdf.addImage(logoDataUrl, "PNG", 163, 17, 30, 22);
 
     pdf.setTextColor(navy);
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(12.5);
-    pdf.text("INSTITUTE OF ENGINEERING & MANAGEMENT (SALT LAKE)", 105, 18, { align: "center" });
+    pdf.setFontSize(11.5);
+    pdf.text("INSTITUTE OF ENGINEERING & MANAGEMENT (SALT LAKE)", 105, 21, { align: "center", maxWidth: 106 });
     pdf.setFontSize(8.5);
-    pdf.text("A constituent institute of", 105, 24, { align: "center" });
-    pdf.setFontSize(12.5);
-    pdf.text("UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA", 105, 30, { align: "center" });
+    pdf.text("A constituent institute of", 105, 27, { align: "center" });
+    pdf.setFontSize(11.5);
+    pdf.text("UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA", 105, 34, { align: "center", maxWidth: 118 });
     pdf.setDrawColor(230, 230, 230);
-    pdf.line(16, 38, 194, 38);
+    pdf.line(17, 43, 193, 43);
 
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor("#000000");
     pdf.setFontSize(11);
-    pdf.text("Name of the Candidate:", 17, 70);
-    pdf.text("Registration Number:", 17, 79);
-    pdf.text("Enrollment Number:", 17, 88);
+    pdf.text("Name of the Candidate:", 20, 73);
+    pdf.text("Registration Number:", 20, 82);
+    pdf.text("Enrollment Number:", 20, 91);
     pdf.setTextColor(blue);
     pdf.setFont("helvetica", "italic");
-    pdf.text(card.name, 72, 70);
-    pdf.text(card.registrationNo, 72, 79);
-    pdf.text(card.enrollmentNo, 72, 88);
+    pdf.text(card.name, 76, 73, { maxWidth: 105 });
+    pdf.text(card.registrationNo, 76, 82, { maxWidth: 105 });
+    pdf.text(card.enrollmentNo, 76, 91, { maxWidth: 105 });
 
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor("#004f9f");
-    pdf.text("Schedule of Minor Examination", 105, 103, { align: "center" });
+    pdf.text("Schedule of Minor Examination", 105, 106, { align: "center" });
 
     pdf.setDrawColor(0, 0, 0);
     pdf.setLineWidth(0.25);
-    pdf.rect(17, 113, 176, 16);
-    pdf.line(17, 121, 193, 121);
-    pdf.line(76, 113, 76, 129);
-    pdf.line(135, 113, 135, 129);
+    pdf.rect(17, 116, 176, 16);
+    pdf.line(17, 124, 193, 124);
+    pdf.line(76, 116, 76, 132);
+    pdf.line(135, 116, 135, 132);
     pdf.setTextColor("#000000");
     pdf.setFont("helvetica", "bold");
-    pdf.text("PAPER NAME", 46.5, 118.5, { align: "center" });
-    pdf.text("Exam Date", 105.5, 118.5, { align: "center" });
-    pdf.text("Exam. Time", 164, 118.5, { align: "center" });
+    pdf.text("PAPER NAME", 46.5, 121.5, { align: "center" });
+    pdf.text("Exam Date", 105.5, 121.5, { align: "center" });
+    pdf.text("Exam. Time", 164, 121.5, { align: "center" });
     pdf.setFont("helvetica", "normal");
-    pdf.text(card.course, 46.5, 126, { align: "center" });
-    pdf.text("3/5/2026", 105.5, 126, { align: "center" });
-    pdf.text("02:00 pm -04:00 pm(ONLINE)", 164, 126, { align: "center" });
+    pdf.text(card.course, 46.5, 129, { align: "center", maxWidth: 56 });
+    pdf.text("3/5/2026", 105.5, 129, { align: "center" });
+    pdf.setFontSize(9);
+    pdf.text("02:00 pm -04:00 pm(ONLINE)", 164, 129, { align: "center", maxWidth: 55 });
 
     pdf.addImage(qrDataUrl, "PNG", 17, 205, 34, 34);
     pdf.setFontSize(6.6);
     pdf.setFont("helvetica", "bold");
-    pdf.text("DISCLAIMER : This is a computer generated document which has been generated from student login.", 52, 225);
-    pdf.addImage(signatureDataUrl, "PNG", 144, 214, 43, 12);
+    pdf.text("DISCLAIMER : This is a computer generated document which has been generated from student login.", 54, 225, { maxWidth: 90 });
+    pdf.addImage(signatureDataUrl, "PNG", 143, 211, 45, 13);
     pdf.setFontSize(7.5);
     pdf.setFont("helvetica", "normal");
-    pdf.text("Controller of Examinations", 165, 247, { align: "center" });
+    pdf.text("Controller of Examinations", 166, 245, { align: "center" });
     pdf.setFontSize(6.5);
-    pdf.text(`Downloaded on: ${downloadedOn}`, 165, 256, { align: "center" });
+    pdf.text(`Downloaded on: ${downloadedOn}`, 166, 254, { align: "center" });
 
     pdf.save(`iem-minor-admit-card-${card.enrollmentNo}.pdf`);
 }
@@ -175,19 +180,19 @@ function AdmitCardPreview({ card }) {
     }, [card]);
 
     return (
-        <div className="w-full max-w-3xl bg-white p-6 text-black shadow-[0_24px_70px_rgba(15,23,42,0.14)]">
-            <div className="mb-8 flex items-start justify-center gap-5 border-b pb-4 text-center">
-                <img src={LOGO_URL} alt="IEM" className="h-14 w-20 object-contain" />
-                <div>
-                    <h2 className="text-sm font-extrabold tracking-wide text-[#252052] md:text-lg">
+        <div className="w-full max-w-[794px] border border-black bg-white p-6 text-black shadow-[0_24px_70px_rgba(15,23,42,0.14)]">
+            <div className="mb-9 grid grid-cols-[88px_1fr_88px] items-start gap-3 border-b border-slate-200 pb-4 text-center">
+                <img src={LOGO_URL} alt="IEM" className="h-16 w-full object-contain" />
+                <div className="min-w-0 px-2">
+                    <h2 className="text-[13px] font-extrabold leading-tight tracking-wide text-[#252052] md:text-lg">
                         INSTITUTE OF ENGINEERING & MANAGEMENT (SALT LAKE)
                     </h2>
-                    <p className="text-xs font-semibold text-[#252052]">A constituent institute of</p>
-                    <h3 className="text-sm font-extrabold text-[#252052] md:text-lg">
+                    <p className="my-1 text-[11px] font-semibold leading-none text-[#252052]">A constituent institute of</p>
+                    <h3 className="text-[13px] font-extrabold leading-tight text-[#252052] md:text-lg">
                         UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA
                     </h3>
                 </div>
-                <img src={LOGO_URL} alt="UEM" className="h-14 w-20 object-contain" />
+                <img src={LOGO_URL} alt="UEM" className="h-16 w-full object-contain" />
             </div>
 
             <div className="mx-auto max-w-2xl space-y-1 text-sm md:text-base">
@@ -197,7 +202,12 @@ function AdmitCardPreview({ card }) {
             </div>
 
             <p className="my-5 text-center text-sm font-medium text-blue-800">Schedule of Minor Examination</p>
-            <table className="w-full border-collapse text-center text-sm">
+            <table className="w-full table-fixed border-collapse text-center text-sm">
+                <colgroup>
+                    <col className="w-1/3" />
+                    <col className="w-1/3" />
+                    <col className="w-1/3" />
+                </colgroup>
                 <thead>
                     <tr>
                         <th className="border border-black px-2 py-1">PAPER NAME</th>
@@ -207,24 +217,24 @@ function AdmitCardPreview({ card }) {
                 </thead>
                 <tbody>
                     <tr>
-                        <td className="border border-black px-2 py-1">{card.course}</td>
+                        <td className="border border-black px-2 py-1 break-words">{card.course}</td>
                         <td className="border border-black px-2 py-1">3/5/2026</td>
-                        <td className="border border-black px-2 py-1">02:00 pm -04:00 pm(ONLINE)</td>
+                        <td className="border border-black px-2 py-1 text-xs md:text-sm">02:00 pm -04:00 pm(ONLINE)</td>
                     </tr>
                 </tbody>
             </table>
 
-            <div className="mt-24 flex items-end justify-between gap-6">
+            <div className="mt-24 grid grid-cols-[112px_1fr_180px] items-end gap-5">
                 {qrDataUrl ? (
                     <img src={qrDataUrl} alt="Admit card QR code" className="h-28 w-28" />
                 ) : (
                     <div className="h-28 w-28 border border-black" />
                 )}
-                <p className="flex-1 text-[10px] font-bold">
+                <p className="text-[10px] font-bold leading-tight">
                     DISCLAIMER : This is a computer generated document which has been generated from student login.
                 </p>
                 <div className="text-center text-xs">
-                    <img src={SIGNATURE_URL} alt="Controller signature" className="mb-6 h-11 w-40 object-contain" />
+                    <img src={SIGNATURE_URL} alt="Controller signature" className="mx-auto mb-5 h-11 w-40 object-contain" />
                     <p>Controller of Examinations</p>
                     <p className="mt-3 text-[10px]">Downloaded on: {todayLabel()}</p>
                 </div>
