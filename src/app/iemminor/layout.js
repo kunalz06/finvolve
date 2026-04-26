@@ -9,15 +9,11 @@ export const metadata = {
 export default function IemMinorLayout({ children }) {
     return (
         <div className="min-h-screen flex flex-col bg-white font-sans text-slate-900">
-            {/* Header - Sky Blue */}
-            <header className="bg-sky-300 p-4 shadow-md">
-                <div className="container mx-auto flex items-center gap-4">
-                    {/* Logo */}
-                    <div className="bg-white rounded-full p-1 h-16 w-16 flex items-center justify-center overflow-hidden shrink-0">
-                        <img src="/iem-logo.png" alt="IEM Logo" className="h-full w-full object-contain" />
-                    </div>
-                    <h1 className="text-red-600 text-xl md:text-3xl font-bold tracking-wide uppercase">
-                        Institute of Engineering and Management
+            <header className="bg-white/95 p-4 shadow-md">
+                <div className="container mx-auto flex items-center justify-start gap-4">
+                    <img src="/iem-logo.png" alt="IEM Logo" className="h-16 w-auto shrink-0 object-contain md:h-20" />
+                    <h1 className="text-lg font-extrabold uppercase tracking-wide text-[#252052] md:text-3xl">
+                        INSTITUTE OF ENGINEERING AND MANAGEMENT
                     </h1>
                 </div>
             </header>

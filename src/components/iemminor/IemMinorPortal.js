@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { jsPDF } from "jspdf";
+import QRCode from "qrcode";
 import {
     AlertCircle,
     CheckCircle,
@@ -17,6 +19,8 @@ const VALID_REGISTRATION = "104202405200088";
 const COURSES = ["CYBERSECURITY", "ROBOTICS", "PEGASUS IT"];
 const STORAGE_KEY = "iemminor_student_session";
 const ADMIT_CARD_KEY = "iemminor_admit_card";
+const LOGO_URL = "/iem-logo.png";
+const SIGNATURE_URL = "/iem-signature.svg";
 
 function todayLabel() {
     return new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
@@ -37,87 +41,153 @@ function loadRazorpayScript() {
     });
 }
 
-function escapePdfText(value) {
-    return String(value || "").replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)");
+function qrPayload(card) {
+    return [
+        `Name of the Candidate: ${card.name}`,
+        `Enrollment Number: ${card.enrollmentNo}`,
+        `Registration Number: ${card.registrationNo}`,
+        `Course: ${card.course}`,
+    ].join("\n");
 }
 
-function createAdmitCardPdf(card) {
-    const lines = [
-        "BT /F2 15 Tf 62 760 Td (INSTITUTE OF ENGINEERING & MANAGEMENT \\(SALT LAKE\\)) Tj ET",
-        "BT /F2 11 Tf 182 742 Td (A constituent institute of) Tj ET",
-        "BT /F2 15 Tf 128 724 Td (UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA) Tj ET",
-        "0.72 w 60 710 m 535 710 l S",
-        `BT /F1 12 Tf 70 652 Td (Name of the Candidate:) Tj ET BT /F3 12 Tf 230 652 Td (${escapePdfText(card.name)}) Tj ET`,
-        `BT /F1 12 Tf 70 632 Td (Registration Number:) Tj ET BT /F3 12 Tf 230 632 Td (${escapePdfText(card.registrationNo)}) Tj ET`,
-        `BT /F1 12 Tf 70 612 Td (Enrollment Number:) Tj ET BT /F3 12 Tf 230 612 Td (${escapePdfText(card.enrollmentNo)}) Tj ET`,
-        "BT /F3 12 Tf 222 582 Td (Schedule of Minor Examination) Tj ET",
-        "0.72 w 60 560 m 535 560 l 535 528 l 60 528 l h S",
-        "60 544 m 535 544 l S 205 560 m 205 528 l S 370 560 m 370 528 l S",
-        "BT /F2 11 Tf 105 548 Td (PAPER NAME) Tj ET",
-        "BT /F2 11 Tf 268 548 Td (Exam Date) Tj ET",
-        "BT /F2 11 Tf 423 548 Td (Exam. Time) Tj ET",
-        `BT /F1 10 Tf 104 534 Td (${escapePdfText(card.course)}) Tj ET`,
-        "BT /F1 10 Tf 279 534 Td (3/5/2026) Tj ET",
-        "BT /F1 10 Tf 389 534 Td (02:00 pm -04:00 pm\\(ONLINE\\)) Tj ET",
-        "0.72 w 70 172 m 156 172 l 156 86 l 70 86 l h S",
-        "BT /F1 7 Tf 84 128 Td (QR CODE) Tj ET",
-        "BT /F2 6 Tf 172 150 Td (DISCLAIMER : This is a computer generated document which has been generated from student login.) Tj ET",
-        "BT /F3 13 Tf 432 144 Td (Debika Bhattacharyya) Tj ET",
-        "BT /F1 8 Tf 446 98 Td (Controller of Examinations) Tj ET",
-        `BT /F1 7 Tf 456 80 Td (Downloaded on: ${escapePdfText(card.downloadedOn)}) Tj ET`,
-    ];
-
-    const stream = lines.join("\n");
-    const objects = [
-        "<< /Type /Catalog /Pages 2 0 R >>",
-        "<< /Type /Pages /Kids [3 0 R] /Count 1 >>",
-        "<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R /F2 5 0 R /F3 6 0 R >> >> /Contents 7 0 R >>",
-        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>",
-        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>",
-        "<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique >>",
-        `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
-    ];
-
-    let pdf = "%PDF-1.4\n";
-    const offsets = [0];
-    objects.forEach((object, index) => {
-        offsets.push(pdf.length);
-        pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+async function imageToDataUrl(url) {
+    const response = await fetch(url);
+    const blob = await response.blob();
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(blob);
     });
-    const xrefOffset = pdf.length;
-    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
-    offsets.slice(1).forEach((offset) => {
-        pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
-    });
-    pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
-    return new Blob([pdf], { type: "application/pdf" });
 }
 
-function downloadAdmitCard(card) {
-    const blob = createAdmitCardPdf({ ...card, downloadedOn: todayLabel() });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `iem-minor-admit-card-${card.enrollmentNo}.pdf`;
-    anchor.click();
-    URL.revokeObjectURL(url);
+async function svgToPngDataUrl(url, width = 320, height = 92) {
+    const svgDataUrl = await imageToDataUrl(url);
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        image.onload = () => {
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const context = canvas.getContext("2d");
+            context.drawImage(image, 0, 0, width, height);
+            resolve(canvas.toDataURL("image/png"));
+        };
+        image.onerror = reject;
+        image.src = svgDataUrl;
+    });
+}
+
+async function downloadAdmitCard(card) {
+    const [logoDataUrl, signatureDataUrl, qrDataUrl] = await Promise.all([
+        imageToDataUrl(LOGO_URL),
+        svgToPngDataUrl(SIGNATURE_URL),
+        QRCode.toDataURL(qrPayload(card), {
+            width: 360,
+            margin: 1,
+            color: { dark: "#000000", light: "#ffffff" },
+        }),
+    ]);
+
+    const downloadedOn = todayLabel();
+    const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+    const navy = "#252052";
+    const blue = "#1f7ae0";
+
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(0, 0, 210, 297, "F");
+    pdf.addImage(logoDataUrl, "PNG", 17, 13, 29, 23);
+    pdf.addImage(logoDataUrl, "PNG", 164, 13, 29, 23);
+
+    pdf.setTextColor(navy);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(12.5);
+    pdf.text("INSTITUTE OF ENGINEERING & MANAGEMENT (SALT LAKE)", 105, 18, { align: "center" });
+    pdf.setFontSize(8.5);
+    pdf.text("A constituent institute of", 105, 24, { align: "center" });
+    pdf.setFontSize(12.5);
+    pdf.text("UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA", 105, 30, { align: "center" });
+    pdf.setDrawColor(230, 230, 230);
+    pdf.line(16, 38, 194, 38);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor("#000000");
+    pdf.setFontSize(11);
+    pdf.text("Name of the Candidate:", 17, 70);
+    pdf.text("Registration Number:", 17, 79);
+    pdf.text("Enrollment Number:", 17, 88);
+    pdf.setTextColor(blue);
+    pdf.setFont("helvetica", "italic");
+    pdf.text(card.name, 72, 70);
+    pdf.text(card.registrationNo, 72, 79);
+    pdf.text(card.enrollmentNo, 72, 88);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor("#004f9f");
+    pdf.text("Schedule of Minor Examination", 105, 103, { align: "center" });
+
+    pdf.setDrawColor(0, 0, 0);
+    pdf.setLineWidth(0.25);
+    pdf.rect(17, 113, 176, 16);
+    pdf.line(17, 121, 193, 121);
+    pdf.line(76, 113, 76, 129);
+    pdf.line(135, 113, 135, 129);
+    pdf.setTextColor("#000000");
+    pdf.setFont("helvetica", "bold");
+    pdf.text("PAPER NAME", 46.5, 118.5, { align: "center" });
+    pdf.text("Exam Date", 105.5, 118.5, { align: "center" });
+    pdf.text("Exam. Time", 164, 118.5, { align: "center" });
+    pdf.setFont("helvetica", "normal");
+    pdf.text(card.course, 46.5, 126, { align: "center" });
+    pdf.text("3/5/2026", 105.5, 126, { align: "center" });
+    pdf.text("02:00 pm -04:00 pm(ONLINE)", 164, 126, { align: "center" });
+
+    pdf.addImage(qrDataUrl, "PNG", 17, 205, 34, 34);
+    pdf.setFontSize(6.6);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("DISCLAIMER : This is a computer generated document which has been generated from student login.", 52, 225);
+    pdf.addImage(signatureDataUrl, "PNG", 144, 214, 43, 12);
+    pdf.setFontSize(7.5);
+    pdf.setFont("helvetica", "normal");
+    pdf.text("Controller of Examinations", 165, 247, { align: "center" });
+    pdf.setFontSize(6.5);
+    pdf.text(`Downloaded on: ${downloadedOn}`, 165, 256, { align: "center" });
+
+    pdf.save(`iem-minor-admit-card-${card.enrollmentNo}.pdf`);
 }
 
 function AdmitCardPreview({ card }) {
+    const [qrDataUrl, setQrDataUrl] = useState("");
+
+    useEffect(() => {
+        let cancelled = false;
+        QRCode.toDataURL(qrPayload(card), {
+            width: 220,
+            margin: 1,
+            color: { dark: "#000000", light: "#ffffff" },
+        }).then((url) => {
+            if (!cancelled) setQrDataUrl(url);
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [card]);
+
     return (
         <div className="w-full max-w-3xl bg-white p-6 text-black shadow-[0_24px_70px_rgba(15,23,42,0.14)]">
             <div className="mb-8 flex items-start justify-center gap-5 border-b pb-4 text-center">
-                <img src="/iem-logo.png" alt="IEM" className="h-14 w-20 object-contain" />
+                <img src={LOGO_URL} alt="IEM" className="h-14 w-20 object-contain" />
                 <div>
-                    <h2 className="text-sm font-extrabold tracking-wide text-slate-800 md:text-lg">
+                    <h2 className="text-sm font-extrabold tracking-wide text-[#252052] md:text-lg">
                         INSTITUTE OF ENGINEERING & MANAGEMENT (SALT LAKE)
                     </h2>
-                    <p className="text-xs font-semibold text-slate-700">A constituent institute of</p>
-                    <h3 className="text-sm font-extrabold text-slate-800 md:text-lg">
+                    <p className="text-xs font-semibold text-[#252052]">A constituent institute of</p>
+                    <h3 className="text-sm font-extrabold text-[#252052] md:text-lg">
                         UNIVERSITY OF ENGINEERING AND MANAGEMENT, KOLKATA
                     </h3>
                 </div>
-                <img src="/iem-logo.png" alt="UEM" className="h-14 w-20 object-contain" />
+                <img src={LOGO_URL} alt="UEM" className="h-14 w-20 object-contain" />
             </div>
 
             <div className="mx-auto max-w-2xl space-y-1 text-sm md:text-base">
@@ -145,14 +215,16 @@ function AdmitCardPreview({ card }) {
             </table>
 
             <div className="mt-24 flex items-end justify-between gap-6">
-                <div className="flex h-28 w-28 items-center justify-center border border-black text-center text-xs font-bold">
-                    QR<br />CODE
-                </div>
+                {qrDataUrl ? (
+                    <img src={qrDataUrl} alt="Admit card QR code" className="h-28 w-28" />
+                ) : (
+                    <div className="h-28 w-28 border border-black" />
+                )}
                 <p className="flex-1 text-[10px] font-bold">
                     DISCLAIMER : This is a computer generated document which has been generated from student login.
                 </p>
                 <div className="text-center text-xs">
-                    <p className="mb-8 font-[cursive] text-base text-blue-800">Debika Bhattacharyya</p>
+                    <img src={SIGNATURE_URL} alt="Controller signature" className="mb-6 h-11 w-40 object-contain" />
                     <p>Controller of Examinations</p>
                     <p className="mt-3 text-[10px]">Downloaded on: {todayLabel()}</p>
                 </div>
