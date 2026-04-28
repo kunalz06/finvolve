@@ -26,7 +26,7 @@ exports.handler = async function handler(event) {
         });
 
         const order = await razorpay.orders.create({
-            amount: 100,
+            amount: 800000,
             currency: "INR",
             receipt: `iem_minor_${Date.now()}`,
             notes: {

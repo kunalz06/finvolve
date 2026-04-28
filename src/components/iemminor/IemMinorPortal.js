@@ -498,7 +498,7 @@ export default function IemMinorPortal() {
                                 disabled={paymentStatus === "processing"}
                                 className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-red-500 bg-white px-8 py-3 text-lg font-semibold text-slate-950 transition hover:bg-red-50 disabled:opacity-60"
                             >
-                                {paymentStatus === "processing" ? <><Loader2 className="animate-spin" size={18} /> Processing...</> : "Proceed to Pay ₹1"}
+                                {paymentStatus === "processing" ? <><Loader2 className="animate-spin" size={18} /> Processing...</> : "Proceed to Pay INR 8000"}
                             </button>
                         </form>
                     ) : (
