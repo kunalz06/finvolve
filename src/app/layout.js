@@ -1,8 +1,11 @@
 import "./dev/globals.css";
 
+const isNetlifyBuild =
+    process.env.NETLIFY === "true" || process.env.NETLIFY_STATIC_EXPORT === "true";
+
 export const metadata = {
-    title: "Registration Closed",
-    description: "IEM Minor registration is closed.",
+    title: isNetlifyBuild ? "Registration Closed" : "DEV Infinity",
+    description: isNetlifyBuild ? "IEM Minor registration is closed." : "Business Solutions",
 };
 
 export default function RootLayout({ children }) {

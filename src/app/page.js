@@ -1,4 +1,13 @@
+import { redirect } from "next/navigation";
+
+const isNetlifyBuild =
+    process.env.NETLIFY === "true" || process.env.NETLIFY_STATIC_EXPORT === "true";
+
 export default function RootPage() {
+    if (!isNetlifyBuild) {
+        redirect("/dev");
+    }
+
     return (
         <main className="min-h-screen bg-white px-4 py-8 text-slate-900 md:px-8">
             <section className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-3xl flex-col items-center justify-center text-center">
