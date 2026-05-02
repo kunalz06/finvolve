@@ -1,8 +1,8 @@
 import "./dev/globals.css";
 
 export const metadata = {
-    title: "IEM Minor",
-    description: "IEM Minor Degree Registration Portal",
+    title: "Registration Closed",
+    description: "IEM Minor registration is closed.",
 };
 
 export default function RootLayout({ children }) {
