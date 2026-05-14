@@ -353,7 +353,7 @@ export default function AdminPage() {
                 <div className="container">
                     <Card hover={false} className="glass-surface-strong mx-auto max-w-md overflow-hidden p-0">
                         <div className="border-b border-white/45 px-8 py-8 text-center">
-                            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.8))] shadow-[0_18px_48px_rgba(103,88,255,0.3)]">
+                            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] shadow-[var(--shadow-soft)]">
                                 <Lock className="text-white" size={28} />
                             </div>
                             <p className="glass-chip-strong mb-3 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.26em] text-primary">
@@ -381,7 +381,7 @@ export default function AdminPage() {
                 {!isConfigValid && <div className="mb-6 rounded-[22px] border border-amber-200 bg-amber-50/85 px-4 py-3 text-sm text-amber-700">Firebase public config appears incomplete.</div>}
                 {error && <div className="mb-6 rounded-[22px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-                <section className="glass-surface-strong page-section rounded-[34px] px-6 py-8 md:px-8 md:py-10">
+                <section className="glass-surface-strong page-section rounded-2xl px-6 py-8 md:px-8 md:py-10">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl">
                             <p className="glass-chip-strong mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -407,7 +407,7 @@ export default function AdminPage() {
                     ))}
                 </div>
 
-                <div className="glass-chip-strong mt-8 inline-flex flex-wrap gap-2 rounded-full p-2 backdrop-blur-xl">
+                <div className="glass-chip-strong mt-8 inline-flex flex-wrap gap-2 rounded-xl p-2">
                     {[
                         { id: "projects", label: "Projects", icon: LayoutDashboard },
                         { id: "messages", label: "Messages", icon: MessageSquare },
@@ -417,7 +417,7 @@ export default function AdminPage() {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${active ? "border border-white/40 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))] text-white shadow-[0_18px_40px_rgba(103,88,255,0.25)]" : "text-slate-600 hover:bg-white/45 hover:text-slate-900"}`}>
+                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-all ${active ? "border-2 border-[var(--border)] bg-[var(--primary)] text-white shadow-[var(--shadow-soft)]" : "text-slate-600 hover:bg-[var(--surface-muted)] hover:text-slate-900"}`}>
                                 <Icon size={16} />
                                 {tab.label}
                             </button>
@@ -594,7 +594,7 @@ export default function AdminPage() {
             </div>
             {selectedRequest && (
                 <div className="glass-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-8" onClick={() => setSelectedRequest(null)}>
-                    <div className="glass-surface-strong max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-[34px]" onClick={(event) => event.stopPropagation()}>
+                    <div className="glass-surface-strong max-h-[90vh] w-full max-w-3xl overflow-hidden rounded-2xl" onClick={(event) => event.stopPropagation()}>
                         <div className="flex items-start justify-between gap-4 border-b border-white/45 px-6 py-5 md:px-8">
                             <div>
                                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Full Request</p>

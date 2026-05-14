@@ -10,6 +10,10 @@ import {
     hashToken,
     verifyRazorpaySignature,
 } from "@/lib/server/payments";
+import {
+    renderProjectRequestAcknowledgementHtml,
+    sendNewsletterMail,
+} from "@/lib/server/newsletter";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 
 const quickStartDataSchema = z.object({
@@ -131,7 +135,29 @@ export async function POST(request) {
                 orderId: data.razorpay_order_id,
                 signature: data.razorpay_signature,
                 wizardSubmission: false,
+                acknowledgementEmailSent: false,
             });
+
+            try {
+                await sendNewsletterMail({
+                    to: data.quickStartData.email,
+                    subject: "We received your DEV Infinity quick-start request",
+                    text: `Hi ${data.quickStartData.name},\n\nPayment is confirmed and we received your quick-start project request.\n\nProject type: ${data.quickStartData.projectType}\n\n${data.quickStartData.description}`,
+                    html: renderProjectRequestAcknowledgementHtml({
+                        ...data.quickStartData,
+                        timeline: "priority",
+                    }),
+                });
+                await quickStartRequest.update({
+                    acknowledgementEmailSent: true,
+                    acknowledgementEmailSentAt: FieldValue.serverTimestamp(),
+                });
+            } catch (mailError) {
+                console.error("Quick-start acknowledgement email failed:", mailError.message);
+                await quickStartRequest.update({
+                    acknowledgementEmailError: mailError.message || "Acknowledgement email failed.",
+                });
+            }
 
             return corsJson(request, {
                 success: true,

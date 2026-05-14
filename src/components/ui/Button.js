@@ -11,13 +11,13 @@ export default function Button({
   icon: Icon,
   ...props 
 }) {
-  const baseStyles = "inline-flex items-center justify-center gap-2 rounded-full border text-center font-semibold backdrop-blur-xl transition-all duration-300";
+  const baseStyles = "inline-flex items-center justify-center gap-2 rounded-xl border-2 text-center font-bold transition-all duration-200";
   
   const variants = {
-    primary: "border-white/35 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.85))] text-white shadow-[0_18px_40px_rgba(103,88,255,0.28)] hover:-translate-y-0.5 hover:shadow-[0_24px_52px_rgba(103,88,255,0.34)]",
-    secondary: "glass-surface border-white/60 text-slate-800 hover:-translate-y-0.5 hover:border-white/85 hover:bg-white/60",
-    outline: "border-white/40 bg-white/14 text-slate-700 hover:bg-white/28 hover:text-slate-900",
-    ghost: "border-transparent bg-transparent text-slate-600 hover:bg-white/28 hover:text-slate-900",
+    primary: "border-[var(--border)] bg-[var(--primary)] text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]",
+    secondary: "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)]",
+    outline: "border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
+    ghost: "border-transparent bg-transparent text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]",
   };
 
   const sizes = {

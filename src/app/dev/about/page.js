@@ -12,9 +12,9 @@ export default function About() {
     <div className="min-h-screen px-6 py-12">
       <div className="container space-y-10">
         <section className="page-section">
-          <div className="glass-surface-strong grid items-center gap-12 rounded-[36px] px-8 py-10 lg:grid-cols-2 lg:px-12">
+          <div className="glass-surface-strong grid items-center gap-12 rounded-2xl px-8 py-10 lg:grid-cols-2 lg:px-12">
             <motion.div initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
                 <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">About Us</span>
               </div>
               <h1 className="mb-6 text-4xl font-bold leading-tight text-slate-950 md:text-5xl lg:text-6xl">
@@ -31,8 +31,8 @@ export default function About() {
 
             <motion.div initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
               <div className="relative mx-auto aspect-square max-w-md">
-                <div className="glass-chip absolute inset-0 rotate-3 rounded-[34px]" />
-                <div className="relative flex h-full items-center justify-center rounded-[34px] bg-[linear-gradient(145deg,rgba(124,92,255,0.92),rgba(105,183,255,0.72))] p-8 text-center text-white shadow-[0_28px_80px_rgba(103,88,255,0.28)]">
+                <div className="glass-chip absolute inset-0 rotate-3 rounded-2xl" />
+                <div className="relative flex h-full items-center justify-center rounded-2xl border-2 border-[var(--border)] bg-[var(--primary)] p-8 text-center text-white shadow-[var(--shadow)]">
                   <div>
                     <div className="mb-2 text-7xl font-bold">50+</div>
                     <div className="text-lg text-white/80">Projects Delivered</div>
@@ -71,7 +71,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
               <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Portfolio</span>
             </div>
             <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">Selected Work</h2>
@@ -90,7 +90,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
               <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Tech Stack</span>
             </div>
             <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">Technologies We Use</h2>
@@ -115,7 +115,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
               <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Values</span>
             </div>
             <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">What Drives Us</h2>
@@ -129,7 +129,7 @@ export default function About() {
           </div>
         </section>
 
-        <section className="glass-surface-strong rounded-[36px] px-8 py-12 text-center">
+        <section className="glass-surface-strong rounded-2xl px-8 py-12 text-center">
           <h2 className="mb-4 text-2xl font-bold text-slate-950 md:text-3xl">Ready to build something ambitious?</h2>
           <p className="mx-auto mb-8 max-w-xl text-slate-600">Let&apos;s discuss your goals and shape the right product path together.</p>
           <div className="flex flex-wrap justify-center gap-4">

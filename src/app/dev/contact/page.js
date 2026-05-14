@@ -49,7 +49,7 @@ export default function Contact() {
     return (
       <div className="min-h-screen px-6 py-12">
         <div className="container">
-          <div className="glass-surface-strong mx-auto max-w-lg rounded-[36px] px-8 py-16 text-center">
+          <div className="glass-surface-strong mx-auto max-w-lg rounded-2xl px-8 py-16 text-center">
             <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-100/90">
               <CheckCircle className="h-12 w-12 text-emerald-600" />
             </motion.div>
@@ -67,7 +67,7 @@ export default function Contact() {
       <div className="container">
         <div className="mx-auto max-w-5xl">
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-16 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
               <span className="text-sm font-medium text-primary">CONTACT US</span>
             </div>
             <h1 className="mb-6 text-4xl font-bold text-slate-950 md:text-5xl">Let&apos;s Start a Conversation</h1>
@@ -80,7 +80,7 @@ export default function Contact() {
                 <h3 className="mb-6 text-lg font-bold text-slate-950">Contact Information</h3>
                 <div className="space-y-6">
                   <a href="mailto:mitraricky06@gmail.com" className="group flex items-start gap-4">
-                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[18px] transition-colors group-hover:bg-white/85">
+                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors">
                       <Mail className="text-primary" size={20} />
                     </div>
                     <div>
@@ -89,7 +89,7 @@ export default function Contact() {
                     </div>
                   </a>
                   <a href="tel:+919907958859" className="group flex items-start gap-4">
-                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[18px] transition-colors group-hover:bg-white/85">
+                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors">
                       <Phone className="text-primary" size={20} />
                     </div>
                     <div>
@@ -98,7 +98,7 @@ export default function Contact() {
                     </div>
                   </a>
                   <div className="flex items-start gap-4">
-                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-[18px]">
+                    <div className="glass-icon-plate flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl">
                       <MapPin className="text-slate-500" size={20} />
                     </div>
                     <div>
@@ -109,7 +109,7 @@ export default function Contact() {
                 </div>
               </Card>
 
-              <Card hover={false} className="glass-surface-strong bg-[linear-gradient(145deg,rgba(124,92,255,0.22),rgba(105,183,255,0.18))]">
+              <Card hover={false} className="glass-surface-strong">
                 <Zap className="mb-4 text-primary" size={32} />
                 <h3 className="mb-2 text-lg font-bold text-slate-950">Ready to Start?</h3>
                 <p className="mb-4 text-sm text-slate-600">Jump straight to our project wizard and get started today.</p>
@@ -124,22 +124,22 @@ export default function Contact() {
                   <div className="grid gap-6 md:grid-cols-2">
                     <div>
                       <label htmlFor="name" className="mb-2 block text-sm font-medium text-slate-700">Your Name</label>
-                      <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="John Doe" className="w-full rounded-[22px] px-4 py-3 text-slate-900" />
+                      <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="John Doe" className="w-full rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                     <div>
                       <label htmlFor="email" className="mb-2 block text-sm font-medium text-slate-700">Email Address</label>
-                      <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@example.com" className="w-full rounded-[22px] px-4 py-3 text-slate-900" />
+                      <input type="email" id="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@example.com" className="w-full rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                   </div>
 
                   <div>
                     <label htmlFor="subject" className="mb-2 block text-sm font-medium text-slate-700">Subject</label>
-                    <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} required placeholder="How can we help?" className="w-full rounded-[22px] px-4 py-3 text-slate-900" />
+                    <input type="text" id="subject" name="subject" value={formData.subject} onChange={handleChange} required placeholder="How can we help?" className="w-full rounded-xl px-4 py-3 text-slate-900" />
                   </div>
 
                   <div>
                     <label htmlFor="message" className="mb-2 block text-sm font-medium text-slate-700">Message</label>
-                    <textarea id="message" name="message" rows={5} value={formData.message} onChange={handleChange} required placeholder="Tell us about your project..." className="w-full resize-none rounded-[22px] px-4 py-3 text-slate-900" />
+                    <textarea id="message" name="message" rows={5} value={formData.message} onChange={handleChange} required placeholder="Tell us about your project..." className="w-full resize-none rounded-xl px-4 py-3 text-slate-900" />
                   </div>
 
                   {status === "error" && (

@@ -100,13 +100,38 @@ export function renderNewsletterHtml({ title, body, unsubscribeUrl }) {
 export async function sendNewsletterMail({ to, subject, text, html, unsubscribeUrl }) {
     const transporter = nodemailer.createTransport(getTransportConfig());
     const from = getFromAddress();
+    const textBody = unsubscribeUrl ? `${text}\n\nUnsubscribe: ${unsubscribeUrl}` : text;
 
     return transporter.sendMail({
         from,
         to,
         replyTo: process.env.NEWSLETTER_REPLY_TO || process.env.NEWSLETTER_SMTP_USER,
         subject,
-        text: `${text}\n\nUnsubscribe: ${unsubscribeUrl}`,
+        text: textBody,
         html,
     });
+}
+
+export function renderProjectRequestAcknowledgementHtml({ name, projectType, timeline, description }) {
+    const safeName = escapeHtml(name || "there");
+    const safeProjectType = escapeHtml(projectType || "your project");
+    const timelineLabel = typeof timeline === "number" ? `${timeline} weeks` : (timeline || "to be discussed");
+    const safeTimeline = escapeHtml(timelineLabel);
+    const safeDescription = escapeHtml(description).replace(/\n/g, "<br />");
+
+    return `
+        <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
+            <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
+                <p style="margin:0 0 12px;color:#2457ff;font-size:12px;text-transform:uppercase;font-weight:800;">DEV Infinity</p>
+                <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">We received your project request</h1>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, thanks for sharing your idea. We have your request and will review it carefully before getting back to you.</p>
+                <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">
+                    <p style="margin:0 0 8px;"><strong>Project type:</strong> ${safeProjectType}</p>
+                    <p style="margin:0 0 8px;"><strong>Timespan:</strong> ${safeTimeline}</p>
+                    <p style="margin:0;"><strong>Description:</strong><br />${safeDescription}</p>
+                </div>
+                <p style="margin:22px 0 0;font-size:14px;line-height:1.7;color:#5e6773;">You do not need to do anything else right now. We will reply from this same email channel.</p>
+            </div>
+        </div>
+    `;
 }

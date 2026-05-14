@@ -4,11 +4,10 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { cn } from '@/lib/utils';
+import { apiUrl } from '@/lib/api';
 
 const STEPS = [
   { id: 'idea', title: 'Project Type', subtitle: 'What are you building?' },
@@ -34,6 +33,7 @@ const BUDGET_RANGES = [
 export default function ProjectWizard() {
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [timelineTouched, setTimelineTouched] = useState(false);
   const [formData, setFormData] = useState({
     projectType: '',
     timeline: 4,
@@ -66,15 +66,44 @@ export default function ProjectWizard() {
   const handleSubmit = async () => {
     setStatus('loading');
     setErrorMessage('');
-    try {
-      if (!db) throw new Error("Firebase not initialized");
 
-      await addDoc(collection(db, "requests"), {
-        ...formData,
-        createdAt: serverTimestamp(),
-        status: 'new',
-        wizardSubmission: true
+    const description = formData.description.trim();
+    if (!timelineTouched || !description) {
+      setDirection(-1);
+      setCurrentStep(1);
+      setStatus('error');
+      setErrorMessage('Please choose a timespan and add a brief description before submitting.');
+      return;
+    }
+
+    if (description.length < 10) {
+      setDirection(-1);
+      setCurrentStep(1);
+      setStatus('error');
+      setErrorMessage('Please add a little more detail to the project description before submitting.');
+      return;
+    }
+
+    if (!formData.projectType || !formData.budget || !formData.name.trim() || !formData.email.trim()) {
+      setStatus('error');
+      setErrorMessage('Please complete the project type, budget, name, and email before submitting.');
+      return;
+    }
+
+    try {
+      const response = await fetch(apiUrl('/dev/api/project-request'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formData,
+          description,
+          timeline: Number(formData.timeline),
+        }),
       });
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || "Failed to submit request.");
+      }
       setStatus('success');
     } catch (error) {
       console.error("Submission error:", error);
@@ -100,7 +129,7 @@ export default function ProjectWizard() {
 
   if (status === 'success') {
     return (
-      <div className="glass-surface-strong mx-auto max-w-2xl rounded-[36px] px-8 py-16 text-center">
+      <div className="glass-surface-strong mx-auto max-w-2xl rounded-2xl px-8 py-16 text-center">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -135,7 +164,7 @@ export default function ProjectWizard() {
           </div>
           <Link
             href="/dev/quick-start"
-            className="inline-flex whitespace-nowrap rounded-full border border-white/40 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_18px_40px_rgba(103,88,255,0.25)] transition-transform hover:-translate-y-0.5"
+              className="inline-flex whitespace-nowrap rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5"
           >
             Quick Start - INR 99
           </Link>
@@ -155,7 +184,7 @@ export default function ProjectWizard() {
       <div className="relative mb-12 flex items-center justify-between px-4">
         <div className="glass-track absolute left-0 top-4 -z-10 h-1 w-full rounded-full" />
         <motion.div
-          className="absolute left-0 top-4 -z-10 h-1 origin-left rounded-full bg-[linear-gradient(90deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))]"
+          className="absolute left-0 top-4 -z-10 h-1 origin-left rounded-full bg-[var(--primary)]"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: currentStep / (STEPS.length - 1) }}
           transition={{ duration: 0.5 }}
@@ -165,7 +194,7 @@ export default function ProjectWizard() {
           <div key={step.id} className="flex flex-col items-center gap-2">
             <div className={cn(
               "flex h-8 w-8 items-center justify-center rounded-full border text-sm font-bold transition-colors duration-300",
-              i <= currentStep ? "border-white/30 bg-[linear-gradient(135deg,rgba(124,92,255,0.95),rgba(105,183,255,0.82))] text-white" : "glass-chip text-slate-500"
+              i <= currentStep ? "border-[var(--border)] bg-[var(--primary)] text-white shadow-[var(--shadow-soft)]" : "glass-chip text-slate-500"
             )}>
               {i + 1}
             </div>
@@ -223,7 +252,7 @@ export default function ProjectWizard() {
                 <div className="relative pt-6 pb-2">
                   <div className="glass-track relative h-4 w-full rounded-full">
                     <div
-                      className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-purple-600 rounded-full"
+                      className="absolute top-0 left-0 h-full rounded-full bg-[var(--primary)]"
                       style={{ width: `${((formData.timeline - 2) / 22) * 100}%` }}
                     />
                     <input
@@ -232,7 +261,10 @@ export default function ProjectWizard() {
                       max="24"
                       step="2"
                       value={formData.timeline}
-                      onChange={(e) => updateData('timeline', parseInt(e.target.value))}
+                      onChange={(e) => {
+                        setTimelineTouched(true);
+                        updateData('timeline', parseInt(e.target.value));
+                      }}
                       className="absolute top-0 left-0 w-full h-full opacity-0 cursor-pointer z-10"
                     />
                     <div
@@ -294,6 +326,7 @@ export default function ProjectWizard() {
                     placeholder="Full Name"
                     value={formData.name}
                     onChange={(e) => updateData('name', e.target.value)}
+                    required
                     className="w-full rounded-[22px] py-3 pl-12 pr-6 text-slate-900"
                   />
                 </div>
@@ -304,6 +337,7 @@ export default function ProjectWizard() {
                     placeholder="Email Address"
                     value={formData.email}
                     onChange={(e) => updateData('email', e.target.value)}
+                    required
                     className="w-full rounded-[22px] py-3 pl-12 pr-6 text-slate-900"
                   />
                 </div>
