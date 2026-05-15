@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
@@ -44,6 +44,14 @@ export default function ProjectWizard() {
   });
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showSuccessBurst, setShowSuccessBurst] = useState(false);
+
+  useEffect(() => {
+    if (status !== 'success') return undefined;
+    setShowSuccessBurst(true);
+    const timeout = window.setTimeout(() => setShowSuccessBurst(false), 1400);
+    return () => window.clearTimeout(timeout);
+  }, [status]);
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -129,22 +137,46 @@ export default function ProjectWizard() {
 
   if (status === 'success') {
     return (
-      <div className="glass-surface-strong mx-auto max-w-2xl rounded-2xl px-8 py-16 text-center">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-emerald-100/90"
-        >
-          <CheckCircle className="h-12 w-12 text-emerald-600" />
-        </motion.div>
-        <h2 className="mb-4 text-3xl font-bold text-slate-950">Message Received!</h2>
-        <p className="mx-auto mb-8 max-w-md text-lg text-slate-600">
-          Thank you for reaching out. We&apos;re already reviewing your concept and will respond within 24 hours.
-        </p>
-        <Button onClick={() => window.location.reload()} variant="primary">
-          Start New Project
-        </Button>
-      </div>
+      <>
+        <AnimatePresence>
+          {showSuccessBurst && (
+            <motion.div
+              className="fixed inset-0 z-[80] flex items-center justify-center bg-emerald-950/35 backdrop-blur-sm"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.18 }}
+              aria-hidden="true"
+            >
+              <motion.div
+                className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-emerald-50 shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
+                initial={{ scale: 0.35, rotate: -10 }}
+                animate={{ scale: [0.35, 1.12, 1], rotate: 0 }}
+                exit={{ scale: 0.82, opacity: 0 }}
+                transition={{ duration: 0.55, ease: "easeOut" }}
+              >
+                <CheckCircle className="h-20 w-20 text-emerald-600 md:h-24 md:w-24" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <div className="glass-surface-strong mx-auto max-w-2xl rounded-2xl px-8 py-16 text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-emerald-100"
+          >
+            <CheckCircle className="h-12 w-12 text-emerald-600" />
+          </motion.div>
+          <h2 className="mb-4 text-3xl font-bold text-slate-950">Message Received!</h2>
+          <p className="mx-auto mb-8 max-w-md text-lg text-slate-600">
+            Thank you for reaching out. We&apos;re already reviewing your concept and will respond within 24 hours.
+          </p>
+          <Button onClick={() => window.location.reload()} variant="primary">
+            Start New Project
+          </Button>
+        </div>
+      </>
     );
   }
 

@@ -4,6 +4,7 @@ import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { createPaymentToken, hashToken } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
+import { renderPaymentLinkHtml, sendNewsletterMail } from "@/lib/server/newsletter";
 
 const optionalTrimmedString = (schema) =>
     z.preprocess((value) => {
@@ -15,7 +16,7 @@ const optionalTrimmedString = (schema) =>
 const payloadSchema = z.object({
     amount: z.coerce.number().int().positive().max(5_00_000),
     clientName: z.string().trim().min(2).max(120),
-    clientEmail: optionalTrimmedString(z.string().email().max(255)),
+    clientEmail: z.string().trim().email().max(255),
     notes: optionalTrimmedString(z.string().max(500)),
     expiresInHours: z.coerce.number().int().min(1).max(24 * 30).optional(),
 });
@@ -89,6 +90,7 @@ export async function POST(request) {
             updatedAt: FieldValue.serverTimestamp(),
             createdByUid: adminAuth.decoded.uid,
             createdByEmail: adminAuth.decoded.email || "",
+            paymentLinkEmailSent: false,
         });
 
         const siteUrl = getSiteUrl(request);
@@ -101,11 +103,41 @@ export async function POST(request) {
         }
 
         const paymentUrl = `${siteUrl}/dev/payments?token=${token}`;
+        let emailSent = false;
+
+        try {
+            await sendNewsletterMail({
+                to: payload.clientEmail,
+                subject: "Your DEV Infinity payment link",
+                text: `Hi ${payload.clientName},\n\nYour secure DEV Infinity payment link is ready.\n\nAmount: INR ${payload.amount.toLocaleString("en-IN")}\nExpires: ${expiresAt.toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })}\n\nOpen the link: ${paymentUrl}`,
+                html: renderPaymentLinkHtml({
+                    clientName: payload.clientName,
+                    amount: payload.amount,
+                    currency: "INR",
+                    paymentUrl,
+                    expiresAt,
+                    notes: payload.notes,
+                }),
+            });
+            emailSent = true;
+            await docRef.update({
+                paymentLinkEmailSent: true,
+                paymentLinkEmailSentAt: FieldValue.serverTimestamp(),
+                updatedAt: FieldValue.serverTimestamp(),
+            });
+        } catch (mailError) {
+            console.error("Payment link email failed:", mailError.message);
+            await docRef.update({
+                paymentLinkEmailError: mailError.message || "Payment link email failed.",
+                updatedAt: FieldValue.serverTimestamp(),
+            });
+        }
 
         return corsJson(request, {
             success: true,
             paymentRequestId: docRef.id,
             paymentUrl,
+            emailSent,
             expiresAt: expiresAt.toISOString(),
         });
     } catch (error) {

@@ -497,7 +497,7 @@ export default function AdminPage() {
                             </div>
                             <form onSubmit={handleCreatePayment} className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
                                 <input className="rounded-[20px] px-4 py-3 text-slate-900" placeholder="Client name" value={newPayment.clientName} onChange={(event) => setNewPayment({ ...newPayment, clientName: event.target.value })} required />
-                                <input className="rounded-[20px] px-4 py-3 text-slate-900" placeholder="Client email" value={newPayment.clientEmail} onChange={(event) => setNewPayment({ ...newPayment, clientEmail: event.target.value })} />
+                                <input className="rounded-[20px] px-4 py-3 text-slate-900" type="email" placeholder="Client email" value={newPayment.clientEmail} onChange={(event) => setNewPayment({ ...newPayment, clientEmail: event.target.value })} required />
                                 <input className="rounded-[20px] px-4 py-3 text-slate-900" type="number" min="1" placeholder="Amount (INR)" value={newPayment.amount} onChange={(event) => setNewPayment({ ...newPayment, amount: event.target.value })} required />
                                 <input className="rounded-[20px] px-4 py-3 text-slate-900" type="number" min="1" max="720" placeholder="Expiry hours" value={newPayment.expiresInHours} onChange={(event) => setNewPayment({ ...newPayment, expiresInHours: event.target.value })} required />
                                 <Button type="submit" variant="primary" disabled={creatingPayment}>{creatingPayment ? "Creating..." : "Generate Link"}</Button>
@@ -510,7 +510,8 @@ export default function AdminPage() {
                             <textarea className="mt-4 min-h-[110px] w-full rounded-[24px] px-4 py-3 text-slate-900" rows={3} placeholder="Notes for the client (optional)" value={newPayment.notes} onChange={(event) => setNewPayment({ ...newPayment, notes: event.target.value })} />
                             {generatedLink && (
                                 <div className="mt-5 rounded-[24px] border border-emerald-200 bg-emerald-50/85 p-4 text-sm text-emerald-800">
-                                    <div className="font-semibold">Payment link ready</div>
+                                    <div className="font-semibold">Payment link ready{generatedLink.emailSent ? " and emailed" : ""}</div>
+                                    {!generatedLink.emailSent && <div className="mt-1 text-xs">The link was created, but the email could not be sent. You can share it manually.</div>}
                                     <div className="mt-2 break-all">{generatedLink.paymentUrl}</div>
                                     <button type="button" className="mt-3 rounded-full border border-emerald-300 bg-white/70 px-4 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-white" onClick={() => navigator.clipboard.writeText(generatedLink.paymentUrl)}>Copy link</button>
                                 </div>

@@ -135,3 +135,28 @@ export function renderProjectRequestAcknowledgementHtml({ name, projectType, tim
         </div>
     `;
 }
+
+export function renderPaymentLinkHtml({ clientName, amount, currency = "INR", paymentUrl, expiresAt, notes }) {
+    const safeName = escapeHtml(clientName || "there");
+    const safeAmount = escapeHtml(`${currency} ${Number(amount || 0).toLocaleString("en-IN")}`);
+    const safePaymentUrl = escapeHtml(paymentUrl);
+    const safeExpiresAt = escapeHtml(expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "soon");
+    const safeNotes = notes ? escapeHtml(notes).replace(/\n/g, "<br />") : "";
+
+    return `
+        <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
+            <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
+                <p style="margin:0 0 12px;color:#2457ff;font-size:12px;text-transform:uppercase;font-weight:800;">DEV Infinity</p>
+                <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">Your secure payment link is ready</h1>
+                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, please use the secure link below to complete your payment.</p>
+                <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">
+                    <p style="margin:0 0 8px;"><strong>Amount:</strong> ${safeAmount}</p>
+                    <p style="margin:0 0 16px;"><strong>Link expires:</strong> ${safeExpiresAt}</p>
+                    <a href="${safePaymentUrl}" style="display:inline-block;background:#2457ff;color:#ffffff;text-decoration:none;border:2px solid #101820;border-radius:12px;padding:12px 18px;font-weight:800;">Open payment link</a>
+                </div>
+                ${safeNotes ? `<p style="margin:20px 0 0;font-size:14px;line-height:1.7;color:#46515f;"><strong>Note:</strong><br />${safeNotes}</p>` : ""}
+                <p style="margin:22px 0 0;font-size:13px;line-height:1.7;color:#5e6773;">If the button does not open, paste this link into your browser:<br /><span style="word-break:break-all;">${safePaymentUrl}</span></p>
+            </div>
+        </div>
+    `;
+}
