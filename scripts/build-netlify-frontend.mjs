@@ -4,6 +4,27 @@ import path from "node:path";
 
 const root = process.cwd();
 const tempRoot = path.join(root, ".tmp-netlify-api-routes");
+const allowMissingApiBaseUrl = process.env.ALLOW_MISSING_NETLIFY_API_BASE_URL === "true";
+
+function assertNetlifyFrontendEnv() {
+    const apiBaseUrl = String(process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
+
+    if (!apiBaseUrl && !allowMissingApiBaseUrl) {
+        console.error(
+            [
+                "Missing NEXT_PUBLIC_API_BASE_URL.",
+                "Netlify is a frontend-only deployment for this app, so browser API calls must point to the Vercel backend.",
+                "Set NEXT_PUBLIC_API_BASE_URL to the Vercel app URL in Netlify environment variables.",
+            ].join("\n"),
+        );
+        process.exit(1);
+    }
+
+    if (apiBaseUrl && !/^https?:\/\//i.test(apiBaseUrl)) {
+        console.error("NEXT_PUBLIC_API_BASE_URL must be an absolute http(s) URL.");
+        process.exit(1);
+    }
+}
 
 const apiRoutes = [
     {
@@ -37,16 +58,17 @@ function restoreRoutes() {
     fs.rmSync(tempRoot, { recursive: true, force: true });
 }
 
+assertNetlifyFrontendEnv();
 moveRoutesOut();
 
 try {
-    const result = spawnSync("npx", ["next", "build"], {
+    const nextCli = path.join(root, "node_modules", "next", "dist", "bin", "next");
+    const result = spawnSync(process.execPath, [nextCli, "build"], {
         cwd: root,
         env: {
             ...process.env,
             NETLIFY_STATIC_EXPORT: "true",
         },
-        shell: process.platform === "win32",
         stdio: "inherit",
     });
 

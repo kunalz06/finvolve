@@ -4,8 +4,10 @@ const isNetlifyBuild =
     process.env.NETLIFY === "true" || process.env.NETLIFY_STATIC_EXPORT === "true";
 
 export const metadata = {
-    title: isNetlifyBuild ? "Registration Closed" : "DEV Infinity",
-    description: isNetlifyBuild ? "IEM Minor registration is closed." : "Business Solutions",
+    title: "DEV Infinity",
+    description: isNetlifyBuild
+        ? "DEV Infinity frontend served from Netlify with APIs hosted on Vercel."
+        : "Business Solutions",
 };
 
 export default function RootLayout({ children }) {
