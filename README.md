@@ -68,6 +68,8 @@ NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
 NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 ```
 
+`NEXT_PUBLIC_API_BASE_URL` must point to the Vercel deployment that hosts the API routes. Use the full URL with `https://`; a bare `your-vercel-app.vercel.app` hostname is normalized during the build, but values such as `/api`, `localhost`, or a placeholder string will fail.
+
 Do not set server secrets on Netlify, including `RAZORPAY_KEY_SECRET`, `IEM_RAZORPAY_KEY_SECRET`, Firebase Admin private keys, or SMTP passwords. This deployment is frontend-only; server API routes and payment logic continue to run on Vercel.
 
 The public browser keys are intentionally bundled into the frontend, so `netlify.toml` omits the `NEXT_PUBLIC_*` keys from Netlify secret scanning. Do not add private server credentials to that omit list.

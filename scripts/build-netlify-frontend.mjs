@@ -6,8 +6,19 @@ const root = process.cwd();
 const tempRoot = path.join(root, ".tmp-netlify-api-routes");
 const allowMissingApiBaseUrl = process.env.ALLOW_MISSING_NETLIFY_API_BASE_URL === "true";
 
+function normalizeApiBaseUrl(value) {
+    const trimmed = String(value || "").trim().replace(/^['"]|['"]$/g, "").replace(/\/$/, "");
+    if (!trimmed) return "";
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (/^[a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(?:\/.*)?$/i.test(trimmed)) {
+        return `https://${trimmed}`;
+    }
+    return trimmed;
+}
+
 function assertNetlifyFrontendEnv() {
-    const apiBaseUrl = String(process.env.NEXT_PUBLIC_API_BASE_URL || "").trim();
+    const rawApiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+    const apiBaseUrl = normalizeApiBaseUrl(rawApiBaseUrl);
 
     if (!apiBaseUrl && !allowMissingApiBaseUrl) {
         console.error(
@@ -21,9 +32,16 @@ function assertNetlifyFrontendEnv() {
     }
 
     if (apiBaseUrl && !/^https?:\/\//i.test(apiBaseUrl)) {
-        console.error("NEXT_PUBLIC_API_BASE_URL must be an absolute http(s) URL.");
+        console.error(
+            [
+                "NEXT_PUBLIC_API_BASE_URL must be an absolute http(s) URL.",
+                "Use your Vercel backend URL, for example: https://your-vercel-app.vercel.app",
+            ].join("\n"),
+        );
         process.exit(1);
     }
+
+    process.env.NEXT_PUBLIC_API_BASE_URL = apiBaseUrl;
 }
 
 const apiRoutes = [

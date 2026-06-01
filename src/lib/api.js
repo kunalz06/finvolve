@@ -1,5 +1,16 @@
 export function getApiBaseUrl() {
-    return (process.env.NEXT_PUBLIC_API_BASE_URL || "").replace(/\/$/, "");
+    const apiBaseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL || "")
+        .trim()
+        .replace(/^['"]|['"]$/g, "")
+        .replace(/\/$/, "");
+
+    if (!apiBaseUrl) return "";
+    if (/^https?:\/\//i.test(apiBaseUrl)) return apiBaseUrl;
+    if (/^[a-z0-9.-]+\.[a-z]{2,}(?::\d+)?(?:\/.*)?$/i.test(apiBaseUrl)) {
+        return `https://${apiBaseUrl}`;
+    }
+
+    return apiBaseUrl;
 }
 
 export function apiUrl(path) {
