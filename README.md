@@ -4,7 +4,6 @@ DEV♾️ is a Next.js App Router project with:
 - Marketing and lead-capture flows under `/dev`
 - Tokenized client payment flow under `/dev/payments`
 - Admin dashboard under `/dev/admin`
-- IEM minor-degree registration flow under `/iemminor`
 
 ## Prerequisites
 
@@ -49,7 +48,7 @@ npm run set-admin -- FIREBASE_UID
 
 ## Netlify Frontend Deployment
 
-This app can be deployed to Netlify as a static frontend while Vercel continues to host the API routes for Razorpay, Firebase Admin, and newsletter email. The Netlify root (`/`) serves the DEV app by default; `/iemminor` remains available as a separate route.
+This app can be deployed to Netlify as a static frontend while Vercel continues to host the API routes for Razorpay, Firebase Admin, and newsletter email. The Netlify root (`/`) serves the DEV app by default.
 
 Netlify uses `npm run build:netlify`, which temporarily excludes App Router API route folders so `output: "export"` can produce the static `out` directory. The Netlify config also points functions at `netlify/disabled-functions` so this deployment ships no Netlify backend. The build requires `NEXT_PUBLIC_API_BASE_URL` so frontend API calls target the Vercel backend. The normal `npm run build` still includes API routes for Vercel.
 
@@ -70,7 +69,7 @@ NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 
 `NEXT_PUBLIC_API_BASE_URL` must point to the Vercel deployment that hosts the API routes. Use the full URL with `https://`; a bare `your-vercel-app.vercel.app` hostname is normalized during the build, but values such as `/api`, `localhost`, or a placeholder string will fail.
 
-Do not set server secrets on Netlify, including `RAZORPAY_KEY_SECRET`, `IEM_RAZORPAY_KEY_SECRET`, Firebase Admin private keys, or SMTP passwords. This deployment is frontend-only; server API routes and payment logic continue to run on Vercel.
+Do not set server secrets on Netlify, including `RAZORPAY_KEY_SECRET`, Firebase Admin private keys, or SMTP passwords. This deployment is frontend-only; server API routes and payment logic continue to run on Vercel.
 
 The public browser keys are intentionally bundled into the frontend, so `netlify.toml` omits the `NEXT_PUBLIC_*` keys from Netlify secret scanning. Do not add private server credentials to that omit list.
 
@@ -81,11 +80,8 @@ CORS_ALLOWED_ORIGINS=https://your-netlify-site.netlify.app,https://your-custom-d
 NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
 NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 NEXT_PUBLIC_RAZORPAY_KEY_ID=...
-NEXT_PUBLIC_IEM_RAZORPAY_KEY_ID=...
 RAZORPAY_KEY_ID=...
 RAZORPAY_KEY_SECRET=...
-IEM_RAZORPAY_KEY_ID=...
-IEM_RAZORPAY_KEY_SECRET=...
 ```
 
 This repo helper applies:

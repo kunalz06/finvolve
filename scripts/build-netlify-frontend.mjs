@@ -49,10 +49,6 @@ const apiRoutes = [
         source: path.join(root, "src", "app", "dev", "api"),
         target: path.join(tempRoot, "dev-api"),
     },
-    {
-        source: path.join(root, "src", "app", "iemminor", "api"),
-        target: path.join(tempRoot, "iemminor-api"),
-    },
 ];
 
 function moveRoutesOut() {
