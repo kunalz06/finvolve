@@ -5,6 +5,7 @@ import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { createPaymentToken, hashToken } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import { renderPaymentLinkHtml, sendNewsletterMail } from "@/lib/server/newsletter";
+import { getCanonicalSiteUrl } from "@/lib/server/site-url";
 
 const optionalTrimmedString = (schema) =>
     z.preprocess((value) => {
@@ -20,17 +21,6 @@ const payloadSchema = z.object({
     notes: optionalTrimmedString(z.string().max(500)),
     expiresInHours: z.coerce.number().int().min(1).max(24 * 30).optional(),
 });
-
-function getSiteUrl(request) {
-    const envUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL;
-    if (envUrl) {
-        return envUrl.replace(/\/$/, "");
-    }
-
-    const proto = request.headers.get("x-forwarded-proto") || "https";
-    const host = request.headers.get("host");
-    return host ? `${proto}://${host}` : "";
-}
 
 export function OPTIONS(request) {
     return corsPreflight(request);
@@ -93,7 +83,7 @@ export async function POST(request) {
             paymentLinkEmailSent: false,
         });
 
-        const siteUrl = getSiteUrl(request);
+        const siteUrl = getCanonicalSiteUrl(request);
         if (!siteUrl) {
             return corsJson(
                 request,

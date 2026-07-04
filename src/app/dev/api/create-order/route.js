@@ -10,6 +10,7 @@ import {
     hashToken,
 } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
+import { getCanonicalSiteUrl } from "@/lib/server/site-url";
 
 const payloadSchema = z.object({
     source: z.enum([PAYMENT_SOURCE.QUICK_START, PAYMENT_SOURCE.PAYMENT_PORTAL]),
@@ -23,16 +24,6 @@ const MIN_PAYMENT_INR = 1;
 
 export function OPTIONS(request) {
     return corsPreflight(request);
-}
-
-function getOrigin(request) {
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL;
-    if (siteUrl) return siteUrl.replace(/\/$/, "");
-
-    const proto = request.headers.get("x-forwarded-proto") || "https";
-    const host = request.headers.get("host");
-    if (!host) return "";
-    return `${proto}://${host}`;
 }
 
 export async function POST(request) {
@@ -159,7 +150,7 @@ export async function POST(request) {
             source,
             paymentRequestId: paymentRequestId || null,
             checkoutKey: keyId,
-            returnUrl: `${getOrigin(request)}/dev/payments`,
+            returnUrl: `${getCanonicalSiteUrl(request)}/dev/payments`,
         });
     } catch (error) {
         console.error("Failed to create Razorpay order:", error.message);

@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
+import { getCanonicalApiUrl, getCanonicalSiteUrl } from "@/lib/server/site-url";
 
 export const NEWSLETTER_COLLECTION = "newsletter_subscribers";
 
@@ -12,21 +13,11 @@ export function createUnsubscribeToken() {
 }
 
 export function getNewsletterSiteUrl(request) {
-    const envUrl = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL;
-    if (envUrl) return envUrl.replace(/\/$/, "");
-
-    const proto = request?.headers?.get("x-forwarded-proto") || "https";
-    const host = request?.headers?.get("host");
-    return host ? `${proto}://${host}` : "";
+    return getCanonicalSiteUrl(request);
 }
 
 export function getNewsletterApiUrl(request) {
-    const envUrl = process.env.NEXT_PUBLIC_API_BASE_URL || process.env.API_BASE_URL;
-    if (envUrl) return envUrl.replace(/\/$/, "");
-
-    const proto = request?.headers?.get("x-forwarded-proto") || "https";
-    const host = request?.headers?.get("host");
-    return host ? `${proto}://${host}` : "";
+    return getCanonicalApiUrl(request);
 }
 
 export function getUnsubscribeUrl({ request, token }) {

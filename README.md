@@ -23,6 +23,7 @@ Copy `.env.example` to `.env.local` and fill values:
   - `RAZORPAY_KEY_SECRET`
 - Firebase Admin credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or split vars)
 - Optional `NEXT_PUBLIC_SITE_URL` for absolute payment links
+- Optional `DEV_APP_SITE_URL` as a server-only override for DEV payment links
 - Optional `NEXT_PUBLIC_API_BASE_URL` for frontend-only hosts such as Netlify to call the Vercel backend
 - Optional `CORS_ALLOWED_ORIGINS` on Vercel to allow Netlify/custom frontend domains to call API routes
 - Newsletter SMTP credentials for personal-mail sending:
@@ -64,8 +65,11 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
 NEXT_PUBLIC_FIREBASE_APP_ID=...
 NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
+DEV_APP_SITE_URL=https://your-netlify-site.netlify.app
 NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 ```
+
+`NEXT_PUBLIC_SITE_URL` and `DEV_APP_SITE_URL` should each be one DEV app URL, not a comma-separated list. Put multiple frontend domains only in `CORS_ALLOWED_ORIGINS`.
 
 `NEXT_PUBLIC_API_BASE_URL` must point to the Vercel deployment that hosts the API routes. Use the full URL with `https://`; a bare `your-vercel-app.vercel.app` hostname is normalized during the build, but values such as `/api`, `localhost`, or a placeholder string will fail.
 
@@ -78,6 +82,7 @@ Set this on Vercel so Netlify can call the backend:
 ```bash
 CORS_ALLOWED_ORIGINS=https://your-netlify-site.netlify.app,https://your-custom-domain.com
 NEXT_PUBLIC_SITE_URL=https://your-netlify-site.netlify.app
+DEV_APP_SITE_URL=https://your-netlify-site.netlify.app
 NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 NEXT_PUBLIC_RAZORPAY_KEY_ID=...
 RAZORPAY_KEY_ID=...
