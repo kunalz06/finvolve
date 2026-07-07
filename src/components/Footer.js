@@ -46,7 +46,7 @@ export default function Footer() {
         <div className="glass-surface-strong relative overflow-hidden rounded-2xl px-5 py-10 md:px-10 md:py-14">
           <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
-              <Link href="/dev" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
+              <Link href="/" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] shadow-[var(--shadow-soft)]">
                   <Zap className="text-white" size={20} />
                 </div>
