@@ -97,22 +97,37 @@ export async function POST(request) {
         });
         const db = getAdminDb();
 
-        // Check for existing active subscription for this email + tier
-        const existingSubs = await db
-            .collection("subscriptions")
-            .where("email", "==", email)
-            .where("tier", "==", tier)
-            .where("status", "in", ["active", "created"])
-            .limit(1)
-            .get();
+        // Check for existing active subscription for this email + tier.
+        // Uses a simple query first to avoid composite-index requirement;
+        // then filters in memory.
+        let existingSub = null;
+        try {
+            const existingSubs = await db
+                .collection("subscriptions")
+                .where("email", "==", email)
+                .where("tier", "==", tier)
+                .limit(10)
+                .get();
 
-        if (!existingSubs.empty) {
-            const existing = existingSubs.docs[0].data();
+            for (const doc of existingSubs.docs) {
+                const data = doc.data();
+                if (data.status === "active" || data.status === "created") {
+                    existingSub = { id: doc.id, ...data };
+                    break;
+                }
+            }
+        } catch (firestoreError) {
+            // If the query still fails (e.g. index not ready), skip the check
+            // and let Razorpay handle duplicate subscriptions via webhook.
+            console.warn("Subscription duplicate-check query failed, skipping:", firestoreError.message);
+        }
+
+        if (existingSub) {
             return corsJson(
                 request,
                 {
-                    error: `You already have an ${planConfig.name} subscription that is ${existing.status}. Please check your dashboard or contact support.`,
-                    existingSubscriptionId: existingSubs.docs[0].id,
+                    error: `You already have a ${planConfig.name} subscription that is ${existingSub.status}. Please check your dashboard or contact support.`,
+                    existingSubscriptionId: existingSub.id,
                 },
                 { status: 409 },
             );
@@ -144,11 +159,6 @@ export async function POST(request) {
                 email,
                 name,
                 source: "dev_infinity_cloud",
-            },
-            customer_details: {
-                name,
-                email,
-                contact: phone,
             },
         });
 
@@ -196,9 +206,10 @@ export async function POST(request) {
         });
     } catch (error) {
         console.error("Failed to create subscription:", error.message);
+        console.error("Stack:", error.stack);
         return corsJson(
             request,
-            { error: "Unable to create subscription right now. Please try again." },
+            { error: "Unable to create subscription right now. Please try again.", debug: error.message },
             { status: 500 },
         );
     }
