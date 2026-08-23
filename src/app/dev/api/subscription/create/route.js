@@ -98,8 +98,6 @@ export async function POST(request) {
         const db = getAdminDb();
 
         // Check for existing active subscription for this email + tier.
-        // Uses a simple query first to avoid composite-index requirement;
-        // then filters in memory.
         let existingSub = null;
         try {
             const existingSubs = await db
@@ -111,14 +109,12 @@ export async function POST(request) {
 
             for (const doc of existingSubs.docs) {
                 const data = doc.data();
-                if (data.status === "active" || data.status === "created") {
+                if (data.status === "active") {
                     existingSub = { id: doc.id, ...data };
                     break;
                 }
             }
         } catch (firestoreError) {
-            // If the query still fails (e.g. index not ready), skip the check
-            // and let Razorpay handle duplicate subscriptions via webhook.
             console.warn("Subscription duplicate-check query failed, skipping:", firestoreError.message);
         }
 
@@ -126,7 +122,7 @@ export async function POST(request) {
             return corsJson(
                 request,
                 {
-                    error: `You already have a ${planConfig.name} subscription that is ${existingSub.status}. Please check your dashboard or contact support.`,
+                    error: `You already have an active ${planConfig.name} subscription. Please check your dashboard or contact support.`,
                     existingSubscriptionId: existingSub.id,
                 },
                 { status: 409 },
@@ -148,7 +144,8 @@ export async function POST(request) {
               }]
             : [];
 
-        // Create the subscription
+        // Create the Razorpay subscription only.
+        // Firestore record is created by the webhook AFTER successful payment.
         const subscription = await razorpay.subscriptions.create({
             plan_id: planId,
             total_count: SUBSCRIPTION_TOTAL_CYCLES,
@@ -158,37 +155,9 @@ export async function POST(request) {
                 tier,
                 email,
                 name,
+                phone,
                 source: "dev_infinity_cloud",
             },
-        });
-
-        // Record the subscription in Firestore
-        await db.collection("subscriptions").doc(subscription.id).set({
-            tier,
-            name,
-            email,
-            phone,
-            status: "created",
-            razorpaySubscriptionId: subscription.id,
-            razorpayPlanId: planId,
-            currentPeriodStart: null,
-            currentPeriodEnd: null,
-            computeUsage: {
-                totalAllowed: planConfig.computeHours.total,
-                usedThisPeriod: 0,
-                firstHalfUsed: 0,
-                secondHalfUsed: 0,
-            },
-            apiUsage: {
-                gpt: { allowed: planConfig.apiAccess.gptHours, used: 0 },
-                gemini: { allowed: planConfig.apiAccess.geminiHours, used: 0 },
-                claude: { allowed: planConfig.apiAccess.claudeHours, used: 0 },
-            },
-            monthlyAmount: planConfig.monthlyAmountINR,
-            setupFee: planConfig.setupFeeINR,
-            cycleCount: 0,
-            createdAt: FieldValue.serverTimestamp(),
-            updatedAt: FieldValue.serverTimestamp(),
         });
 
         const firstChargeAmount =
