@@ -58,7 +58,7 @@ export default function CloudPage() {
                     ].map((stat, i) => (
                         <motion.div
                             key={stat.label}
-                            initial={{ opacity: 0, y: 20 }}
+                            initial={false}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.4, delay: i * 0.1 }}
@@ -92,7 +92,7 @@ export default function CloudPage() {
                             return (
                                 <motion.div
                                     key={tierKey}
-                                    initial={{ opacity: 0, y: 24 }}
+                                    initial={false}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
