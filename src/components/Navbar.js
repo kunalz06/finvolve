@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X, Zap, Cloud } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const navLinks = [
   { name: "Services", href: "/dev/services" },
+  { name: "Cloud", href: "/dev/cloud" },
   { name: "About", href: "/dev/about" },
   { name: "Start Project", href: "/dev/request" },
 ];

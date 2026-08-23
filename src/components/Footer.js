@@ -67,6 +67,7 @@ export default function Footer() {
                 <FooterLink href="/dev/services">Web Development</FooterLink>
                 <FooterLink href="/dev/services">Mobile Apps</FooterLink>
                 <FooterLink href="/dev/services">AI Solutions</FooterLink>
+                <FooterLink href="/dev/cloud">Cloud & AI APIs</FooterLink>
                 <FooterLink href="/dev/services">Custom Software</FooterLink>
               </ul>
             </div>
