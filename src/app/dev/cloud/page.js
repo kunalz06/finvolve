@@ -100,16 +100,14 @@ export default function CloudPage() {
                                 >
                                     <Card
                                         hover={!isHighlighted}
-                                        className={`relative flex h-full flex-col ${
-                                            isHighlighted
-                                                ? "glass-surface-strong border-2 !border-[var(--accent)] md:scale-105"
-                                                : ""
-                                        }`}
+                                        className={"relative flex h-full flex-col " + (isHighlighted
+                                            ? "glass-surface-strong border-2 !border-[var(--accent)] md:scale-105"
+                                            : "")}
                                     >
                                         {/* Badge */}
                                         <div className="mb-6 flex items-center gap-3">
                                             <div
-                                                className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[var(--border)] ${badge.color} shadow-[var(--shadow-soft)]`}
+                                                className={"flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[var(--border)] " + badge.color + " shadow-[var(--shadow-soft)]"}
                                             >
                                                 <Icon className="text-white" size={24} />
                                             </div>
@@ -126,12 +124,12 @@ export default function CloudPage() {
                                         {/* Pricing */}
                                         <div className="mb-6">
                                             {plan.originalMonthlyAmountINR && plan.offerEndDate && new Date(plan.offerEndDate) >= new Date() && (
-                                                <div className="mb-3 rounded-xl border border-amber-300 bg-amber-50/90 px-3 py-2 text-center">
-                                                    <p className="text-xs font-bold uppercase tracking-wider text-amber-700">Limited Offer</p>
-                                                    <p className="mt-0.5 text-[13px] text-amber-800">
-                                                        Original: <span className="line-through">INR {plan.originalMonthlyAmountINR.toLocaleString("en-IN")}/mo + INR {plan.originalSetupFeeINR.toLocaleString("en-IN")} setup</span>
+                                                <div className="mb-3 rounded-xl border-2 border-amber-400 bg-amber-50 px-3 py-2.5 text-center">
+                                                    <p className="text-[11px] font-black uppercase tracking-widest text-amber-700">Limited Offer</p>
+                                                    <p className="mt-1 text-[13px] font-semibold text-amber-900">
+                                                        Original: <span className="line-through decoration-amber-400">INR {plan.originalMonthlyAmountINR.toLocaleString("en-IN")}/mo + INR {plan.originalSetupFeeINR.toLocaleString("en-IN")} setup</span>
                                                     </p>
-                                                    <p className="mt-1 text-xs font-semibold text-amber-700">Offer valid till {new Date(plan.offerEndDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+                                                    <p className="mt-1.5 text-[11px] font-bold text-amber-800">Offer valid till 24 September 2026</p>
                                                 </div>
                                             )}
                                             <div className="flex items-baseline gap-1">
