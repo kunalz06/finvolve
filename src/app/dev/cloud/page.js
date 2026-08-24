@@ -596,9 +596,14 @@ export default function CloudPage() {
                     onClick={() => toggleFaq(index)}
                     className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[var(--surface-muted)] transition-colors"
                   >
-                    <span className="text-base md:text-lg font-black text-[var(--heading)] leading-snug">
-                      {faq.q}
-                    </span>
+                    <div className="flex items-center gap-3.5">
+                      <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
+                        Q{index + 1}
+                      </span>
+                      <span className="text-base md:text-lg font-black text-slate-950 dark:text-slate-50 leading-snug">
+                        {faq.q}
+                      </span>
+                    </div>
                     <div
                       className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--border)] transition-all ${
                         isOpen
@@ -616,17 +621,15 @@ export default function CloudPage() {
                   <AnimatePresence initial={false}>
                     {isOpen && (
                       <motion.div
-                        key="content"
+                        key={`faq-ans-${index}`}
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         className="overflow-hidden border-t-2 border-[var(--border-soft)] bg-[var(--surface)]"
                       >
-                        <div className="p-5 md:p-6">
-                          <p className="text-sm md:text-base leading-relaxed text-[var(--foreground)] font-medium">
-                            {faq.a}
-                          </p>
+                        <div className="p-5 md:p-6 text-slate-900 dark:text-slate-100 text-base md:text-lg leading-relaxed font-semibold">
+                          {faq.a}
                         </div>
                       </motion.div>
                     )}
