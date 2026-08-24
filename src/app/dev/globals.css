@@ -94,7 +94,7 @@ a {
   transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
 }
 
-a:hover {
+a:hover:not([class*="border"]):not([class*="bg-"]):not([class*="btn"]) {
   color: var(--primary);
 }
 

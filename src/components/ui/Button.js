@@ -14,10 +14,10 @@ export default function Button({
   const baseStyles = "inline-flex items-center justify-center gap-2 rounded-xl border-2 text-center font-bold transition-all duration-200";
   
   const variants = {
-    primary: "border-[var(--border)] bg-[var(--primary)] text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)]",
-    secondary: "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)]",
-    outline: "border-[var(--border)] bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]",
-    ghost: "border-transparent bg-transparent text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--foreground)]",
+    primary: "border-[var(--border)] bg-[var(--primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] hover:!text-white",
+    secondary: "border-[var(--border)] bg-[var(--surface-strong)] !text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)] hover:!text-[var(--foreground)]",
+    outline: "border-[var(--border)] bg-transparent !text-[var(--foreground)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)]",
+    ghost: "border-transparent bg-transparent !text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)]",
   };
 
   const sizes = {
