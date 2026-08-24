@@ -44,9 +44,12 @@ export default function Terms() {
 
               <section>
                 <h2 className="text-lg font-bold text-slate-950 mb-4">2. Services</h2>
-                <p>
+                <p className="mb-4">
                   DEV♾️ provides software development services, including but not limited to web development, mobile app development,
                   and custom software solutions. We are dedicated to delivering high-quality, scalable, and secure digital products.
+                </p>
+                <p>
+                  DEV♾️ also operates DEV Infinity Cloud, a subscription-based platform that provides access to compute engine resources and AI model APIs (including ChatGPT, Google Gemini, and Claude models) on a monthly billing basis. Cloud services are subject to plan-specific usage limits, availability, and the additional terms in Section 3A below.
                 </p>
               </section>
 
@@ -60,6 +63,23 @@ export default function Terms() {
                   <p className="font-semibold text-amber-700 text-sm">
                     Refund Policy: No refunds after payment.
                   </p>
+                </div>
+              </section>
+
+              <section>
+                <h2 className="text-lg font-bold text-slate-950 mb-4">3A. Cloud Subscription Terms</h2>
+                <div className="bg-blue-50 border border-blue-200 p-6 mb-4 rounded-xl">
+                  <p className="text-blue-800 mb-2">
+                    DEV Infinity Cloud subscriptions are billed monthly via Razorpay and run for a 12-month cycle. By subscribing, you agree to the following terms:
+                  </p>
+                  <ul className="list-disc pl-6 mt-3 space-y-2 text-blue-900">
+                    <li><strong>Usage Limits:</strong> Each plan has defined limits for compute engine hours and AI model API access. Usage resets at the start of each billing cycle. Exceeding limits may result in restricted access until the next cycle.</li>
+                    <li><strong>Billing:</strong> Monthly subscription fees and the one-time setup fee are non-refundable. Your payment method will be charged automatically each month until the subscription is cancelled or completed (12 cycles).</li>
+                    <li><strong>Plan Changes:</strong> Tier upgrades or downgrades take effect at the start of the next billing cycle. Your current plan benefits continue until then. The new monthly rate applies from the next charge date.</li>
+                    <li><strong>Pause & Resume:</strong> You may pause your subscription, which freezes billing and usage. Resuming reactivates your subscription. Paused time counts toward the 12-cycle subscription duration.</li>
+                    <li><strong>Cancellation:</strong> You may cancel at any time. Your access continues until the end of the current billing period. No partial-month refunds are provided.</li>
+                    <li><strong>Acceptable Use:</strong> Cloud resources must not be used for any illegal activity, cryptocurrency mining, or resale of API access. We reserve the right to suspend or terminate access for violations.</li>
+                  </ul>
                 </div>
               </section>
 

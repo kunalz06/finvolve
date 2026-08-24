@@ -96,6 +96,8 @@ export default function AdminPage() {
     const [messages, setMessages] = useState([]);
     const [payments, setPayments] = useState([]);
     const [newsletterSubscribers, setNewsletterSubscribers] = useState([]);
+    const [subscriptions, setSubscriptions] = useState([]);
+    const [subActionLoading, setSubActionLoading] = useState(null);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [deletingRequestId, setDeletingRequestId] = useState("");
     const [newPayment, setNewPayment] = useState({
@@ -178,6 +180,21 @@ export default function AdminPage() {
             query(collection(db, "newsletter_subscribers"), orderBy("createdAt", "desc")),
             (snap) => setNewsletterSubscribers(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
         );
+
+        // Subscriptions — fetched via API (admin SDK, not client Firebase)
+        const fetchSubscriptions = async () => {
+            try {
+                const idToken = await auth.currentUser.getIdToken(true);
+                const res = await fetch(apiUrl("/dev/api/admin/subscriptions"), {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                });
+                const json = await res.json();
+                if (res.ok) setSubscriptions(json.subscriptions || []);
+            } catch (e) {
+                console.warn("Failed to fetch subscriptions:", e.message);
+            }
+        };
+        fetchSubscriptions();
 
         return stopListeners;
     }, [authState]);
@@ -336,6 +353,7 @@ export default function AdminPage() {
     const unreadCount = messages.filter((item) => item.status === "unread").length;
     const paidPaymentsCount = payments.filter((item) => item.status === "paid").length;
     const activeSubscriberCount = newsletterSubscribers.filter((item) => item.status === "active").length;
+    const activeSubCount = subscriptions.filter((s) => s.status === "active" || s.status === "paused").length;
     const revenue = payments
         .filter((item) => item.status === "paid")
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
@@ -345,7 +363,8 @@ export default function AdminPage() {
         { label: "Paid", value: paidPaymentsCount, tone: "text-emerald-600" },
         { label: "Revenue", value: formatCurrency(revenue), tone: "text-slate-900" },
         { label: "Subscribers", value: activeSubscriberCount, tone: "text-primary" },
-    ]), [requests.length, unreadCount, paidPaymentsCount, revenue, activeSubscriberCount]);
+        { label: "Cloud Subs", value: activeSubCount, tone: "text-emerald-600" },
+    ]), [requests.length, unreadCount, paidPaymentsCount, revenue, activeSubscriberCount, activeSubCount]);
 
     if (authState !== "authenticated") {
         return (
@@ -413,6 +432,7 @@ export default function AdminPage() {
                         { id: "messages", label: "Messages", icon: MessageSquare },
                         { id: "payments", label: "Payments", icon: CreditCard },
                         { id: "newsletter", label: "Newsletter", icon: Users },
+                        { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
                     ].map((tab) => {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
@@ -536,6 +556,91 @@ export default function AdminPage() {
                                     <button type="button" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</button>
                                 </Card>
                             ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === "subscriptions" && (
+                    <div className="mt-8 space-y-6">
+                        <div className="glass-surface-strong page-section rounded-2xl px-6 py-8 md:px-8">
+                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Cloud Subscriptions</p>
+                            <h2 className="mt-3 text-2xl font-bold text-slate-950">All DEV Infinity Cloud subscriptions</h2>
+                            <p className="mt-2 text-sm text-slate-600">View, cancel, pause, resume, or change the plan for any subscription.</p>
+                        </div>
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {subscriptions.length === 0 && (
+                                <EmptyState title="No subscriptions yet" copy="Cloud subscriptions will appear here once users subscribe." />
+                            )}
+                            {subscriptions.map((sub) => {
+                                const planName = sub.tier === "base" ? "Starter" : sub.tier === "medium" ? "Pro" : "Enterprise";
+                                const statusClass = sub.status === "active" ? "border-emerald-300/70" : sub.status === "paused" ? "border-amber-300/70" : "opacity-60";
+                                const statusBadge = sub.status === "active" ? "border-emerald-200 bg-emerald-50/80 text-emerald-700" : sub.status === "paused" ? "border-amber-200 bg-amber-50/80 text-amber-700" : sub.status === "cancelled" ? "border-red-200 bg-red-50/80 text-red-700" : "glass-chip-strong text-slate-600";
+                                return (
+                                    <Card key={sub.id} className={statusClass}>
+                                        <div className="mb-3 flex items-start justify-between gap-3">
+                                            <div>
+                                                <h3 className="text-lg font-bold text-slate-950">{sub.name || "Unnamed"}</h3>
+                                                <p className="mt-1 text-sm text-slate-600">{sub.email || "No email"}</p>
+                                            </div>
+                                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusBadge}`}>{sub.status}</span>
+                                        </div>
+                                        <div className="space-y-2 text-sm text-slate-600">
+                                            <div><strong>Plan:</strong> {planName} ({sub.tier})</div>
+                                            <div><strong>Monthly:</strong> INR {Number(sub.monthlyAmount || 0).toLocaleString()}</div>
+                                            <div><strong>Cycles:</strong> {sub.cycleCount || 0}/12</div>
+                                            {sub.phone && <div><strong>Phone:</strong> {sub.phone}</div>}
+                                            {sub.currentPeriodEnd && <div><strong>Period ends:</strong> {new Date(sub.currentPeriodEnd).toLocaleDateString()}</div>}
+                                            {sub.pendingTierChange && (
+                                                <div className="rounded-[18px] border border-blue-200 bg-blue-50/80 px-3 py-2 text-xs text-blue-700">
+                                                    Tier change: {(sub.pendingTierChange.from === "base" ? "Starter" : sub.pendingTierChange.from === "medium" ? "Pro" : "Enterprise")} → {(sub.pendingTierChange.to === "base" ? "Starter" : sub.pendingTierChange.to === "medium" ? "Pro" : "Enterprise")} (pending)
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="mt-5 flex flex-wrap gap-2">
+                                            {sub.status === "active" && (
+                                                <button type="button" className="rounded-full border border-amber-200 bg-amber-50/75 px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100" onClick={async () => {
+                                                    setSubActionLoading(sub.id);
+                                                    try {
+                                                        const idToken = await auth.currentUser.getIdToken(true);
+                                                        await fetch(apiUrl("/dev/api/admin/subscriptions"), {
+                                                            method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+                                                            body: JSON.stringify({ subscriptionId: sub.id, action: "pause" }),
+                                                        });
+                                                    } catch (e) { setError(e.message); }
+                                                    finally { setSubActionLoading(null); }
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Pause"}</button>
+                                            )}
+                                            {sub.status === "paused" && (
+                                                <button type="button" className="rounded-full border border-emerald-200 bg-emerald-50/75 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100" onClick={async () => {
+                                                    setSubActionLoading(sub.id);
+                                                    try {
+                                                        const idToken = await auth.currentUser.getIdToken(true);
+                                                        await fetch(apiUrl("/dev/api/admin/subscriptions"), {
+                                                            method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+                                                            body: JSON.stringify({ subscriptionId: sub.id, action: "resume" }),
+                                                        });
+                                                    } catch (e) { setError(e.message); }
+                                                    finally { setSubActionLoading(null); }
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Resume"}</button>
+                                            )}
+                                            {(sub.status === "active" || sub.status === "paused") && (
+                                                <button type="button" className="rounded-full border border-red-200 bg-red-50/75 px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-100" onClick={async () => {
+                                                    if (!confirm("Cancel this subscription?")) return;
+                                                    setSubActionLoading(sub.id);
+                                                    try {
+                                                        const idToken = await auth.currentUser.getIdToken(true);
+                                                        await fetch(apiUrl("/dev/api/admin/subscriptions"), {
+                                                            method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+                                                            body: JSON.stringify({ subscriptionId: sub.id, action: "cancel" }),
+                                                        });
+                                                    } catch (e) { setError(e.message); }
+                                                    finally { setSubActionLoading(null); }
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Cancel"}</button>
+                                            )}
+                                        </div>
+                                    </Card>
+                                );
+                            })}
                         </div>
                     </div>
                 )}

@@ -10,6 +10,11 @@ import {
     Bot,
     Loader2,
     Search,
+    Pause,
+    Play,
+    XCircle,
+    RefreshCw,
+    ArrowRight,
 } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
@@ -39,6 +44,9 @@ export default function DashboardPage() {
     const [loading, setLoading] = useState(false);
     const [subscription, setSubscription] = useState(null);
     const [error, setError] = useState("");
+    const [actionLoading, setActionLoading] = useState(null);
+    const [actionMessage, setActionMessage] = useState(null);
+    const [showTierModal, setShowTierModal] = useState(false);
 
     const handleLookup = async (e) => {
         e.preventDefault();
@@ -47,6 +55,7 @@ export default function DashboardPage() {
         setLoading(true);
         setError("");
         setSubscription(null);
+        setActionMessage(null);
 
         try {
             const res = await fetch(
@@ -56,7 +65,7 @@ export default function DashboardPage() {
             if (!res.ok) throw new Error(data.error || "Unable to fetch subscription.");
 
             if (!data.found) {
-                setError("No active subscription found for this email address.");
+                setError("No subscription found for this email address.");
             } else {
                 setSubscription(data);
             }
@@ -67,7 +76,64 @@ export default function DashboardPage() {
         }
     };
 
+    const handleAction = async (action) => {
+        if (!subscription || actionLoading) return;
+        setActionLoading(action);
+        setActionMessage(null);
+        setError("");
+
+        try {
+            const res = await fetch(apiUrl("/dev/api/subscription/status"), {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: email.trim(), action }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || `Failed to ${action}.`);
+
+            setActionMessage({ type: "success", text: `Subscription ${action === "cancel" ? "cancelled" : action === "pause" ? "paused" : "resumed"} successfully.` });
+            // Refresh
+            handleLookup(new Event("submit"));
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
+    const handleChangeTier = async (newTier) => {
+        if (!subscription || actionLoading) return;
+        setActionLoading(`tier_${newTier}`);
+        setActionMessage(null);
+        setError("");
+
+        try {
+            const res = await fetch(apiUrl("/dev/api/subscription/change-tier"), {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    email: email.trim(),
+                    currentSubscriptionId: subscription.subscriptionId,
+                    newTier,
+                }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || "Failed to change tier.");
+
+            setActionMessage({ type: "success", text: data.message });
+            setShowTierModal(false);
+            handleLookup(new Event("submit"));
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const planConfig = subscription ? SUBSCRIPTION_TIERS[subscription.tier] : null;
+    const isActive = subscription?.status === "active";
+    const isPaused = subscription?.status === "paused";
+    const otherTiers = Object.keys(SUBSCRIPTION_TIERS).filter((t) => t !== subscription?.tier);
 
     return (
         <div className="min-h-screen px-6 py-12">
@@ -84,7 +150,7 @@ export default function DashboardPage() {
                             <span className="text-sm font-medium text-primary">DASHBOARD</span>
                         </div>
                         <h1 className="mb-2 text-3xl font-bold text-slate-950 md:text-4xl">Subscription Dashboard</h1>
-                        <p className="text-lg text-slate-600">Look up your subscription and track usage.</p>
+                        <p className="text-lg text-slate-600">Look up your subscription and manage it.</p>
                     </div>
 
                     {/* Lookup Form */}
@@ -121,6 +187,17 @@ export default function DashboardPage() {
                         </div>
                     )}
 
+                    {actionMessage && (
+                        <div className={`mb-8 flex items-center gap-3 rounded-2xl border p-4 ${
+                            actionMessage.type === "success"
+                                ? "border-emerald-200 bg-emerald-50/85 text-emerald-700"
+                                : "border-red-200 bg-red-50/85 text-red-700"
+                        }`}>
+                            <CheckCircle size={20} />
+                            <span>{actionMessage.text}</span>
+                        </div>
+                    )}
+
                     {/* Subscription Details */}
                     {subscription && planConfig && (
                         <div className="space-y-8">
@@ -135,12 +212,19 @@ export default function DashboardPage() {
                                 <span
                                     className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${
                                         statusColors[subscription.status] || "text-slate-600 bg-slate-50/85 border-slate-200"
-                                    }`}
+                                    }`
                                 >
                                     {subscription.status === "active" && <CheckCircle size={16} />}
                                     {statusLabels[subscription.status] || subscription.status}
                                 </span>
                             </div>
+
+                            {/* Pending tier change notice */}
+                            {subscription.razorpaySubscriptionId && (
+                                <div className="rounded-2xl border border-blue-200 bg-blue-50/85 p-4 text-blue-700 text-sm">
+                                    Any plan changes will take effect at the start of your next billing cycle.
+                                </div>
+                            )}
 
                             <div className="grid gap-8 md:grid-cols-2">
                                 {/* Billing Info */}
@@ -170,17 +254,13 @@ export default function DashboardPage() {
                                                 <span className="text-sm text-slate-600">Current Period</span>
                                                 <span className="text-right text-sm font-medium text-slate-950">
                                                     {new Date(subscription.currentPeriodStart).toLocaleDateString("en-IN", {
-                                                        day: "numeric",
-                                                        month: "short",
-                                                        year: "numeric",
+                                                        day: "numeric", month: "short", year: "numeric",
                                                     })}
                                                     {subscription.currentPeriodEnd && (
                                                         <span className="text-slate-500">
                                                             {" "}— {" "}
                                                             {new Date(subscription.currentPeriodEnd).toLocaleDateString("en-IN", {
-                                                                day: "numeric",
-                                                                month: "short",
-                                                                year: "numeric",
+                                                                day: "numeric", month: "short", year: "numeric",
                                                             })}
                                                         </span>
                                                     )}
@@ -265,10 +345,96 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Actions */}
-                            <div className="flex flex-wrap justify-center gap-4">
-                                <Button href="/dev/cloud" variant="secondary">Change Plan</Button>
-                                <Button href="/dev/contact" variant="outline">Contact Support</Button>
-                            </div>
+                            <Card hover={false} className="glass-surface-strong">
+                                <h3 className="mb-6 text-lg font-bold text-slate-950">Manage Subscription</h3>
+                                <div className="flex flex-wrap gap-3">
+                                    {(isActive || isPaused) && (
+                                        <Button
+                                            onClick={() => setShowTierModal(true)}
+                                            variant="secondary"
+                                            disabled={!!actionLoading}
+                                        >
+                                            <RefreshCw size={16} /> Change Plan
+                                        </Button>
+                                    )}
+                                    {isActive && (
+                                        <Button
+                                            onClick={() => handleAction("pause")}
+                                            variant="secondary"
+                                            disabled={!!actionLoading}
+                                        >
+                                            {actionLoading === "pause" ? <Loader2 size={16} className="animate-spin" /> : <Pause size={16} />}
+                                            Pause
+                                        </Button>
+                                    )}
+                                    {isPaused && (
+                                        <Button
+                                            onClick={() => handleAction("resume")}
+                                            variant="primary"
+                                            disabled={!!actionLoading}
+                                        >
+                                            {actionLoading === "resume" ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />}
+                                            Resume
+                                        </Button>
+                                    )}
+                                    {(isActive || isPaused) && (
+                                        <Button
+                                            onClick={() => handleAction("cancel")}
+                                            variant="outline"
+                                            className="text-red-600 border-red-300 hover:bg-red-50"
+                                            disabled={!!actionLoading}
+                                        >
+                                            {actionLoading === "cancel" ? <Loader2 size={16} className="animate-spin" /> : <XCircle size={16} />}
+                                            Cancel
+                                        </Button>
+                                    )}
+                                    <Button href="/dev/contact" variant="secondary">
+                                        Contact Support
+                                    </Button>
+                                </div>
+                            </Card>
+
+                            {/* Tier Change Modal */}
+                            {showTierModal && (
+                                <div className="glass-overlay fixed inset-0 z-50 flex items-center justify-center px-4 py-8" onClick={() => setShowTierModal(false)}>
+                                    <div className="glass-surface-strong w-full max-w-lg overflow-hidden rounded-2xl" onClick={(e) => e.stopPropagation()}>
+                                        <div className="flex items-center justify-between border-b border-white/45 px-6 py-5">
+                                            <div>
+                                                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Switch Plan</p>
+                                                <h2 className="mt-2 text-2xl font-bold text-slate-950">Change to a different plan</h2>
+                                            </div>
+                                            <button className="glass-chip-strong inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-600 hover:bg-white/85" onClick={() => setShowTierModal(false)}>
+                                                <span className="text-lg leading-none">×</span>
+                                            </button>
+                                        </div>
+                                        <div className="space-y-4 p-6">
+                                            <div className="rounded-xl bg-blue-50/85 border border-blue-200 p-4 text-sm text-blue-700">
+                                                Your new plan will start at the beginning of the next billing cycle. Current benefits continue until then.
+                                            </div>
+                                            {otherTiers.map((tierKey) => {
+                                                const tp = SUBSCRIPTION_TIERS[tierKey];
+                                                const isLoading = actionLoading === `tier_${tierKey}`;
+                                                return (
+                                                    <div key={tierKey} className="flex items-center justify-between rounded-xl border border-[var(--border)] p-4">
+                                                        <div>
+                                                            <p className="font-bold text-slate-950">{tp.name}</p>
+                                                            <p className="text-sm text-slate-500">INR {tp.monthlyAmountINR.toLocaleString("en-IN")}/mo · {tp.computeHours.total} hrs compute</p>
+                                                        </div>
+                                                        <Button
+                                                            onClick={() => handleChangeTier(tierKey)}
+                                                            variant="secondary"
+                                                            disabled={isLoading}
+                                                            className="shrink-0"
+                                                        >
+                                                            {isLoading ? <Loader2 size={16} className="animate-spin" /> : <><ArrowRight size={16} /> Switch</>}
+                                                        </Button>
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

@@ -2,6 +2,7 @@ import crypto from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { SUBSCRIPTION_TIERS } from "@/lib/server/subscription-plans";
+import { sendSubscriptionEmailSafe, tierNames } from "@/lib/server/subscription-emails";
 
 /**
  * Verifies the Razorpay webhook signature.
@@ -133,6 +134,14 @@ export async function POST(request) {
                     if (doc) {
                         await subRef.set(doc);
                         console.log(`Webhook: created subscription ${subscriptionId} (${notes.tier}) after activation.`);
+                        // Send activation email
+                        sendSubscriptionEmailSafe({
+                            to: notes.email,
+                            name: notes.name,
+                            action: "activated",
+                            planName: tierNames[notes.tier] || doc.tier,
+                            subscriptionId,
+                        });
                     }
                 } else {
                     // Document already exists (edge case) — just activate it.
@@ -158,7 +167,8 @@ export async function POST(request) {
 
                 const chargeEntity = payload.payment?.entity;
                 if (chargeEntity?.status === "captured") {
-                    const tier = subSnap.data()?.tier;
+                    const subData = subSnap.data();
+                    const tier = subData?.tier;
                     const periodEnd = new Date();
                     periodEnd.setDate(periodEnd.getDate() + 30);
                     await subRef.update({
@@ -169,6 +179,15 @@ export async function POST(request) {
                         currentPeriodEnd: periodEnd.toISOString(),
                         updatedAt: FieldValue.serverTimestamp(),
                         ...(tier ? buildPeriodResetUpdate(tier) : {}),
+                    });
+                    // Send billing receipt email
+                    sendSubscriptionEmailSafe({
+                        to: subData.email,
+                        name: subData.name,
+                        action: "charged",
+                        planName: tierNames[tier] || tier,
+                        subscriptionId,
+                        amount: chargeEntity.amount,
                     });
                 }
                 break;
@@ -184,30 +203,64 @@ export async function POST(request) {
             }
 
             case "subscription.paused": {
+                const subSnap = await subRef.get();
                 await subRef.update({
                     status: "paused",
                     pausedAt: FieldValue.serverTimestamp(),
                     updatedAt: FieldValue.serverTimestamp(),
                 });
+                if (subSnap.exists) {
+                    const d = subSnap.data();
+                    sendSubscriptionEmailSafe({
+                        to: d.email,
+                        name: d.name,
+                        action: "paused",
+                        planName: tierNames[d.tier] || d.tier,
+                        subscriptionId,
+                    });
+                }
                 break;
             }
 
             case "subscription.resumed": {
+                const subSnap = await subRef.get();
                 await subRef.update({
                     status: "active",
                     resumedAt: FieldValue.serverTimestamp(),
                     updatedAt: FieldValue.serverTimestamp(),
                 });
+                if (subSnap.exists) {
+                    const d = subSnap.data();
+                    sendSubscriptionEmailSafe({
+                        to: d.email,
+                        name: d.name,
+                        action: "resumed",
+                        planName: tierNames[d.tier] || d.tier,
+                        subscriptionId,
+                    });
+                }
                 break;
             }
 
             case "subscription.cancelled": {
+                const subSnap = await subRef.get();
                 await subRef.update({
                     status: "cancelled",
                     cancelledAt: FieldValue.serverTimestamp(),
                     cancelReason: entity?.ended_at ? "end_of_term" : "user_requested",
                     updatedAt: FieldValue.serverTimestamp(),
                 });
+                // Send cancellation email
+                if (subSnap.exists) {
+                    const d = subSnap.data();
+                    sendSubscriptionEmailSafe({
+                        to: d.email,
+                        name: d.name,
+                        action: "cancelled",
+                        planName: tierNames[d.tier] || d.tier,
+                        subscriptionId,
+                    });
+                }
                 break;
             }
 
