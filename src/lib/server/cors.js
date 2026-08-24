@@ -13,8 +13,6 @@ function configuredOrigins() {
         ...splitOrigins(process.env.NETLIFY_ALLOWED_ORIGINS),
         ...splitOrigins(process.env.NEXT_PUBLIC_SITE_URL),
         ...splitOrigins(process.env.SITE_URL),
-        ...splitOrigins(process.env.NEXT_PUBLIC_API_BASE_URL),
-        ...splitOrigins(process.env.ALLOWED_ORIGIN),
     ];
 }
 
@@ -23,13 +21,6 @@ function isAllowedOrigin(origin) {
 
     const normalizedOrigin = origin.replace(/\/$/, "");
     if (configuredOrigins().includes(normalizedOrigin)) return true;
-
-    // Allow known frontend domains that proxy API calls to this Vercel backend
-    const knownFrontendOrigins = [
-        "https://devsoftwareai.live",
-        "https://www.devsoftwareai.live",
-    ];
-    if (knownFrontendOrigins.includes(normalizedOrigin)) return true;
 
     return /^https?:\/\/localhost(:\d+)?$/.test(normalizedOrigin) ||
         /^https?:\/\/127\.0\.0\.1(:\d+)?$/.test(normalizedOrigin);
@@ -41,7 +32,7 @@ export function getCorsHeaders(request) {
 
     return {
         "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Methods": "GET,POST,PATCH,OPTIONS",
+        "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
         "Access-Control-Allow-Headers": "Content-Type, Authorization",
         "Access-Control-Max-Age": "86400",
         Vary: "Origin",
