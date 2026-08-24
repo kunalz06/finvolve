@@ -210,9 +210,7 @@ export default function DashboardPage() {
                                     <p className="text-sm text-slate-500">ID: {subscription.subscriptionId}</p>
                                 </div>
                                 <span
-                                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold ${
-                                        statusColors[subscription.status] || "text-slate-600 bg-slate-50/85 border-slate-200"
-                                    }`
+                                    className={"inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-bold " + (statusColors[subscription.status] || "text-slate-600 bg-slate-50/85 border-slate-200")}
                                 >
                                     {subscription.status === "active" && <CheckCircle size={16} />}
                                     {statusLabels[subscription.status] || subscription.status}
