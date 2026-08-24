@@ -157,14 +157,10 @@ export default function CloudPage() {
                 <section className="glass-surface-strong relative overflow-hidden rounded-2xl px-6 py-12 md:px-12 md:py-16">
                     <div className="relative z-10 max-w-4xl space-y-6">
                         <div className="flex flex-wrap items-center gap-3">
-                            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary md:text-sm">
-                                <Cloud size={16} className="text-primary" />
+                            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider text-primary md:text-sm">
+                                <Cloud size={18} className="text-primary" />
                                 <span>DEV♾️ Cloud Infrastructure</span>
                             </div>
-                            <span className="inline-flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
-                                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                                All Clusters Operational
-                            </span>
                         </div>
 
                         <h1 className="text-4xl font-black leading-[1.08] text-slate-950 md:text-6xl lg:text-7xl">
@@ -172,15 +168,15 @@ export default function CloudPage() {
                             <span className="glass-text-gradient">Compute & AI Models</span> on Demand
                         </h1>
 
-                        <p className="max-w-2xl text-base leading-relaxed text-slate-600 md:text-xl">
+                        <p className="max-w-2xl text-base leading-relaxed text-slate-700 font-medium md:text-xl">
                             Deploy instantly to high-capacity compute engines and unified frontier LLM APIs (GPT-4o, Gemini, Claude). Zero infrastructure overhead, transparent pricing, and self-service control.
                         </p>
 
                         <div className="flex flex-wrap items-center gap-4 pt-2">
-                            <Button href="#plans" variant="primary" size="large">
+                            <Button href="#plans" variant="primary" size="large" className="font-extrabold shadow-[4px_4px_0_#101820]">
                                 View Pricing Plans <ArrowRight size={18} />
                             </Button>
-                            <Button href="/dev/cloud/dashboard" variant="secondary" size="large">
+                            <Button href="/dev/cloud/dashboard" variant="secondary" size="large" className="font-bold text-slate-950">
                                 <Zap size={18} /> Open Cloud Dashboard
                             </Button>
                         </div>
@@ -193,13 +189,13 @@ export default function CloudPage() {
                                 { icon: Gauge, label: "99.9% Uptime", sub: "Enterprise Reliability" },
                                 { icon: RefreshCw, label: "Flexible Lifecycle", sub: "Pause & Resume Anytime" },
                             ].map((badge, idx) => (
-                                <div key={idx} className="flex items-center gap-2.5">
-                                    <div className="glass-icon-plate flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg">
-                                        <badge.icon size={16} className="text-primary" />
+                                <div key={idx} className="flex items-center gap-3">
+                                    <div className="glass-icon-plate flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl">
+                                        <badge.icon size={18} className="text-primary" />
                                     </div>
                                     <div>
-                                        <p className="text-xs font-bold text-slate-950">{badge.label}</p>
-                                        <p className="text-[11px] text-slate-500">{badge.sub}</p>
+                                        <p className="text-xs font-black text-slate-950">{badge.label}</p>
+                                        <p className="text-[11px] font-semibold text-slate-600">{badge.sub}</p>
                                     </div>
                                 </div>
                             ))}
@@ -244,12 +240,12 @@ export default function CloudPage() {
                                     <div className={`flex h-12 w-12 items-center justify-center rounded-xl border-2 border-[var(--border)] ${feature.color} shadow-[var(--shadow-soft)]`}>
                                         <feature.icon className="text-white" size={24} />
                                     </div>
-                                    <span className="font-code-brand text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                    <span className="font-code-brand text-xs font-black uppercase tracking-wider text-slate-700">
                                         {feature.tag}
                                     </span>
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-950">{feature.title}</h3>
-                                <p className="text-sm leading-relaxed text-slate-600">{feature.desc}</p>
+                                <h3 className="text-xl font-black text-slate-950">{feature.title}</h3>
+                                <p className="text-sm leading-relaxed text-slate-700 font-medium">{feature.desc}</p>
                             </Card>
                         </motion.div>
                     ))}
@@ -258,14 +254,14 @@ export default function CloudPage() {
                 {/* Pricing Cards Section */}
                 <section id="plans" className="space-y-8 scroll-mt-24">
                     <div className="text-center space-y-3">
-                        <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-primary">
+                        <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase tracking-wider text-primary">
                             <Sparkles size={14} />
                             <span>Transparent Subscription Plans</span>
                         </div>
                         <h2 className="text-3xl font-black text-slate-950 md:text-5xl">
                             Choose Your Compute Capacity
                         </h2>
-                        <p className="mx-auto max-w-2xl text-base text-slate-600 md:text-lg">
+                        <p className="mx-auto max-w-2xl text-base text-slate-700 font-medium md:text-lg">
                             Simple monthly billing with included setup fee. Enjoy 12 months of predictable, high-performance compute and AI access.
                         </p>
                     </div>
@@ -297,7 +293,7 @@ export default function CloudPage() {
                                     >
                                         {/* Highlight Ribbon */}
                                         {isHighlighted && (
-                                            <div className="absolute -top-3.5 right-6 rounded-full border-2 border-[var(--border)] bg-[var(--accent)] px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-[var(--shadow-soft)]">
+                                            <div className="absolute -top-3.5 right-6 rounded-full border-2 border-[var(--border)] bg-[var(--accent)] px-3.5 py-1 text-[11px] font-black uppercase tracking-wider text-white shadow-[var(--shadow-soft)]">
                                                 ★ MOST POPULAR
                                             </div>
                                         )}
@@ -311,7 +307,7 @@ export default function CloudPage() {
                                                     <Icon className={badge.text} size={24} />
                                                 </div>
                                                 <div>
-                                                    <span className="font-code-brand text-xs font-bold uppercase tracking-wider text-slate-500">
+                                                    <span className="font-code-brand text-xs font-black uppercase tracking-wider text-slate-600">
                                                         {plan.name} Tier
                                                     </span>
                                                     <h3 className="text-2xl font-black text-slate-950">{plan.name}</h3>
@@ -320,47 +316,47 @@ export default function CloudPage() {
 
                                             {/* Limited Time Offer for Starter */}
                                             {plan.originalMonthlyAmountINR && plan.offerEndDate && new Date(plan.offerEndDate) >= new Date() && (
-                                                <div className="mb-5 rounded-xl border-2 border-amber-400 bg-amber-50/95 p-3 text-center shadow-sm">
-                                                    <div className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-amber-800">
-                                                        <Flame size={12} className="text-amber-600" />
+                                                <div className="mb-5 rounded-xl border-2 border-amber-500 bg-amber-50 p-3.5 text-center shadow-sm">
+                                                    <div className="inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest text-amber-900">
+                                                        <Flame size={14} className="text-amber-600" />
                                                         <span>Limited Promotional Launch</span>
                                                     </div>
-                                                    <p className="mt-1 text-xs font-semibold text-amber-950">
-                                                        Original: <span className="line-through decoration-amber-500 font-medium">₹{plan.originalMonthlyAmountINR.toLocaleString("en-IN")}/mo + ₹{plan.originalSetupFeeINR.toLocaleString("en-IN")} setup</span>
+                                                    <p className="mt-1.5 text-xs font-bold text-amber-950">
+                                                        Original: <span className="line-through decoration-amber-600 font-semibold">₹{plan.originalMonthlyAmountINR.toLocaleString("en-IN")}/mo + ₹{plan.originalSetupFeeINR.toLocaleString("en-IN")} setup</span>
                                                     </p>
-                                                    <p className="mt-1 text-[11px] font-bold text-amber-700">Valid until 24 September 2026</p>
+                                                    <p className="mt-1 text-[11px] font-black text-amber-800">Valid until 24 September 2026</p>
                                                 </div>
                                             )}
 
                                             {/* Pricing Display */}
                                             <div className="mb-6 rounded-xl border-2 border-[var(--border-soft)] bg-[var(--surface-muted)] p-4">
                                                 <div className="flex items-baseline gap-1.5">
-                                                    <span className="text-sm font-bold text-slate-600">INR</span>
+                                                    <span className="text-sm font-black text-slate-700">INR</span>
                                                     <span className="text-4xl font-black tracking-tight text-slate-950 md:text-5xl">
                                                         ₹{plan.monthlyAmountINR.toLocaleString("en-IN")}
                                                     </span>
-                                                    <span className="text-sm font-semibold text-slate-500">/ month</span>
+                                                    <span className="text-sm font-bold text-slate-600">/ month</span>
                                                 </div>
-                                                <div className="mt-2 flex items-center justify-between border-t border-[var(--border-soft)] pt-2 text-xs font-medium text-slate-600">
+                                                <div className="mt-2 flex items-center justify-between border-t border-[var(--border-soft)] pt-2 text-xs font-bold text-slate-700">
                                                     <span>One-time Setup Fee</span>
-                                                    <span className="font-bold text-slate-900">₹{plan.setupFeeINR.toLocaleString("en-IN")}</span>
+                                                    <span className="font-black text-slate-950">₹{plan.setupFeeINR.toLocaleString("en-IN")}</span>
                                                 </div>
                                             </div>
 
                                             {/* Compute Allocation Pill */}
-                                            <div className="mb-6 flex items-center gap-2 rounded-lg border border-primary/20 bg-primary/5 px-3 py-2 text-xs font-bold text-primary">
-                                                <Clock size={15} />
+                                            <div className="mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/10 px-3.5 py-2.5 text-xs font-black text-primary">
+                                                <Clock size={16} />
                                                 <span>{plan.computeHours.total} Compute Hours Included / Month</span>
                                             </div>
 
                                             {/* Features List */}
                                             <div className="space-y-3 mb-8">
-                                                <p className="font-code-brand text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                                                <p className="font-code-brand text-xs font-black uppercase tracking-wider text-slate-700">
                                                     Included Capabilities
                                                 </p>
                                                 <ul className="space-y-2.5">
                                                     {plan.features.map((feature) => (
-                                                        <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-700">
+                                                        <li key={feature} className="flex items-start gap-2.5 text-sm text-slate-800 font-medium">
                                                             <CheckCircle size={16} className="mt-0.5 flex-shrink-0 text-primary" />
                                                             <span className="leading-snug">{feature}</span>
                                                         </li>
@@ -375,12 +371,12 @@ export default function CloudPage() {
                                                 href={`/dev/cloud/checkout?tier=${tierKey}`}
                                                 variant={isHighlighted ? "primary" : "secondary"}
                                                 size="large"
-                                                className="w-full justify-between"
+                                                className={`w-full justify-between font-extrabold ${isHighlighted ? "shadow-[4px_4px_0_#101820]" : "text-slate-950"}`}
                                             >
                                                 <span>Subscribe to {plan.name}</span>
                                                 <ArrowRight size={18} />
                                             </Button>
-                                            <p className="mt-2 text-center text-[11px] text-slate-500">
+                                            <p className="mt-2 text-center text-[11px] font-semibold text-slate-600">
                                                 Secure Razorpay Checkout • Cancel or Pause Anytime
                                             </p>
                                         </div>
@@ -395,7 +391,7 @@ export default function CloudPage() {
                 <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-6">
                     <div className="flex flex-wrap items-center justify-between gap-4 border-b-2 border-[var(--border-soft)] pb-6">
                         <div>
-                            <div className="glass-chip-strong mb-2 inline-flex items-center gap-2 rounded-xl px-3 py-1 text-xs font-bold uppercase text-primary">
+                            <div className="glass-chip-strong mb-2 inline-flex items-center gap-2 rounded-xl px-3.5 py-1 text-xs font-black uppercase text-primary">
                                 <Layers size={14} />
                                 <span>Detailed Comparison</span>
                             </div>
@@ -405,7 +401,7 @@ export default function CloudPage() {
                         </div>
                         <button
                             onClick={() => setShowComparison(!showComparison)}
-                            className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2 text-xs font-bold uppercase shadow-[var(--shadow-soft)] hover:bg-[var(--primary-soft)] transition-all"
+                            className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-xs font-black uppercase text-slate-950 shadow-[var(--shadow-soft)] hover:bg-[var(--primary-soft)] transition-all"
                         >
                             <span>{showComparison ? "Collapse Table" : "Expand Table"}</span>
                             {showComparison ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -417,7 +413,7 @@ export default function CloudPage() {
                             <table className="w-full text-left border-collapse">
                                 <thead>
                                     <tr className="border-b-2 border-[var(--border)]">
-                                        <th className="py-4 pr-6 text-sm font-bold uppercase tracking-wider text-slate-500 w-2/5">
+                                        <th className="py-4 pr-6 text-sm font-black uppercase tracking-wider text-slate-700 w-2/5">
                                             Feature / Resource
                                         </th>
                                         <th className="py-4 px-4 text-sm font-black text-slate-950 text-center w-1/5">
@@ -435,10 +431,10 @@ export default function CloudPage() {
                                     {comparisonFeatures.map((item, idx) => (
                                         <tr key={idx} className="hover:bg-[var(--surface-muted)] transition-colors">
                                             <td className="py-4 pr-6">
-                                                <p className="font-bold text-slate-950 text-sm">{item.name}</p>
-                                                <p className="text-xs text-slate-500">{item.desc}</p>
+                                                <p className="font-black text-slate-950 text-sm">{item.name}</p>
+                                                <p className="text-xs text-slate-600 font-medium">{item.desc}</p>
                                             </td>
-                                            <td className="py-4 px-4 text-center text-xs font-semibold text-slate-700">
+                                            <td className="py-4 px-4 text-center text-xs font-bold text-slate-800">
                                                 {typeof item.base === "boolean" ? (
                                                     item.base ? (
                                                         <CheckCircle size={18} className="mx-auto text-primary" />
@@ -449,7 +445,7 @@ export default function CloudPage() {
                                                     item.base
                                                 )}
                                             </td>
-                                            <td className="py-4 px-4 text-center text-xs font-bold text-slate-900 bg-[var(--surface-muted)]">
+                                            <td className="py-4 px-4 text-center text-xs font-black text-slate-950 bg-[var(--surface-muted)]">
                                                 {typeof item.medium === "boolean" ? (
                                                     item.medium ? (
                                                         <CheckCircle size={18} className="mx-auto text-[var(--accent)]" />
@@ -460,7 +456,7 @@ export default function CloudPage() {
                                                     item.medium
                                                 )}
                                             </td>
-                                            <td className="py-4 px-4 text-center text-xs font-bold text-slate-900">
+                                            <td className="py-4 px-4 text-center text-xs font-black text-slate-950">
                                                 {typeof item.highest === "boolean" ? (
                                                     item.highest ? (
                                                         <CheckCircle size={18} className="mx-auto text-emerald-600" />
@@ -474,19 +470,19 @@ export default function CloudPage() {
                                         </tr>
                                     ))}
                                     <tr className="border-t-2 border-[var(--border)] font-bold">
-                                        <td className="py-5 pr-6 text-sm text-slate-950">Action</td>
+                                        <td className="py-5 pr-6 text-sm text-slate-950 font-black">Action</td>
                                         <td className="py-5 px-4 text-center">
-                                            <Button href="/dev/cloud/checkout?tier=base" variant="secondary" size="small">
+                                            <Button href="/dev/cloud/checkout?tier=base" variant="secondary" size="small" className="font-bold text-slate-950">
                                                 Select Starter
                                             </Button>
                                         </td>
                                         <td className="py-5 px-4 text-center bg-[var(--surface-muted)] rounded-b-lg">
-                                            <Button href="/dev/cloud/checkout?tier=medium" variant="primary" size="small">
+                                            <Button href="/dev/cloud/checkout?tier=medium" variant="primary" size="small" className="font-extrabold shadow-[3px_3px_0_#101820]">
                                                 Select Pro
                                             </Button>
                                         </td>
                                         <td className="py-5 px-4 text-center">
-                                            <Button href="/dev/cloud/checkout?tier=highest" variant="secondary" size="small">
+                                            <Button href="/dev/cloud/checkout?tier=highest" variant="secondary" size="small" className="font-bold text-slate-950">
                                                 Select Enterprise
                                             </Button>
                                         </td>
@@ -500,13 +496,13 @@ export default function CloudPage() {
                 {/* AI Models & Ecosystem Showcase */}
                 <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-6">
                     <div className="text-center max-w-2xl mx-auto space-y-2">
-                        <span className="font-code-brand text-xs font-bold uppercase tracking-wider text-primary">
+                        <span className="font-code-brand text-xs font-black uppercase tracking-wider text-primary">
                             Pre-Configured Integrations
                         </span>
                         <h3 className="text-2xl font-black text-slate-950 md:text-3xl">
                             Supported AI Models & Ecosystem
                         </h3>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-slate-700 font-medium">
                             Connect your application to top-tier LLMs and accelerators through our unified developer gateway.
                         </p>
                     </div>
@@ -524,9 +520,9 @@ export default function CloudPage() {
                                 key={i}
                                 className="glass-surface rounded-xl p-4 text-center space-y-1.5 hover:-translate-y-1 transition-all"
                             >
-                                <p className="font-bold text-sm text-slate-950">{model.name}</p>
-                                <p className="text-xs text-slate-500">{model.sub}</p>
-                                <span className="inline-block rounded-md bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-600">
+                                <p className="font-black text-sm text-slate-950">{model.name}</p>
+                                <p className="text-xs text-slate-600 font-semibold">{model.sub}</p>
+                                <span className="inline-block rounded-md bg-slate-200 px-2 py-0.5 text-[10px] font-extrabold text-slate-800">
                                     {model.tag}
                                 </span>
                             </div>
@@ -538,7 +534,7 @@ export default function CloudPage() {
                 <section className="glass-surface-strong rounded-2xl px-6 py-10 md:px-12 md:py-14 space-y-8">
                     <div className="flex items-center justify-between">
                         <div>
-                            <span className="font-code-brand text-xs font-bold uppercase tracking-wider text-primary">
+                            <span className="font-code-brand text-xs font-black uppercase tracking-wider text-primary">
                                 Deployment Workflow
                             </span>
                             <h2 className="text-2xl font-black text-slate-950 md:text-4xl">
@@ -569,39 +565,65 @@ export default function CloudPage() {
                                 <div className="glass-chip-strong inline-flex h-10 w-10 items-center justify-center rounded-xl font-code-brand text-sm font-black text-primary">
                                     {item.step}
                                 </div>
-                                <h4 className="text-lg font-bold text-slate-950">{item.title}</h4>
-                                <p className="text-sm leading-relaxed text-slate-600">{item.desc}</p>
+                                <h4 className="text-lg font-black text-slate-950">{item.title}</h4>
+                                <p className="text-sm leading-relaxed text-slate-700 font-medium">{item.desc}</p>
                             </div>
                         ))}
                     </div>
                 </section>
 
-                {/* Interactive FAQ Accordion */}
-                <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-6">
-                    <div className="text-center max-w-2xl mx-auto space-y-2">
-                        <div className="glass-chip-strong inline-flex items-center gap-1.5 rounded-xl px-3 py-1 text-xs font-bold uppercase text-primary">
-                            <HelpCircle size={14} />
+                {/* Interactive FAQ Section */}
+                <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
+                    <div className="text-center max-w-2xl mx-auto space-y-3">
+                        <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase text-primary">
+                            <HelpCircle size={15} />
                             <span>Frequently Asked Questions</span>
                         </div>
-                        <h3 className="text-2xl font-black text-slate-950 md:text-3xl">
+                        <h3 className="text-3xl font-black text-slate-950 md:text-4xl">
                             Got Questions About Cloud Services?
                         </h3>
+                        <p className="text-sm text-slate-700 font-medium">
+                            Clear answers regarding compute hours, API keys, pause options, and billing cycles.
+                        </p>
                     </div>
 
-                    <div className="max-w-3xl mx-auto space-y-3 pt-2">
+                    <div className="max-w-3xl mx-auto space-y-4">
                         {faqs.map((faq, index) => {
                             const isOpen = openFaq === index;
                             return (
                                 <div
                                     key={index}
-                                    className="glass-surface rounded-xl overflow-hidden transition-all duration-200"
+                                    className={`rounded-2xl border-2 transition-all duration-200 overflow-hidden ${
+                                        isOpen
+                                            ? "border-primary bg-[var(--surface-strong)] shadow-[4px_4px_0_var(--primary)]"
+                                            : "border-[var(--border)] bg-[var(--surface)] shadow-[3px_3px_0_var(--border)] hover:border-slate-800"
+                                    }`}
                                 >
                                     <button
                                         onClick={() => toggleFaq(index)}
-                                        className="w-full flex items-center justify-between p-5 text-left font-bold text-slate-950 text-sm md:text-base hover:bg-[var(--surface-muted)] transition-colors"
+                                        className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 transition-colors"
                                     >
-                                        <span>{faq.q}</span>
-                                        <div className="flex-shrink-0 ml-4">
+                                        <div className="flex items-center gap-3.5">
+                                            <span
+                                                className={`font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] transition-colors ${
+                                                    isOpen
+                                                        ? "bg-[var(--primary)] text-white shadow-[2px_2px_0_#101820]"
+                                                        : "bg-[var(--surface-muted)] text-slate-900"
+                                                }`}
+                                            >
+                                                Q{index + 1}
+                                            </span>
+                                            <span className="text-base md:text-lg font-black text-slate-950 leading-snug">
+                                                {faq.q}
+                                            </span>
+                                        </div>
+                                        <div
+                                            className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl border-2 border-[var(--border)] transition-all ${
+                                                isOpen
+                                                    ? "bg-[var(--primary)] text-white shadow-[2px_2px_0_#101820]"
+                                                    : "bg-[var(--surface-muted)] text-slate-950 hover:bg-[var(--primary-soft)]"
+                                            }`}
+                                        >
                                             {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
                                         </div>
                                     </button>
@@ -612,9 +634,11 @@ export default function CloudPage() {
                                                 animate={{ opacity: 1, height: "auto" }}
                                                 exit={{ opacity: 0, height: 0 }}
                                                 transition={{ duration: 0.2 }}
-                                                className="border-t border-[var(--border-soft)] p-5 text-sm leading-relaxed text-slate-600 bg-[var(--surface-strong)]"
+                                                className="border-t-2 border-[var(--border-soft)] bg-[var(--surface-muted)]/70 p-5 md:p-6"
                                             >
-                                                {faq.a}
+                                                <p className="text-sm md:text-base leading-relaxed text-slate-800 font-medium">
+                                                    {faq.a}
+                                                </p>
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
@@ -633,15 +657,15 @@ export default function CloudPage() {
                         <h3 className="text-2xl font-black text-slate-950 md:text-3xl">
                             Already Have an Active Subscription?
                         </h3>
-                        <p className="text-sm md:text-base text-slate-600">
+                        <p className="text-sm md:text-base text-slate-700 font-medium">
                             Lookup your account by email to inspect real-time compute usage, view active API credentials, change plans, or pause your service.
                         </p>
                     </div>
                     <div className="flex flex-wrap items-center justify-center gap-4">
-                        <Button href="/dev/cloud/dashboard" variant="primary" size="large">
+                        <Button href="/dev/cloud/dashboard" variant="primary" size="large" className="font-extrabold shadow-[4px_4px_0_#101820]">
                             <Zap size={18} /> Go to Cloud Dashboard
                         </Button>
-                        <Button href="/dev/contact" variant="secondary" size="large">
+                        <Button href="/dev/contact" variant="secondary" size="large" className="font-bold text-slate-950">
                             <Users size={18} /> Contact Enterprise Sales
                         </Button>
                     </div>
