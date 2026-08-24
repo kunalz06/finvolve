@@ -125,6 +125,15 @@ export default function CloudPage() {
 
                                         {/* Pricing */}
                                         <div className="mb-6">
+                                            {plan.originalMonthlyAmountINR && plan.offerEndDate && new Date(plan.offerEndDate) >= new Date() && (
+                                                <div className="mb-3 rounded-xl border border-amber-300 bg-amber-50/90 px-3 py-2 text-center">
+                                                    <p className="text-xs font-bold uppercase tracking-wider text-amber-700">Limited Offer</p>
+                                                    <p className="mt-0.5 text-[13px] text-amber-800">
+                                                        Original: <span className="line-through">INR {plan.originalMonthlyAmountINR.toLocaleString("en-IN")}/mo + INR {plan.originalSetupFeeINR.toLocaleString("en-IN")} setup</span>
+                                                    </p>
+                                                    <p className="mt-1 text-xs font-semibold text-amber-700">Offer valid till {new Date(plan.offerEndDate).toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })}</p>
+                                                </div>
+                                            )}
                                             <div className="flex items-baseline gap-1">
                                                 <span className="text-sm font-medium text-slate-500">INR</span>
                                                 <span className="text-4xl font-black text-slate-950">
