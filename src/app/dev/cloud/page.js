@@ -600,7 +600,7 @@ export default function CloudPage() {
                       <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
                         Q{index + 1}
                       </span>
-                      <span className="text-base md:text-lg font-black text-slate-950 dark:text-slate-50 leading-snug">
+                      <span className="font-sans text-base md:text-lg font-black text-slate-950 dark:text-slate-50 leading-snug">
                         {faq.q}
                       </span>
                     </div>
