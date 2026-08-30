@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { MessageCircle, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import ChatWindow from "./ChatWindow";
 
 const STORAGE_KEY = "dev_chat_minimized";
@@ -13,14 +12,37 @@ export default function ChatWidget() {
   const [isMinimized, setIsMinimized] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const [windowVisible, setWindowVisible] = useState(false);
+  const [fabVisible, setFabVisible] = useState(false);
+  const [tooltipVisible, setTooltipVisible] = useState(false);
   const tooltipTimerRef = useRef(null);
+  const closeTimerRef = useRef(null);
 
-  // Ensure framer-motion animations only run client-side
+  // Client-only mount: kick off CSS-transition-driven entrances
   useEffect(() => {
     setMounted(true);
     setIsMinimized(sessionStorage.getItem(STORAGE_KEY) === "true");
-    setShowTooltip(!sessionStorage.getItem(TOOLTIP_KEY));
+    const tooltipSeen = sessionStorage.getItem(TOOLTIP_KEY);
+    setShowTooltip(!tooltipSeen);
+
+    // Staggered entrance: FAB first, then tooltip
+    requestAnimationFrame(() => {
+      setFabVisible(true);
+      if (!tooltipSeen) {
+        setTimeout(() => setTooltipVisible(true), 200);
+      }
+    });
   }, []);
+
+  // Sync tooltip visibility when showTooltip changes after mount
+  useEffect(() => {
+    if (!mounted) return;
+    if (showTooltip) {
+      setTimeout(() => setTooltipVisible(true), 50);
+    } else {
+      setTooltipVisible(false);
+    }
+  }, [showTooltip, mounted]);
 
   // Hide tooltip after 6 seconds
   useEffect(() => {
@@ -32,90 +54,75 @@ export default function ChatWidget() {
     return () => clearTimeout(tooltipTimerRef.current);
   }, [showTooltip]);
 
-  const handleOpen = () => {
+  const handleOpen = useCallback(() => {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
     setIsOpen(true);
+    setWindowVisible(true);
+    setFabVisible(false);
+    setTooltipVisible(false);
     setIsMinimized(false);
     sessionStorage.removeItem(STORAGE_KEY);
     setShowTooltip(false);
     sessionStorage.setItem(TOOLTIP_KEY, "true");
-  };
+  }, []);
 
-  const handleClose = () => {
-    setIsOpen(false);
-    setIsMinimized(false);
-  };
+  const handleClose = useCallback(() => {
+    setWindowVisible(false);
+    // Wait for CSS transition to finish before unmounting
+    closeTimerRef.current = setTimeout(() => {
+      setIsOpen(false);
+      setFabVisible(true);
+    }, 220);
+  }, []);
 
-  const handleMinimize = () => {
-    setIsOpen(false);
-    setIsMinimized(true);
+  const handleMinimize = useCallback(() => {
+    setWindowVisible(false);
+    closeTimerRef.current = setTimeout(() => {
+      setIsOpen(false);
+      setIsMinimized(true);
+      setFabVisible(true);
+    }, 220);
     sessionStorage.setItem(STORAGE_KEY, "true");
-  };
+  }, []);
 
   return (
     <div className="chat-widget">
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            className="chat-window-wrapper"
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeOut" }}
-          >
-            <ChatWindow onClose={handleClose} onMinimize={handleMinimize} />
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {mounted && (
-        <AnimatePresence mode="wait">
-          {!isOpen && (
-            <motion.button
-              key={isMinimized ? "minimized" : "default"}
-              className={`chat-fab ${isMinimized ? "chat-fab-muted" : ""}`}
-              onClick={handleOpen}
-              whileHover={{ scale: 1.08 }}
-              whileTap={{ scale: 0.95 }}
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.5 }}
-              transition={{ duration: 0.2 }}
-              type="button"
-              aria-label="Open chat assistant"
-            >
-              <MessageCircle size={24} />
-              {isMinimized && <span className="chat-fab-badge" />}
-            </motion.button>
-          )}
-        </AnimatePresence>
+      {isOpen && (
+        <div
+          className={`chat-window-wrapper ${windowVisible ? "cw-enter" : "cw-exit"}`}
+        >
+          <ChatWindow onClose={handleClose} onMinimize={handleMinimize} />
+        </div>
       )}
 
-      {mounted && (
-        <AnimatePresence>
-          {showTooltip && !isOpen && (
-            <motion.div
-              className="chat-tooltip"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.25 }}
-            >
-              <span>Need help? Chat with DEV&#8734;</span>
-              <button
-                className="chat-tooltip-close"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowTooltip(false);
-                  sessionStorage.setItem(TOOLTIP_KEY, "true");
-                }}
-                type="button"
-                aria-label="Dismiss tooltip"
-              >
-                <X size={12} />
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
+      {mounted && !isOpen && (
+        <button
+          className={`chat-fab ${isMinimized ? "chat-fab-muted" : ""} ${fabVisible ? "chat-fab-visible" : ""}`}
+          onClick={handleOpen}
+          type="button"
+          aria-label="Open chat assistant"
+        >
+          <MessageCircle size={24} />
+          {isMinimized && <span className="chat-fab-badge" />}
+        </button>
+      )}
+
+      {mounted && tooltipVisible && !isOpen && (
+        <div className="chat-tooltip chat-tooltip-visible">
+          <span>Need help? Chat with DEV&#8734;</span>
+          <button
+            className="chat-tooltip-close"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowTooltip(false);
+              sessionStorage.setItem(TOOLTIP_KEY, "true");
+            }}
+            type="button"
+            aria-label="Dismiss tooltip"
+          >
+            <X size={12} />
+          </button>
+        </div>
       )}
     </div>
   );

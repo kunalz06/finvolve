@@ -35,13 +35,25 @@
   justify-content: center;
   cursor: pointer;
   box-shadow: 4px 4px 0 var(--border), 0 4px 20px rgba(36, 87, 255, 0.25);
-  transition: background 0.2s, box-shadow 0.2s;
+  transition: background 0.2s, box-shadow 0.2s, opacity 0.25s ease, transform 0.25s ease;
   position: relative;
+  opacity: 0;
+  transform: scale(0.5);
+}
+
+.chat-fab-visible {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .chat-fab:hover {
   background: var(--primary-hover);
   box-shadow: 4px 4px 0 var(--border), 0 6px 28px rgba(36, 87, 255, 0.35);
+  transform: scale(1.08);
+}
+
+.chat-fab-visible:active {
+  transform: scale(0.95);
 }
 
 .chat-fab-muted {
@@ -84,6 +96,14 @@
   align-items: center;
   gap: 8px;
   white-space: nowrap;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.chat-tooltip-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .chat-tooltip::after {
@@ -126,6 +146,17 @@
   right: 0;
   width: 380px;
   max-height: 560px;
+  transition: opacity 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.cw-enter {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.cw-exit {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
 }
 
 .chat-window {
