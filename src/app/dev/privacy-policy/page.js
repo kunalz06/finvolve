@@ -40,10 +40,11 @@ export default function PrivacyPolicy() {
                   We collect information you provide directly when you use our services. This includes:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
-                  <li><strong className="text-slate-950">Personal Information:</strong> Name, email address, and phone number provided through project request forms, contact forms, and Cloud subscription sign-ups.</li>
+                  <li><strong className="text-slate-950">Personal Information:</strong> Name, email address, and phone number provided through project request forms, contact forms, Cloud subscription sign-ups, and Cloud rental requests.</li>
                   <li><strong className="text-slate-950">Project Details:</strong> Project type and project description/requirements submitted via the &quot;Start a Project&quot; form.</li>
-                  <li><strong className="text-slate-950">Cloud Subscription Data:</strong> When you subscribe to DEV Infinity Cloud, we collect your name, email, phone number, chosen subscription tier, and payment transaction details. We also store compute usage metrics and AI API usage data associated with your subscription.</li>
-                  <li><strong className="text-slate-950">Payment Information:</strong> Transaction details for the &quot;Quick Start&quot; service and Cloud subscriptions. Note that we do not store your credit card or bank account details; payments are processed by our third-party payment processor, Razorpay.</li>
+                  <li><strong className="text-slate-950">Cloud Subscription Data:</strong> When you subscribe to DEV Infinity Cloud, we collect your name, email, phone number, chosen subscription tier, and payment transaction details. We also store compute usage metrics and AI API usage data associated with your subscription. Subscription plans include Starter (billed every 15 days), Pro (monthly), and Enterprise (monthly), each with a one-time setup fee.</li>
+                  <li><strong className="text-slate-950">Cloud Rental Data:</strong> When you use our pay-per-use Rent Services, we collect your name, email, phone number, selected rental duration, and payment transaction details for the upfront fee and subsequent usage bill. We store compute hours consumed, billing breakdown, and payment status for each rental session.</li>
+                  <li><strong className="text-slate-950">Payment Information:</strong> Transaction details for the &quot;Quick Start&quot; service, Cloud subscriptions, and Cloud rentals. Note that we do not store your credit card or bank account details; payments are processed by our third-party payment processor, Razorpay.</li>
                   <li><strong className="text-slate-950">Newsletter Data:</strong> Email address if you subscribe to our newsletter via the site footer.</li>
                 </ul>
               </section>
@@ -56,7 +57,8 @@ export default function PrivacyPolicy() {
                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
                   <li>Provide, maintain, and improve our software development services and Cloud platform.</li>
                   <li>Process Cloud subscription payments, manage billing cycles, and track compute and API usage against your plan limits.</li>
-                  <li>Send you transactional emails related to your Cloud subscription (activation confirmations, monthly billing receipts, pause/resume/cancellation notifications, and plan change updates).</li>
+                  <li>Process Cloud rental requests, manage upfront fee collection, track compute usage during rental periods, and generate post-usage bills with Razorpay payment links.</li>
+                  <li>Send you transactional emails related to your Cloud subscription (activation confirmations, billing receipts, pause/resume/cancellation notifications, and plan change updates) and Cloud rental (rental activation confirmations, usage bill notifications with payment links, and bill payment receipts).</li>
                   <li>Process transactions and send you related information, including confirmations and invoices.</li>
                   <li>Communicate with you about your project requirements, updates, and support.</li>
                   <li>Respond to your comments, questions, and requests.</li>
@@ -70,7 +72,7 @@ export default function PrivacyPolicy() {
                   We do not share your personal information with third parties except in the following cases:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
-                  <li><strong className="text-slate-950">Service Providers:</strong> We share subscription data with Razorpay (payment processor) to facilitate Cloud subscription billing. We use Firebase (Google) for database and authentication services. We use SMTP email services to send transactional subscription emails.</li>
+                  <li><strong className="text-slate-950">Service Providers:</strong> We share transaction data with Razorpay (payment processor) to facilitate Cloud subscription billing, rental upfront fee collection, and rental usage bill payments via payment links. We use Firebase (Google) for database and authentication services. We use SMTP email services to send transactional subscription and rental emails.</li>
                   <li><strong className="text-slate-950">Legal Compliance:</strong> We may disclose information if we believe disclosure is in accordance with, or required by, any applicable law or legal process.</li>
                 </ul>
               </section>
@@ -78,7 +80,7 @@ export default function PrivacyPolicy() {
               <section>
                 <h2 className="text-lg font-bold text-slate-950 mb-4">4. Security</h2>
                 <p className="mb-4">
-                  We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. We use secure cloud infrastructure (Firebase) with server-side access controls for all data storage, including project requests, contact messages, and Cloud subscription records. Payment processing is handled entirely by Razorpay with industry-standard encryption. Webhook events from Razorpay are verified using HMAC-SHA256 signature validation.
+                  We take reasonable measures to help protect information about you from loss, theft, misuse, and unauthorized access, disclosure, alteration, and destruction. We use secure cloud infrastructure (Firebase) with server-side access controls for all data storage, including project requests, contact messages, Cloud subscription records, and Cloud rental records. Payment processing for subscriptions, rental upfront fees, and rental usage bills is handled entirely by Razorpay with industry-standard encryption. Webhook events from Razorpay are verified using HMAC-SHA256 signature validation.
                 </p>
               </section>
 
