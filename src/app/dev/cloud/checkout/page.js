@@ -40,6 +40,7 @@ function CheckoutContent() {
         email: "",
         phone: "",
     });
+    const [termsAccepted, setTermsAccepted] = useState(false);
     const [status, setStatus] = useState("idle");
     const [errorMessage, setErrorMessage] = useState("");
     const [subscriptionId, setSubscriptionId] = useState(null);
@@ -51,6 +52,10 @@ function CheckoutContent() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!termsAccepted) {
+            setErrorMessage("Please accept the Terms & Conditions to proceed.");
+            return;
+        }
         if (!tier || !VALID_TIERS.includes(tier)) {
             setErrorMessage("Invalid plan selected.");
             return;
@@ -232,12 +237,24 @@ function CheckoutContent() {
                                         </div>
                                     )}
 
+                                    <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] p-4 transition-colors hover:border-[var(--primary)]">
+                                        <input
+                                            type="checkbox"
+                                            checked={termsAccepted}
+                                            onChange={(e) => { setTermsAccepted(e.target.checked); if (e.target.checked) setErrorMessage(""); }}
+                                            className="mt-0.5 h-4 w-4 flex-shrink-0 accent-[var(--primary)]"
+                                        />
+                                        <span className="text-sm leading-relaxed text-[var(--foreground)]">
+                                            I have read and agree to the <Link href="/dev/terms" target="_blank" className="font-bold text-primary underline underline-offset-2 hover:no-underline">Terms &amp; Conditions</Link>, including the Cloud Subscription billing terms and acceptable use policy.
+                                        </span>
+                                    </label>
+
                                     <Button
                                         type="submit"
                                         variant="primary"
                                         size="large"
                                         className="w-full"
-                                        disabled={status === "processing"}
+                                        disabled={status === "processing" || !termsAccepted}
                                     >
                                         {status === "processing" ? (
                                             <>

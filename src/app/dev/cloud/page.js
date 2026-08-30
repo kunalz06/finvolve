@@ -164,6 +164,7 @@ export default function CloudPage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [showComparison, setShowComparison] = useState(true);
   const [rentalForm, setRentalForm] = useState({ name: "", email: "", phone: "", days: 7 });
+  const [rentalTermsAccepted, setRentalTermsAccepted] = useState(false);
   const [rentalLoading, setRentalLoading] = useState(false);
   const [rentalResult, setRentalResult] = useState(null);
   const [rentalError, setRentalError] = useState("");
@@ -171,6 +172,10 @@ export default function CloudPage() {
 
   const handleRentalSubmit = async (e) => {
     e.preventDefault();
+    if (!rentalTermsAccepted) {
+      setRentalError("Please accept the Terms & Conditions to proceed.");
+      return;
+    }
     setRentalLoading(true);
     setRentalResult(null);
     setRentalError("");
@@ -821,11 +826,23 @@ export default function CloudPage() {
                   </div>
                 )}
 
+                <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] p-4 transition-colors hover:border-[var(--primary)]">
+                  <input
+                    type="checkbox"
+                    checked={rentalTermsAccepted}
+                    onChange={(e) => { setRentalTermsAccepted(e.target.checked); if (e.target.checked) setRentalError(""); }}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 accent-[var(--primary)]"
+                  />
+                  <span className="text-sm leading-relaxed text-[var(--foreground)]">
+                    I have read and agree to the <Link href="/dev/terms" target="_blank" className="font-bold text-primary underline underline-offset-2 hover:no-underline">Terms &amp; Conditions</Link>, including the Rent Services billing terms and acceptable use policy.
+                  </span>
+                </label>
+
                 <Button
                   type="submit"
                   variant="primary"
                   size="large"
-                  disabled={rentalLoading}
+                  disabled={rentalLoading || !rentalTermsAccepted}
                   className="w-full justify-center gap-2"
                 >
                   {rentalLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
