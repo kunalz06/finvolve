@@ -30,13 +30,22 @@ async function ensurePlanExists(razorpay, db, tier) {
     const docRef = db.collection("config").doc(`plan_${tier}`);
     const doc = await docRef.get();
 
+    // Validate cached plan matches current price
     if (doc.exists && doc.data().razorpayPlanId) {
-        return doc.data().razorpayPlanId;
+        const cached = doc.data();
+        if (cached.monthlyAmount === planConfig.monthlyAmountINR) {
+            return cached.razorpayPlanId;
+        }
     }
 
+    // Determine billing period
+    const periodDays = planConfig.billingPeriodDays;
+    const planParams = periodDays && periodDays < 30
+        ? { period: "daily", interval: periodDays }
+        : { period: "monthly", interval: 1 };
+
     const plan = await razorpay.plans.create({
-        period: "monthly",
-        interval: 1,
+        ...planParams,
         item: {
             name: planConfig.name,
             amount: planConfig.monthlyAmountINR * 100,

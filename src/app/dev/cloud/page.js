@@ -332,7 +332,7 @@ export default function CloudPage() {
                           <span className="text-4xl font-black tracking-tight text-[var(--heading)] md:text-5xl">
                             ₹{plan.monthlyAmountINR.toLocaleString("en-IN")}
                           </span>
-                          <span className="text-sm font-bold text-[var(--muted)]">/ month</span>
+                          <span className="text-sm font-bold text-[var(--muted)]">{plan.billingPeriodDays ? "/ " + plan.billingPeriodDays + " days" : "/ month"}</span>
                         </div>
                         <div className="mt-2 flex items-center justify-between border-t border-[var(--border-soft)] pt-2 text-xs font-bold text-[var(--foreground)]">
                           <span>One-time Setup Fee</span>
@@ -343,7 +343,7 @@ export default function CloudPage() {
                       {/* Compute Allocation Pill */}
                       <div className="mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/10 px-3.5 py-2.5 text-xs font-black text-primary">
                         <Clock size={16} />
-                        <span>{plan.computeHours.total} Compute Hours Included / Month</span>
+                        <span>{plan.computeHours.total} Compute Hours Included / {plan.billingPeriodDays ? plan.billingPeriodDays + " Days" : "Month"}</span>
                       </div>
 
                       {/* Features List */}

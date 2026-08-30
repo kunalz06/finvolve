@@ -8,11 +8,9 @@ export const SUBSCRIPTION_TIERS = {
   base: {
     id: "base",
     name: "Starter",
-    monthlyAmountINR: 1,
-    setupFeeINR: 1,
-    originalMonthlyAmountINR: 5000,
-    originalSetupFeeINR: 1000,
-    offerEndDate: "2026-09-24",
+    monthlyAmountINR: 200,
+    setupFeeINR: 100,
+    billingPeriodDays: 15,
     description: "DEV Infinity Cloud — Starter Plan",
     computeHours: {
       total: 300,
