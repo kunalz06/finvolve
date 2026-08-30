@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   Bot,
+  CalendarDays,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -15,19 +16,25 @@ import {
   Flame,
   Gauge,
   HelpCircle,
+  IndianRupee,
   Layers,
+  Loader2,
   Minus,
   RefreshCw,
+  Server,
   Shield,
   ShieldCheck,
   Sparkles,
   Terminal,
+  Timer,
   Users,
   Zap,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { SUBSCRIPTION_TIERS } from "@/lib/server/subscription-plans";
+import { RENTAL_CONFIG } from "@/lib/server/rental-plans";
+import { apiUrl } from "@/lib/api";
 
 const tierOrder = ["base", "medium", "highest"];
 
@@ -45,9 +52,9 @@ const tierBadges = {
 
 const comparisonFeatures = [
   {
-    name: "Monthly Compute Allocation",
-    desc: "Dedicated CPU runtime per 30-day billing cycle",
-    base: "300 Hours (Split 150h/150h)",
+    name: "Compute Allocation",
+    desc: "Dedicated CPU runtime per billing cycle",
+    base: "300 Hours / 15 days (Split)",
     medium: "600 Hours (Unrestricted)",
     highest: "1,000 Hours (Dedicated)",
   },
@@ -142,6 +149,72 @@ const faqs = [
 export default function CloudPage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [showComparison, setShowComparison] = useState(true);
+  const [rentalForm, setRentalForm] = useState({ name: "", email: "", phone: "", days: 7 });
+  const [rentalLoading, setRentalLoading] = useState(false);
+  const [rentalResult, setRentalResult] = useState(null);
+  const [rentalError, setRentalError] = useState("");
+
+  const handleRentalSubmit = async (e) => {
+    e.preventDefault();
+    setRentalLoading(true);
+    setRentalResult(null);
+    setRentalError("");
+    try {
+      const res = await fetch(apiUrl("/dev/api/rental/create"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rentalForm),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Rental creation failed.");
+      setRentalResult(json);
+      setRentalForm({ name: "", email: "", phone: "", days: 7 });
+    } catch (err) {
+      setRentalError(err.message);
+    } finally {
+      setRentalLoading(false);
+    }
+  };
+
+  const handleRentalPay = () => {
+    if (!rentalResult) return;
+    const options = {
+      key: rentalResult.checkoutKey,
+      amount: rentalResult.upfrontFee * 100,
+      currency: rentalResult.currency,
+      name: "DEV Infinity",
+      description: `Cloud Rental — ${rentalResult.days} Days`,
+      order_id: rentalResult.orderId,
+      handler: async function (response) {
+        try {
+          const verifyRes = await fetch(apiUrl("/dev/api/rental/verify"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rentalId: rentalResult.rentalId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const verifyJson = await verifyRes.json();
+          if (verifyRes.ok) {
+            setRentalResult({ ...rentalResult, status: "active" });
+          } else {
+            setRentalError(verifyJson.error || "Payment verification failed.");
+          }
+        } catch (err) {
+          setRentalError("Verification failed. Contact support with your rental ID: " + rentalResult.rentalId);
+        }
+      },
+      prefill: { name: rentalForm.name, email: rentalForm.email, contact: rentalForm.phone },
+      theme: { color: "#2457ff" },
+    };
+    if (window.Razorpay) {
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    }
+  };
 
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -524,6 +597,157 @@ export default function CloudPage() {
                 </span>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Rent Services Section */}
+        <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase text-primary">
+              <Server size={14} />
+              <span>RENT SERVICES</span>
+            </div>
+            <h2 className="text-3xl font-black text-[var(--heading)] md:text-4xl">
+              Rent Cloud Compute On-Demand
+            </h2>
+            <p className="text-sm text-[var(--foreground)] font-medium">
+              No subscription needed. Pick a duration, pay a small upfront fee, and only pay for the compute hours you actually use.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <IndianRupee size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Upfront Fee</p>
+              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.upfrontFeeINR}</p>
+              <p className="text-xs text-[var(--muted)] font-medium">One-time before usage</p>
+            </div>
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <Timer size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Usage Rate</p>
+              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR}</p>
+              <p className="text-xs text-[var(--muted)] font-medium">Per {RENTAL_CONFIG.computeHoursPerUnit} hours of compute</p>
+            </div>
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <CalendarDays size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Billing</p>
+              <p className="text-2xl font-black text-[var(--heading)]">Post-Use</p>
+              <p className="text-xs text-[var(--muted)] font-medium">Bill + payment link emailed</p>
+            </div>
+          </div>
+
+          {/* Rental Form */}
+          <div className="max-w-lg mx-auto glass-surface rounded-2xl p-6 md:p-8 space-y-5">
+            {rentalResult && rentalResult.status === "active" ? (
+              <div className="text-center space-y-4 py-4">
+                <div className="glass-icon-plate mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
+                  <CheckCircle size={28} className="text-green-600" />
+                </div>
+                <h4 className="text-xl font-black text-[var(--heading)]">Rental Activated!</h4>
+                <p className="text-sm text-[var(--foreground)] font-medium">
+                  Your {rentalResult.days}-day rental is live. A confirmation email has been sent.
+                </p>
+                <p className="font-code-brand text-xs text-[var(--muted)]">Rental ID: {rentalResult.rentalId}</p>
+                <Button onClick={() => setRentalResult(null)} variant="secondary" size="medium">
+                  Rent Another
+                </Button>
+              </div>
+            ) : rentalResult && !rentalResult.status ? (
+              <div className="text-center space-y-4 py-4">
+                <p className="text-sm text-[var(--foreground)] font-medium">Pay the upfront fee to activate your rental.</p>
+                <Button onClick={handleRentalPay} variant="primary" size="large" className="w-full justify-center gap-2">
+                  <IndianRupee size={18} /> Pay ₹{rentalResult.upfrontFee} Upfront Fee
+                </Button>
+                <p className="font-code-brand text-xs text-[var(--muted)]">Rental ID: {rentalResult.rentalId}</p>
+              </div>
+            ) : (
+              <form onSubmit={handleRentalSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={rentalForm.name}
+                    onChange={(e) => setRentalForm({ ...rentalForm, name: e.target.value })}
+                    className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                    placeholder="Your full name"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={rentalForm.email}
+                      onChange={(e) => setRentalForm({ ...rentalForm, email: e.target.value })}
+                      className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                      placeholder="you@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Phone</label>
+                    <input
+                      type="tel"
+                      required
+                      value={rentalForm.phone}
+                      onChange={(e) => setRentalForm({ ...rentalForm, phone: e.target.value })}
+                      className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-2">Rental Duration</label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {RENTAL_CONFIG.timeOptions.map((opt) => (
+                      <button
+                        key={opt.days}
+                        type="button"
+                        onClick={() => setRentalForm({ ...rentalForm, days: opt.days })}
+                        className={
+                          "rounded-xl border-2 py-2.5 text-xs font-black transition-all " +
+                          (rentalForm.days === opt.days
+                            ? "border-[var(--primary)] bg-[var(--primary-soft)] text-primary shadow-[var(--shadow-soft)]"
+                            : "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[var(--primary)]")
+                        }
+                      >
+                        {opt.days}D
+                      </button>
+                    ))}
+                  </div>
+                  {rentalForm.days === 7 && (
+                    <p className="mt-1.5 text-[11px] font-bold text-[var(--accent)]">Most popular choice</p>
+                  )}
+                </div>
+
+                {rentalError && (
+                  <div className="rounded-xl border-2 border-red-400 bg-red-50 dark:bg-red-950/30 p-3 text-xs font-bold text-red-800 dark:text-red-300">
+                    {rentalError}
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="large"
+                  disabled={rentalLoading}
+                  className="w-full justify-center gap-2"
+                >
+                  {rentalLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+                  {rentalLoading ? "Creating Rental..." : "Rent for " + rentalForm.days + " Days — ₹" + RENTAL_CONFIG.upfrontFeeINR + " Upfront"}
+                </Button>
+                <p className="text-center text-[11px] font-semibold text-[var(--muted)]">
+                  Secure Razorpay Checkout • Bill emailed after usage • No hidden charges
+                </p>
+              </form>
+            )}
           </div>
         </section>
 

@@ -18,6 +18,7 @@ import {
 import {
     AlertCircle,
     CheckCircle,
+    Clock,
     CreditCard,
     Eye,
     LayoutDashboard,
@@ -97,6 +98,9 @@ export default function AdminPage() {
     const [payments, setPayments] = useState([]);
     const [newsletterSubscribers, setNewsletterSubscribers] = useState([]);
     const [subscriptions, setSubscriptions] = useState([]);
+    const [rentals, setRentals] = useState([]);
+    const [billHoursInput, setBillHoursInput] = useState("");
+    const [billingRentalId, setBillingRentalId] = useState(null);
     const [subActionLoading, setSubActionLoading] = useState(null);
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [deletingRequestId, setDeletingRequestId] = useState("");
@@ -195,6 +199,20 @@ export default function AdminPage() {
             }
         };
         fetchSubscriptions();
+
+        const fetchRentals = async () => {
+            try {
+                const idToken = await auth.currentUser.getIdToken(true);
+                const res = await fetch(apiUrl("/dev/api/admin/rentals"), {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                });
+                const json = await res.json();
+                if (res.ok) setRentals(json.rentals || []);
+            } catch (e) {
+                console.warn("Failed to fetch rentals:", e.message);
+            }
+        };
+        fetchRentals();
 
         return stopListeners;
     }, [authState]);
@@ -357,6 +375,7 @@ export default function AdminPage() {
     const revenue = payments
         .filter((item) => item.status === "paid")
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const activeRentalCount = rentals.filter((r) => r.status === "active").length;
     const stats = useMemo(() => ([
         { label: "Requests", value: requests.length, tone: "text-slate-900" },
         { label: "Unread", value: unreadCount, tone: "text-primary" },
@@ -364,7 +383,8 @@ export default function AdminPage() {
         { label: "Revenue", value: formatCurrency(revenue), tone: "text-slate-900" },
         { label: "Subscribers", value: activeSubscriberCount, tone: "text-primary" },
         { label: "Cloud Subs", value: activeSubCount, tone: "text-emerald-600" },
-    ]), [requests.length, unreadCount, paidPaymentsCount, revenue, activeSubscriberCount, activeSubCount]);
+        { label: "Rentals", value: activeRentalCount, tone: "text-amber-600" },
+    ]), [requests.length, unreadCount, paidPaymentsCount, revenue, activeSubscriberCount, activeSubCount, activeRentalCount]);
 
     if (authState !== "authenticated") {
         return (
@@ -433,6 +453,7 @@ export default function AdminPage() {
                         { id: "payments", label: "Payments", icon: CreditCard },
                         { id: "newsletter", label: "Newsletter", icon: Users },
                         { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
+                        { id: "rentals", label: "Rentals", icon: Clock },
                     ].map((tab) => {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
@@ -692,6 +713,93 @@ export default function AdminPage() {
                                         {item.lastNewsletterSentAt && <div>Last sent: {formatDate(item.lastNewsletterSentAt)}</div>}
                                         {item.lastEmailError && <div className="rounded-[18px] border border-red-200 bg-red-50/80 px-3 py-2 text-red-700">Last error: {item.lastEmailError}</div>}
                                     </div>
+                                </Card>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {activeTab === "rentals" && (
+                    <div className="mt-8 space-y-6">
+                        {rentals.length === 0 && (
+                            <EmptyState title="No cloud rentals yet" copy="Rentals from the cloud page will appear here after users pay the upfront fee." />
+                        )}
+                        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                            {rentals.map((r) => (
+                                <Card key={r.id} className={r.status === "active" ? "border-amber-300/60" : "opacity-80"}>
+                                    <div className="flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <h3 className="truncate text-lg font-bold text-slate-950">{r.name || "Unknown"}</h3>
+                                            <p className="truncate text-sm text-slate-600">{r.email}</p>
+                                        </div>
+                                        <span className={"flex-shrink-0 rounded-full px-3 py-1 text-xs font-semibold " + (
+                                            r.status === "active" ? "border border-emerald-200 bg-emerald-50/80 text-emerald-700" :
+                                            r.status === "paid" || r.status === "settled" ? "border border-blue-200 bg-blue-50/80 text-blue-700" :
+                                            r.status === "billed" ? "border border-amber-200 bg-amber-50/80 text-amber-700" :
+                                            "glass-chip-strong text-slate-600"
+                                        )}>{r.status}</span>
+                                    </div>
+                                    <div className="mt-4 space-y-2 text-xs text-slate-500">
+                                        <div className="flex justify-between"><span>Duration</span><span className="font-semibold text-slate-900">{r.days} days</span></div>
+                                        <div className="flex justify-between"><span>Upfront Fee</span><span className="font-semibold text-slate-900">INR {r.upfrontFeeINR}</span></div>
+                                        <div className="flex justify-between"><span>Hours Used</span><span className="font-semibold text-slate-900">{r.hoursUsed || 0}</span></div>
+                                        <div className="flex justify-between"><span>Bill Amount</span><span className="font-semibold text-slate-900">INR {(r.billAmountINR || 0).toLocaleString()}</span></div>
+                                        <div>Created: {formatDate(r.createdAt)}</div>
+                                        {r.activatedAt && <div>Activated: {formatDate(r.activatedAt)}</div>}
+                                        {r.expiresAt && <div>Expires: {formatDate(r.expiresAt)}</div>}
+                                        {r.billGeneratedAt && <div>Billed: {formatDate(r.billGeneratedAt)}</div>}
+                                        {r.billPaidAt && <div>Bill Paid: {formatDate(r.billPaidAt)}</div>}
+                                    </div>
+                                    {r.status === "active" && (
+                                        <div className="mt-4 border-t border-slate-200 pt-4 space-y-2">
+                                            {billingRentalId === r.id ? (
+                                                <div className="flex gap-2">
+                                                    <input
+                                                        type="number"
+                                                        min="0"
+                                                        step="0.5"
+                                                        placeholder="Hours used"
+                                                        value={billHoursInput}
+                                                        onChange={(e) => setBillHoursInput(e.target.value)}
+                                                        className="flex-1 rounded-[16px] border-2 border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-slate-900"
+                                                    />
+                                                    <Button variant="primary" size="small" disabled={subActionLoading === r.id || !billHoursInput} onClick={async () => {
+                                                        const hours = parseFloat(billHoursInput);
+                                                        if (!hours || hours <= 0) return;
+                                                        setSubActionLoading(r.id);
+                                                        setError("");
+                                                        try {
+                                                            const idToken = await auth.currentUser.getIdToken(true);
+                                                            const res = await fetch(apiUrl("/dev/api/rental/bill"), {
+                                                                method: "POST",
+                                                                headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
+                                                                body: JSON.stringify({ rentalId: r.id, hoursUsed: hours }),
+                                                            });
+                                                            const json = await res.json();
+                                                            if (!res.ok) throw new Error(json.error || "Bill failed");
+                                                            setBillingRentalId(null);
+                                                            setBillHoursInput("");
+                                                            // Refresh rentals
+                                                            const res2 = await fetch(apiUrl("/dev/api/admin/rentals"), { headers: { Authorization: `Bearer ${idToken}` } });
+                                                            const json2 = await res2.json();
+                                                            if (res2.ok) setRentals(json2.rentals || []);
+                                                        } catch (e) { setError(e.message); }
+                                                        finally { setSubActionLoading(null); }
+                                                    }}>{subActionLoading === r.id ? "..." : "Bill"}</Button>
+                                                    <Button variant="secondary" size="small" onClick={() => { setBillingRentalId(null); setBillHoursInput(""); }}>Cancel</Button>
+                                                </div>
+                                            ) : (
+                                                <Button variant="secondary" size="small" className="w-full" onClick={() => { setBillingRentalId(r.id); setBillHoursInput(""); }}>
+                                                    Generate Usage Bill
+                                                </Button>
+                                            )}
+                                        </div>
+                                    )}
+                                    {r.billPaymentLink && (r.status === "billed") && (
+                                        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50/75 p-2 text-xs text-amber-700 break-all">
+                                            Payment link sent to {r.email}
+                                        </div>
+                                    )}
                                 </Card>
                             ))}
                         </div>
