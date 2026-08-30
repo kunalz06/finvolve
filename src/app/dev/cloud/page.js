@@ -126,7 +126,7 @@ const comparisonFeatures = [
 const faqs = [
   {
     q: "How are compute hours allocated and tracked?",
-    a: "Compute hours represent dedicated execution runtime for your workloads and scripts. Each billing cycle runs for 30 days and resets your usage metrics automatically. On the Starter plan, hours are split evenly across the month (150h first half / 150h second half), while Pro and Enterprise tiers provide unrestricted monthly pools.",
+    a: "Compute hours represent dedicated execution runtime for your workloads and scripts. Your usage resets at the start of each billing cycle automatically. The Starter plan bills every 15 days with 300 hours split across the period (150h first half / 150h second half), while Pro and Enterprise tiers provide unrestricted monthly pools that reset every 30 days.",
   },
   {
     q: "Can I pause or resume my subscription at any time?",
@@ -142,7 +142,7 @@ const faqs = [
   },
   {
     q: "How do plan upgrades and downgrades work?",
-    a: "You can transition between tiers anytime from your dashboard. Upgrades or plan switches are scheduled for your upcoming monthly renewal date so your current plan benefits continue without disruption.",
+    a: "You can transition between tiers anytime from your dashboard. Upgrades or plan switches are scheduled for your upcoming renewal date so your current plan benefits continue without disruption. For the Starter plan, changes take effect at the next 15-day renewal; for Pro and Enterprise, at the next monthly renewal.",
   },
 ];
 
@@ -818,13 +818,14 @@ export default function CloudPage() {
                 >
                   <button
                     onClick={() => toggleFaq(index)}
+                    style={{ fontFamily: 'inherit' }}
                     className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[var(--surface-muted)] transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
                         Q{index + 1}
                       </span>
-                      <span className="font-sans text-base md:text-lg font-black text-slate-950 dark:text-slate-50 leading-snug">
+                      <span className="text-base md:text-lg font-black text-[var(--heading)] leading-snug">
                         {faq.q}
                       </span>
                     </div>
@@ -852,7 +853,7 @@ export default function CloudPage() {
                         transition={{ duration: 0.25, ease: "easeInOut" }}
                         className="overflow-hidden border-t-2 border-[var(--border-soft)] bg-[var(--surface)]"
                       >
-                        <div className="p-5 md:p-6 text-slate-900 dark:text-slate-100 text-base md:text-lg leading-relaxed font-semibold">
+                        <div className="p-5 md:p-6 text-[var(--foreground)] text-base md:text-lg leading-relaxed font-semibold">
                           {faq.a}
                         </div>
                       </motion.div>
