@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Bot,
@@ -843,22 +843,18 @@ export default function CloudPage() {
                     </div>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key={`faq-ans-${index}`}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden border-t-2 border-[var(--border-soft)] bg-[var(--surface)]"
-                      >
-                        <div className="p-5 md:p-6 text-[var(--foreground)] text-base md:text-lg leading-relaxed font-semibold">
-                          {faq.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div
+                    className={
+                      "grid transition-[grid-template-rows] duration-300 ease-in-out border-t-2 border-[var(--border-soft)] " +
+                      (isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")
+                    }
+                  >
+                    <div className="overflow-hidden bg-[var(--surface)]">
+                      <div className="p-5 md:p-6 text-[var(--foreground)] text-base md:text-lg leading-relaxed font-semibold">
+                        {faq.a}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
