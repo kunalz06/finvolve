@@ -1,6 +1,8 @@
 import "./globals.css";
+import "@/components/chat/chat.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 export const metadata = {
   title: "DEV Infinity | Next Gen Engineering",
@@ -15,6 +17,7 @@ export default function DevLayout({ children }) {
         {children}
       </main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 }

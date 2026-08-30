@@ -43,3 +43,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Chatbot training (not needed in prod)
+/chatbot-venv/
+/training/
+
+# Work log
+/worklog.md

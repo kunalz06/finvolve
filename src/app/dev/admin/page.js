@@ -18,6 +18,7 @@ import {
 import {
     AlertCircle,
     CheckCircle,
+    ChevronDown,
     Clock,
     CreditCard,
     Eye,
@@ -99,6 +100,8 @@ export default function AdminPage() {
     const [newsletterSubscribers, setNewsletterSubscribers] = useState([]);
     const [subscriptions, setSubscriptions] = useState([]);
     const [rentals, setRentals] = useState([]);
+    const [chatSessions, setChatSessions] = useState([]);
+    const [expandedChat, setExpandedChat] = useState(null);
     const [billHoursInput, setBillHoursInput] = useState("");
     const [billingRentalId, setBillingRentalId] = useState(null);
     const [subActionLoading, setSubActionLoading] = useState(null);
@@ -203,6 +206,10 @@ export default function AdminPage() {
         listenersRef.current.rentals = onSnapshot(
             query(collection(db, "rentals"), orderBy("createdAt", "desc")),
             (snap) => setRentals(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
+        listenersRef.current.chats = onSnapshot(
+            query(collection(db, "chat_sessions"), orderBy("createdAt", "desc")),
+            (snap) => setChatSessions(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
         );
 
         return stopListeners;
@@ -445,6 +452,7 @@ export default function AdminPage() {
                         { id: "newsletter", label: "Newsletter", icon: Users },
                         { id: "subscriptions", label: "Subscriptions", icon: CreditCard },
                         { id: "rentals", label: "Rentals", icon: Clock },
+                        { id: "chats", label: "Chats", icon: MessageSquare },
                     ].map((tab) => {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
@@ -791,6 +799,75 @@ export default function AdminPage() {
                                 </Card>
                             ))}
                         </div>
+                    </div>
+                )}
+
+                {activeTab === "chats" && (
+                    <div className="mt-8 space-y-4">
+                        {chatSessions.length === 0 && (
+                            <EmptyState title="No chat sessions yet" copy="Conversations from the DEV∞ chatbot will appear here in real-time." />
+                        )}
+                        {chatSessions.map((session) => {
+                            const msgs = session.messages || [];
+                            const isExpanded = expandedChat === session.id;
+                            return (
+                                <Card key={session.id} hover={false} className={session.status === "open" ? "border-primary/30" : "opacity-75"}>
+                                    <div
+                                        className="flex cursor-pointer items-start justify-between gap-4 p-5"
+                                        onClick={() => setExpandedChat(isExpanded ? null : session.id)}
+                                    >
+                                        <div className="min-w-0">
+                                            <div className="flex items-center gap-3">
+                                                <span className="glass-chip-strong rounded-full px-3 py-1 font-mono text-xs">
+                                                    {msgs.length} messages
+                                                </span>
+                                                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${session.status === "open" ? "border border-emerald-200 bg-emerald-50/80 text-emerald-700" : "glass-chip text-slate-600"}`}>
+                                                    {session.status || "open"}
+                                                </span>
+                                                {session.source === "chatbot" && (
+                                                    <span className="glass-chip rounded-full px-3 py-1 text-xs">Chatbot</span>
+                                                )}
+                                            </div>
+                                            <div className="mt-2 truncate text-sm text-slate-600">
+                                                {msgs[0]?.text?.slice(0, 80) || "(empty session)"}
+                                            </div>
+                                            <div className="mt-1 text-xs text-slate-500">{formatDate(session.createdAt)}</div>
+                                        </div>
+                                        <ChevronDown size={18} className={`mt-1 flex-shrink-0 text-slate-400 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                                    </div>
+                                    {isExpanded && (
+                                        <div className="border-t border-slate-200 px-5 py-4">
+                                            <div className="max-h-80 space-y-3 overflow-y-auto">
+                                                {msgs.map((msg, i) => (
+                                                    <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                                                        <div className={`max-w-[80%] rounded-xl px-4 py-2.5 text-sm ${msg.role === "user" ? "bg-[var(--primary)] text-white" : "bg-[var(--surface-muted)] border border-[var(--border-soft)]"}`}>
+                                                            {msg.text}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <div className="mt-3 flex gap-2">
+                                                <Button
+                                                    variant="secondary"
+                                                    size="small"
+                                                    onClick={() => updateDoc(doc(db, "chat_sessions", session.id), { status: session.status === "resolved" ? "open" : "resolved" })}
+                                                >
+                                                    {session.status === "resolved" ? "Reopen" : "Mark Resolved"}
+                                                    <CheckCircle size={16} />
+                                                </Button>
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-4 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100"
+                                                    onClick={() => deleteDoc(doc(db, "chat_sessions", session.id))}
+                                                >
+                                                    <Trash2 size={14} />Delete
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
+                                </Card>
+                            );
+                        })}
                     </div>
                 )}
             </div>

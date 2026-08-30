@@ -53,5 +53,11 @@ service cloud.firestore {
       allow read, update, delete: if isAdmin();
       allow create: if false;
     }
+
+    // Chat sessions — public create, admin read/update.
+    match /chat_sessions/{sessionId} {
+      allow create: if true;
+      allow read, update, delete: if isAdmin();
+    }
   }
 }
