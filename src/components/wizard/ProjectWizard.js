@@ -24,10 +24,10 @@ const PROJECT_TYPES = [
 ];
 
 const BUDGET_RANGES = [
-  { id: 'starter', label: '< ?5k', desc: 'MVP / Prototype' },
-  { id: 'standard', label: '?5k - ?20k', desc: 'Full Production Build' },
-  { id: 'premium', label: '?20k - ?50k', desc: 'Enterprise Scale' },
-  { id: 'custom', label: '?50k+', desc: 'Complex Ecosystem' },
+  { id: 'starter', label: '< \u20B95k', desc: 'MVP / Prototype' },
+  { id: 'standard', label: '\u20B95k - \u20B920k', desc: 'Full Production Build' },
+  { id: 'premium', label: '\u20B920k - \u20B950k', desc: 'Enterprise Scale' },
+  { id: 'custom', label: '\u20B950k+', desc: 'Complex Ecosystem' },
 ];
 
 export default function ProjectWizard() {
@@ -149,7 +149,7 @@ export default function ProjectWizard() {
               aria-hidden="true"
             >
               <motion.div
-                className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-emerald-50 shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
+                className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-[var(--surface-strong)] shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
                 initial={{ scale: 0.35, rotate: -10 }}
                 animate={{ scale: [0.35, 1.12, 1], rotate: 0 }}
                 exit={{ scale: 0.82, opacity: 0 }}
@@ -164,7 +164,7 @@ export default function ProjectWizard() {
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-emerald-100"
+            className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-emerald-500/15"
           >
             <CheckCircle className="h-12 w-12 text-emerald-600" />
           </motion.div>
@@ -419,7 +419,7 @@ export default function ProjectWizard() {
       </div>
 
       {status === 'error' && (
-        <div className="mt-4 flex items-center gap-2 rounded-[22px] border border-red-200 bg-red-50/85 p-4 text-red-700">
+        <div className="mt-4 flex items-center gap-2 rounded-[22px] border border-red-500/40 bg-red-500/10 p-4 text-red-400">
           <AlertCircle size={20} />
           {errorMessage}
         </div>

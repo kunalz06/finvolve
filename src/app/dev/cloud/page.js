@@ -509,7 +509,8 @@ export default function CloudPage() {
           </div>
 
           {showComparison && (
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 hidden max-md:block" aria-hidden="true" />
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b-2 border-[var(--border)]">
@@ -537,9 +538,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-bold text-[var(--foreground)]">
                         {typeof item.base === "boolean" ? (
                           item.base ? (
-                            <CheckCircle size={18} className="mx-auto text-primary" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-primary" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.base
@@ -548,9 +549,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)] bg-[var(--surface-muted)]">
                         {typeof item.medium === "boolean" ? (
                           item.medium ? (
-                            <CheckCircle size={18} className="mx-auto text-[var(--accent)]" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-[var(--accent)]" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.medium
@@ -559,9 +560,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)]">
                         {typeof item.highest === "boolean" ? (
                           item.highest ? (
-                            <CheckCircle size={18} className="mx-auto text-emerald-600" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-emerald-600" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.highest

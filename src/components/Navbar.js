@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const HOME_PATH = "/dev";
@@ -99,42 +100,87 @@ export default function Navbar() {
               aria-label="Toggle navigation"
               type="button"
             >
-              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              <AnimatePresence mode="wait" initial={false}>
+                {mobileMenuOpen ? (
+                  <motion.span
+                    key="close"
+                    initial={{ rotate: -90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: 90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center justify-center"
+                  >
+                    <X size={24} />
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="menu"
+                    initial={{ rotate: 90, opacity: 0 }}
+                    animate={{ rotate: 0, opacity: 1 }}
+                    exit={{ rotate: -90, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="flex items-center justify-center"
+                  >
+                    <Menu size={24} />
+                  </motion.span>
+                )}
+              </AnimatePresence>
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="container mx-auto mt-3 md:hidden">
-          <div className="glass-surface-strong rounded-2xl p-4">
-            <div className="flex flex-col gap-3">
-              {visibleLinks.map((link) =>
-                link.isCta ? (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="mt-2 rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)]"
-                  >
-                    {link.name}
-                  </Link>
-                ) : (
-                  <Link
-                    key={link.name}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="rounded-xl px-4 py-3 text-base font-bold text-slate-700 transition-all duration-200 hover:bg-[var(--surface-muted)] hover:text-slate-900"
-                  >
-                    {link.name}
-                  </Link>
-                )
-              )}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            key="mobile-menu"
+            initial={{ opacity: 0, y: -8, scale: 0.97 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.97 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="container mx-auto mt-3 md:hidden"
+          >
+            <div className="glass-surface-strong rounded-2xl p-4">
+              <div className="flex flex-col gap-3">
+                {visibleLinks.map((link, i) =>
+                  link.isCta ? (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.04 * i, duration: 0.15 }}
+                    >
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="mt-2 block rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)]"
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key={link.name}
+                      initial={{ opacity: 0, x: -12 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.04 * i, duration: 0.15 }}
+                    >
+                      <Link
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block rounded-xl px-4 py-3 text-base font-bold text-slate-700 transition-all duration-200 hover:bg-[var(--surface-muted)] hover:text-slate-900"
+                      >
+                        {link.name}
+                      </Link>
+                    </motion.div>
+                  )
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }
