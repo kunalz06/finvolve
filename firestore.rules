@@ -47,5 +47,11 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if isAdmin();
     }
+
+    // Rentals are written by server routes (Admin SDK).
+    match /rentals/{rentalId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
   }
 }

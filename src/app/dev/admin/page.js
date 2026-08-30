@@ -200,19 +200,10 @@ export default function AdminPage() {
         };
         fetchSubscriptions();
 
-        const fetchRentals = async () => {
-            try {
-                const idToken = await auth.currentUser.getIdToken(true);
-                const res = await fetch(apiUrl("/dev/api/admin/rentals"), {
-                    headers: { Authorization: `Bearer ${idToken}` },
-                });
-                const json = await res.json();
-                if (res.ok) setRentals(json.rentals || []);
-            } catch (e) {
-                console.warn("Failed to fetch rentals:", e.message);
-            }
-        };
-        fetchRentals();
+        listenersRef.current.rentals = onSnapshot(
+            query(collection(db, "rentals"), orderBy("createdAt", "desc")),
+            (snap) => setRentals(snap.docs.map((row) => ({ id: row.id, ...row.data() }))),
+        );
 
         return stopListeners;
     }, [authState]);
@@ -779,10 +770,7 @@ export default function AdminPage() {
                                                             if (!res.ok) throw new Error(json.error || "Bill failed");
                                                             setBillingRentalId(null);
                                                             setBillHoursInput("");
-                                                            // Refresh rentals
-                                                            const res2 = await fetch(apiUrl("/dev/api/admin/rentals"), { headers: { Authorization: `Bearer ${idToken}` } });
-                                                            const json2 = await res2.json();
-                                                            if (res2.ok) setRentals(json2.rentals || []);
+                                                            // onSnapshot will auto-refresh
                                                         } catch (e) { setError(e.message); }
                                                         finally { setSubActionLoading(null); }
                                                     }}>{subActionLoading === r.id ? "..." : "Bill"}</Button>
