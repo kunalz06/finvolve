@@ -146,6 +146,20 @@ const faqs = [
   },
 ];
 
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 export default function CloudPage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [showComparison, setShowComparison] = useState(true);
@@ -153,6 +167,7 @@ export default function CloudPage() {
   const [rentalLoading, setRentalLoading] = useState(false);
   const [rentalResult, setRentalResult] = useState(null);
   const [rentalError, setRentalError] = useState("");
+  const [rentalUserDetails, setRentalUserDetails] = useState({ name: "", email: "", phone: "" });
 
   const handleRentalSubmit = async (e) => {
     e.preventDefault();
@@ -168,6 +183,7 @@ export default function CloudPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || "Rental creation failed.");
       setRentalResult(json);
+      setRentalUserDetails({ name: rentalForm.name, email: rentalForm.email, phone: rentalForm.phone });
       setRentalForm({ name: "", email: "", phone: "", days: 7 });
     } catch (err) {
       setRentalError(err.message);
@@ -176,14 +192,22 @@ export default function CloudPage() {
     }
   };
 
-  const handleRentalPay = () => {
+  const handleRentalPay = async () => {
     if (!rentalResult) return;
+    setRentalError("");
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      setRentalError("Failed to load payment gateway. Please check your internet connection and try again.");
+      return;
+    }
+
     const options = {
       key: rentalResult.checkoutKey,
       amount: rentalResult.upfrontFee * 100,
       currency: rentalResult.currency,
       name: "DEV Infinity",
-      description: `Cloud Rental — ${rentalResult.days} Days`,
+      description: "Cloud Rental — " + rentalResult.days + " Days",
       order_id: rentalResult.orderId,
       handler: async function (response) {
         try {
@@ -207,13 +231,14 @@ export default function CloudPage() {
           setRentalError("Verification failed. Contact support with your rental ID: " + rentalResult.rentalId);
         }
       },
-      prefill: { name: rentalForm.name, email: rentalForm.email, contact: rentalForm.phone },
+      prefill: { name: rentalUserDetails.name, email: rentalUserDetails.email, contact: rentalUserDetails.phone },
       theme: { color: "#2457ff" },
     };
-    if (window.Razorpay) {
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    }
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      setRentalError(response?.error?.description || "Payment failed. Please try again.");
+    });
+    rzp.open();
   };
 
   const toggleFaq = (index) => {
