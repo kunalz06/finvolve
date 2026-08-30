@@ -670,18 +670,81 @@ export default function CloudPage() {
           {/* Rental Form */}
           <div className="max-w-lg mx-auto glass-surface rounded-2xl p-6 md:p-8 space-y-5">
             {rentalResult && rentalResult.status === "active" ? (
-              <div className="text-center space-y-4 py-4">
-                <div className="glass-icon-plate mx-auto flex h-14 w-14 items-center justify-center rounded-2xl">
-                  <CheckCircle size={28} className="text-green-600" />
+              <div className="space-y-5 py-2">
+                {/* Success Header */}
+                <div className="text-center space-y-3">
+                  <div className="glass-icon-plate relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-emerald-400 bg-emerald-50">
+                    <CheckCircle size={30} className="text-emerald-600" />
+                    <div className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 border-2 border-[var(--surface-strong)]">
+                      <Sparkles size={12} className="text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="glass-chip-strong inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Live &amp; Provisioned</span>
+                    </div>
+                    <h4 className="text-2xl font-black text-[var(--heading)] mt-2">Rental Activated!</h4>
+                    <p className="text-sm text-[var(--foreground)] font-medium mt-1">
+                      Your {rentalResult.days}-day compute rental is now live and ready to use.
+                    </p>
+                  </div>
                 </div>
-                <h4 className="text-xl font-black text-[var(--heading)]">Rental Activated!</h4>
-                <p className="text-sm text-[var(--foreground)] font-medium">
-                  Your {rentalResult.days}-day rental is live. A confirmation email has been sent.
-                </p>
-                <p className="font-code-brand text-xs text-[var(--muted)]">Rental ID: {rentalResult.rentalId}</p>
-                <Button onClick={() => setRentalResult(null)} variant="secondary" size="medium">
-                  Rent Another
-                </Button>
+
+                {/* Summary Card */}
+                <div className="rounded-2xl border-2 border-[var(--border)] overflow-hidden">
+                  <div className="px-4 py-3 bg-[var(--surface-muted)] border-b-2 border-[var(--border)]">
+                    <p className="text-xs font-black uppercase tracking-wider text-[var(--muted)]">Rental Summary</p>
+                  </div>
+                  <div className="divide-y divide-[var(--border-soft)]">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <span className="font-code-brand text-xs">ID</span>
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)] font-mono">{rentalResult.rentalId}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <Clock size={14} /> Duration
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)]">{rentalResult.days} Days</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <IndianRupee size={14} /> Upfront Fee
+                      </div>
+                      <span className="text-sm font-bold text-emerald-600">₹{RENTAL_CONFIG.upfrontFeeINR} Paid</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <Timer size={14} /> Usage Rate
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR} / {RENTAL_CONFIG.computeHoursPerUnit}hrs</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info Box */}
+                <div className="rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3">
+                  <p className="text-xs text-[var(--foreground)] font-medium leading-relaxed">
+                    A confirmation email has been sent. After your rental period ends, your actual compute usage will be calculated and a bill with a Razorpay payment link will be emailed to you.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3 pt-1">
+                  <Button
+                    onClick={() => setRentalResult(null)}
+                    variant="secondary"
+                    size="large"
+                    className="w-full justify-center gap-2"
+                  >
+                    <RefreshCw size={16} /> Rent Another
+                  </Button>
+                  <Button href="/dev/contact" variant="ghost" size="small" className="w-full justify-center">
+                    <Shield size={14} /> Need Help? Contact Support
+                  </Button>
+                </div>
               </div>
             ) : rentalResult && !rentalResult.status ? (
               <div className="text-center space-y-4 py-4">

@@ -1,7 +1,7 @@
 /**
  * Rental (pay-as-you-go) configuration for DEV Infinity Cloud.
- * Users rent compute for a selected duration, pay ₹150 upfront,
- * and are billed ₹200 per 20 compute-hours after usage.
+ * Users rent compute for a selected duration, pay a small upfront fee,
+ * and are billed per compute-hours after usage.
  */
 
 export const RENTAL_CONFIG = {
