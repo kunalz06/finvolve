@@ -6,7 +6,7 @@
 
 export const RENTAL_CONFIG = {
     /** One-time upfront fee before usage begins (INR) */
-    upfrontFeeINR: 150,
+    upfrontFeeINR: 1,
 
     /** Cost per billing unit of compute (INR) */
     computeRateINR: 200,
