@@ -515,87 +515,160 @@ export default function CloudPage() {
           </div>
 
           {showComparison && (
-            <div id="comparison-table" className="relative overflow-x-auto -mx-4 px-4 sm:px-0">
-              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 sm:hidden" aria-hidden="true" />
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="border-b-2 border-[var(--border)]">
-                    <th className="py-4 pr-6 text-sm font-black uppercase tracking-wider text-[var(--muted)] w-2/5">
-                      Feature / Resource
-                    </th>
-                    <th className="py-4 px-4 text-sm font-black text-[var(--heading)] text-center w-1/5">
-                      Starter
-                    </th>
-                    <th className="py-4 px-4 text-sm font-black text-[var(--accent)] text-center w-1/5 bg-[var(--surface-muted)] rounded-t-lg">
-                      Pro
-                    </th>
-                    <th className="py-4 px-4 text-sm font-black text-[var(--heading)] text-center w-1/5">
-                      Enterprise
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-soft)]">
-                  {comparisonFeatures.map((item, idx) => (
-                    <tr key={idx} className="hover:bg-[var(--surface-muted)] transition-colors">
-                      <td className="py-4 pr-6">
-                        <p className="font-black text-[var(--heading)] text-sm">{item.name}</p>
-                        <p className="text-xs text-[var(--muted)] font-medium">{item.desc}</p>
-                      </td>
-                      <td className="py-4 px-4 text-center text-xs font-bold text-[var(--foreground)]">
-                        {typeof item.base === "boolean" ? (
-                          item.base ? (
-                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-primary" /></span>
+            <div id="comparison-table" className="w-full">
+              {/* Desktop Table View */}
+              <div className="hidden md:block relative overflow-x-auto -mx-4 px-4 sm:px-0">
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 sm:hidden" aria-hidden="true" />
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b-2 border-[var(--border)]">
+                      <th className="py-4 pr-6 text-sm font-black uppercase tracking-wider text-[var(--muted)] w-2/5">
+                        Feature / Resource
+                      </th>
+                      <th className="py-4 px-4 text-sm font-black text-[var(--heading)] text-center w-1/5">
+                        Starter
+                      </th>
+                      <th className="py-4 px-4 text-sm font-black text-[var(--accent)] text-center w-1/5 bg-[var(--surface-muted)] rounded-t-lg">
+                        Pro
+                      </th>
+                      <th className="py-4 px-4 text-sm font-black text-[var(--heading)] text-center w-1/5">
+                        Enterprise
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-[var(--border-soft)]">
+                    {comparisonFeatures.map((item, idx) => (
+                      <tr key={idx} className="hover:bg-[var(--surface-muted)] transition-colors">
+                        <td className="py-4 pr-6">
+                          <p className="font-black text-[var(--heading)] text-sm">{item.name}</p>
+                          <p className="text-xs text-[var(--muted)] font-medium">{item.desc}</p>
+                        </td>
+                        <td className="py-4 px-4 text-center text-sm font-bold text-[var(--foreground)]">
+                          {typeof item.base === "boolean" ? (
+                            item.base ? (
+                              <span role="img" aria-label="Included"><CheckCircle size={20} className="mx-auto text-primary" /></span>
+                            ) : (
+                              <span role="img" aria-label="Not included"><Minus size={20} className="mx-auto text-slate-400" /></span>
+                            )
                           ) : (
-                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
-                          )
-                        ) : (
-                          item.base
-                        )}
-                      </td>
-                      <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)] bg-[var(--surface-muted)]">
-                        {typeof item.medium === "boolean" ? (
-                          item.medium ? (
-                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-[var(--accent)]" /></span>
+                            item.base
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-center text-sm font-black text-[var(--heading)] bg-[var(--surface-muted)]">
+                          {typeof item.medium === "boolean" ? (
+                            item.medium ? (
+                              <span role="img" aria-label="Included"><CheckCircle size={20} className="mx-auto text-[var(--accent)]" /></span>
+                            ) : (
+                              <span role="img" aria-label="Not included"><Minus size={20} className="mx-auto text-slate-400" /></span>
+                            )
                           ) : (
-                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
-                          )
-                        ) : (
-                          item.medium
-                        )}
-                      </td>
-                      <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)]">
-                        {typeof item.highest === "boolean" ? (
-                          item.highest ? (
-                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-emerald-600" /></span>
+                            item.medium
+                          )}
+                        </td>
+                        <td className="py-4 px-4 text-center text-sm font-black text-[var(--heading)]">
+                          {typeof item.highest === "boolean" ? (
+                            item.highest ? (
+                              <span role="img" aria-label="Included"><CheckCircle size={20} className="mx-auto text-emerald-600" /></span>
+                            ) : (
+                              <span role="img" aria-label="Not included"><Minus size={20} className="mx-auto text-slate-400" /></span>
+                            )
                           ) : (
-                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
-                          )
-                        ) : (
-                          item.highest
-                        )}
+                            item.highest
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                    <tr className="border-t-2 border-[var(--border)] font-bold">
+                      <td className="py-5 pr-6 text-sm text-[var(--heading)] font-black">Action</td>
+                      <td className="py-5 px-4 text-center">
+                        <Button href="/dev/cloud/checkout?tier=base" variant="secondary" size="small" className="min-w-[140px]">
+                          Select Starter
+                        </Button>
+                      </td>
+                      <td className="py-5 px-4 text-center bg-[var(--surface-muted)] rounded-b-lg">
+                        <Button href="/dev/cloud/checkout?tier=medium" variant="primary" size="small" className="min-w-[140px]">
+                          Select Pro
+                        </Button>
+                      </td>
+                      <td className="py-5 px-4 text-center">
+                        <Button href="/dev/cloud/checkout?tier=highest" variant="secondary" size="small" className="min-w-[140px]">
+                          Select Enterprise
+                        </Button>
                       </td>
                     </tr>
-                  ))}
-                  <tr className="border-t-2 border-[var(--border)] font-bold">
-                    <td className="py-5 pr-6 text-sm text-[var(--heading)] font-black">Action</td>
-                    <td className="py-5 px-4 text-center">
-                      <Button href="/dev/cloud/checkout?tier=base" variant="secondary" size="small">
-                        Select Starter
-                      </Button>
-                    </td>
-                    <td className="py-5 px-4 text-center bg-[var(--surface-muted)] rounded-b-lg">
-                      <Button href="/dev/cloud/checkout?tier=medium" variant="primary" size="small">
-                        Select Pro
-                      </Button>
-                    </td>
-                    <td className="py-5 px-4 text-center">
-                      <Button href="/dev/cloud/checkout?tier=highest" variant="secondary" size="small">
-                        Select Enterprise
-                      </Button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Card View */}
+              <div className="md:hidden space-y-6">
+                {comparisonFeatures.map((item, idx) => (
+                  <div key={idx} className="glass-surface-strong rounded-2xl p-5 border-2 border-[var(--border)] shadow-[var(--shadow-soft)]">
+                    <div className="mb-4 pb-4 border-b-2 border-[var(--border)]">
+                      <p className="font-black text-[var(--heading)] text-base">{item.name}</p>
+                      <p className="text-sm text-[var(--muted)] font-medium mt-1">{item.desc}</p>
+                    </div>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div className="text-center p-3">
+                        <p className="text-xs font-black text-[var(--heading)] mb-2">Starter</p>
+                        <div className="text-sm font-bold text-[var(--foreground)]">
+                          {typeof item.base === "boolean" ? (
+                            item.base ? (
+                              <CheckCircle size={24} className="mx-auto text-primary" />
+                            ) : (
+                              <Minus size={24} className="mx-auto text-slate-400" />
+                            )
+                          ) : (
+                            <span className="text-xs">{item.base}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-center p-3 bg-[var(--surface-muted)] rounded-xl">
+                        <p className="text-xs font-black text-[var(--accent)] mb-2">Pro</p>
+                        <div className="text-sm font-bold text-[var(--heading)]">
+                          {typeof item.medium === "boolean" ? (
+                            item.medium ? (
+                              <CheckCircle size={24} className="mx-auto text-[var(--accent)]" />
+                            ) : (
+                              <Minus size={24} className="mx-auto text-slate-400" />
+                            )
+                          ) : (
+                            <span className="text-xs">{item.medium}</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="text-center p-3">
+                        <p className="text-xs font-black text-[var(--heading)] mb-2">Enterprise</p>
+                        <div className="text-sm font-bold text-[var(--heading)]">
+                          {typeof item.highest === "boolean" ? (
+                            item.highest ? (
+                              <CheckCircle size={24} className="mx-auto text-emerald-600" />
+                            ) : (
+                              <Minus size={24} className="mx-auto text-slate-400" />
+                            )
+                          ) : (
+                            <span className="text-xs">{item.highest}</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="glass-surface-strong rounded-2xl p-5 border-2 border-[var(--border)] shadow-[var(--shadow-soft)] mt-6">
+                  <p className="text-sm font-black text-[var(--heading)] mb-4">Select Your Plan</p>
+                  <div className="grid grid-cols-3 gap-3">
+                    <Button href="/dev/cloud/checkout?tier=base" variant="secondary" size="small" className="w-full py-3">
+                      Starter
+                    </Button>
+                    <Button href="/dev/cloud/checkout?tier=medium" variant="primary" size="small" className="w-full py-3">
+                      Pro
+                    </Button>
+                    <Button href="/dev/cloud/checkout?tier=highest" variant="secondary" size="small" className="w-full py-3">
+                      Enterprise
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </section>
