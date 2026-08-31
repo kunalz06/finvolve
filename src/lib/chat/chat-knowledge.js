@@ -147,7 +147,7 @@ export const KNOWLEDGE = {
 
   testimonials: {
     texts: [
-      "Here's what our clients say about working with us:\n\n• *"They delivered our fintech dashboard in record time. The real-time features are flawless."* — FinTech Startup\n\n• *"The mobile app exceeded our expectations. Smooth performance on both iOS and Android."* — HealthVote Team\n\n• *"DEV Infinity built our entire SaaS platform from scratch. It scales beautifully."* — Nexus CRM\n\n• *"Quick turnaround, clean code, and they actually listen to feedback."* — EduLearn\n\n**98% client satisfaction** across 50+ projects.",
+      `Here's what our clients say about working with us:\n\n• *"They delivered our fintech dashboard in record time. The real-time features are flawless."* — FinTech Startup\n\n• *"The mobile app exceeded our expectations. Smooth performance on both iOS and Android."* — HealthVote Team\n\n• *"DEV Infinity built our entire SaaS platform from scratch. It scales beautifully."* — Nexus CRM\n\n• *"Quick turnaround, clean code, and they actually listen to feedback."* — EduLearn\n\n**98% client satisfaction** across 50+ projects.`,
     ],
     quickReplies: ["Our Portfolio", "Start a Project", "Contact Us"],
   },
