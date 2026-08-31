@@ -112,38 +112,20 @@ export default function Navbar() {
                 aria-label="Toggle navigation"
                 type="button"
               >
-                <AnimatePresence mode="wait" initial={false}>
-                  {mobileMenuOpen ? (
-                    <motion.span
-                      key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="pointer-events-none flex items-center justify-center"
-                    >
-                      <X size={24} />
-                    </motion.span>
-                  ) : (
-                    <motion.span
-                      key="menu"
-                      initial={{ rotate: 90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.15 }}
-                      className="pointer-events-none flex items-center justify-center"
-                    >
-                      <Menu size={24} />
-                    </motion.span>
-                  )}
-                </AnimatePresence>
+                <motion.span
+                  animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
+                  transition={{ duration: 0.2, ease: "easeInOut" }}
+                  className="pointer-events-none flex items-center justify-center"
+                >
+                  {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                </motion.span>
               </Button>
             </div>
           </div>
         </div>
 
         {/* Mobile menu */}
-        <AnimatePresence>
+        <AnimatePresence mode="wait">
           {mobileMenuOpen && (
             <>
               {/* Backdrop */}
@@ -152,7 +134,7 @@ export default function Navbar() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.18 }}
+                transition={{ duration: 0.2 }}
                 className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md lg:hidden"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-hidden="true"
@@ -160,45 +142,33 @@ export default function Navbar() {
               {/* Menu */}
               <motion.div
                 key="mobile-menu"
-                initial={{ opacity: 0, y: -16, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -16, scale: 0.95 }}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="fixed left-0 top-[72px] z-50 w-full px-3 md:top-[84px] lg:hidden"
               >
                 <div className="glass-surface-strong rounded-2xl p-4 shadow-2xl border-2 border-[var(--border)]">
                   <div className="flex flex-col gap-2">
-                    {visibleLinks.map((link, i) =>
+                    {visibleLinks.map((link) =>
                       link.isCta ? (
-                        <motion.div
+                        <Link
                           key={link.name}
-                          initial={{ opacity: 0, x: -16 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.04 * i, duration: 0.18 }}
+                          href={link.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3.5 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-all duration-200 hover:-translate-y-0.5"
                         >
-                          <Link
-                            href={link.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="block rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3.5 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-all duration-200 hover:-translate-y-0.5"
-                          >
-                            {link.name}
-                          </Link>
-                        </motion.div>
+                          {link.name}
+                        </Link>
                       ) : (
-                        <motion.div
+                        <Link
                           key={link.name}
-                          initial={{ opacity: 0, x: -16 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: 0.04 * i, duration: 0.18 }}
+                          href={link.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="block rounded-xl px-4 py-3.5 text-base font-bold transition-all duration-200 hover:bg-[var(--surface-muted)]" style={{ color: 'var(--foreground, #1e293b)' }}
                         >
-                          <Link
-                            href={link.href}
-                            onClick={() => setMobileMenuOpen(false)}
-                            className="block rounded-xl px-4 py-3.5 text-base font-bold transition-all duration-200 hover:bg-[var(--surface-muted)]" style={{ color: 'var(--foreground, #1e293b)' }}
-                          >
-                            {link.name}
-                          </Link>
-                        </motion.div>
+                          {link.name}
+                        </Link>
                       )
                     )}
                   </div>
