@@ -106,13 +106,11 @@ export default function Navbar() {
             <div className="flex items-center gap-2 lg:hidden">
               <ThemeToggle compact />
               <Button
-                className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:text-primary" 
+                className="glass-surface-strong relative z-50 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border-2 border-[var(--border)] shadow-[var(--shadow-soft)] transition-colors hover:-translate-y-0.5 hover:bg-[var(--surface-muted)]"
                 style={{ color: 'var(--heading, #0f172a)' }}
                 onClick={() => setMobileMenuOpen((open) => !open)}
                 aria-label="Toggle navigation"
                 type="button"
-                variant="glass"
-                size="icon"
               >
                 <AnimatePresence mode="wait" initial={false}>
                   {mobileMenuOpen ? (
@@ -122,7 +120,7 @@ export default function Navbar() {
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: 90, opacity: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="flex items-center justify-center"
+                      className="pointer-events-none flex items-center justify-center"
                     >
                       <X size={24} />
                     </motion.span>
@@ -133,7 +131,7 @@ export default function Navbar() {
                       animate={{ rotate: 0, opacity: 1 }}
                       exit={{ rotate: -90, opacity: 0 }}
                       transition={{ duration: 0.15 }}
-                      className="flex items-center justify-center"
+                      className="pointer-events-none flex items-center justify-center"
                     >
                       <Menu size={24} />
                     </motion.span>
@@ -155,7 +153,7 @@ export default function Navbar() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
-                className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md lg:hidden"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-hidden="true"
               />
@@ -168,7 +166,7 @@ export default function Navbar() {
                 transition={{ duration: 0.2, ease: "easeOut" }}
                 className="fixed left-0 top-[72px] z-50 w-full px-3 md:top-[84px] lg:hidden"
               >
-                <div className="glass-surface-strong rounded-2xl p-4 shadow-2xl">
+                <div className="glass-surface-strong rounded-2xl p-4 shadow-2xl border-2 border-[var(--border)]">
                   <div className="flex flex-col gap-2">
                     {visibleLinks.map((link, i) =>
                       link.isCta ? (
