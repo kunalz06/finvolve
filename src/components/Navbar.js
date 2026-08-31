@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
 import Button from "@/components/ui/Button";
 
@@ -112,71 +111,46 @@ export default function Navbar() {
                 aria-label="Toggle navigation"
                 type="button"
               >
-                <motion.span
-                  animate={{ rotate: mobileMenuOpen ? 90 : 0 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="pointer-events-none flex items-center justify-center"
-                >
+                <span className={`flex items-center justify-center transition-transform duration-200 ease-in-out ${mobileMenuOpen ? 'rotate-90' : 'rotate-0'}`}>
                   {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </motion.span>
+                </span>
               </Button>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu */}
-        <AnimatePresence mode="wait">
-          {mobileMenuOpen && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                key="mobile-backdrop"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md lg:hidden"
-                onClick={() => setMobileMenuOpen(false)}
-                aria-hidden="true"
-              />
-              {/* Menu */}
-              <motion.div
-                key="mobile-menu"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2, ease: "easeOut" }}
-                className="fixed left-0 top-[72px] z-50 w-full px-3 md:top-[84px] lg:hidden"
-              >
-                <div className="glass-surface-strong rounded-2xl p-4 shadow-2xl border-2 border-[var(--border)]">
-                  <div className="flex flex-col gap-2">
-                    {visibleLinks.map((link) =>
-                      link.isCta ? (
-                        <Link
-                          key={link.name}
-                          href={link.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3.5 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-all duration-200 hover:-translate-y-0.5"
-                        >
-                          {link.name}
-                        </Link>
-                      ) : (
-                        <Link
-                          key={link.name}
-                          href={link.href}
-                          onClick={() => setMobileMenuOpen(false)}
-                          className="block rounded-xl px-4 py-3.5 text-base font-bold transition-all duration-200 hover:bg-[var(--surface-muted)]" style={{ color: 'var(--foreground, #1e293b)' }}
-                        >
-                          {link.name}
-                        </Link>
-                      )
-                    )}
-                  </div>
-                </div>
-              </motion.div>
-            </>
-          )}
-        </AnimatePresence>
+        {/* Mobile menu - positioned outside nav for proper z-index stacking */}
+        <div className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-md lg:hidden transition-opacity duration-200 ${mobileMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible'}`}
+          onClick={() => setMobileMenuOpen(false)}
+          aria-hidden="true"
+        />
+        <div className={`fixed left-0 top-[72px] z-50 w-full px-3 md:top-[84px] lg:hidden transition-all duration-200 ease-out ${mobileMenuOpen ? 'opacity-100 translate-y-0 visible' : 'opacity-0 -translate-y-4 invisible'}`}>
+          <div className="glass-surface-strong rounded-2xl p-4 shadow-2xl border-2 border-[var(--border)]">
+            <div className="flex flex-col gap-2">
+              {visibleLinks.map((link) =>
+                link.isCta ? (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block rounded-xl border-2 border-[var(--border)] bg-[var(--accent)] px-5 py-3.5 text-center text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-all duration-200 hover:-translate-y-0.5"
+                  >
+                    {link.name}
+                  </Link>
+                ) : (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block rounded-xl px-4 py-3.5 text-base font-bold transition-all duration-200 hover:bg-[var(--surface-muted)]" style={{ color: 'var(--foreground, #1e293b)' }}
+                  >
+                    {link.name}
+                  </Link>
+                )
+              )}
+            </div>
+          </div>
+        </div>
       </nav>
     </>
   );
