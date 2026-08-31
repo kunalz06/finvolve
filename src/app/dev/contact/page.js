@@ -79,7 +79,7 @@ export default function Contact() {
             </div>
           </motion.div>
           
-          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center":
+          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
             <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
               <span className="text-sm font-medium text-primary">CONTACT US</span>
             </div>
