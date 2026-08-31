@@ -15,6 +15,11 @@
   --accent-mint: #16a34a;
   --accent-amber: #d97706;
   --accent-rose: #d9467c;
+  --red-primary: #e53e3e;
+  --red-secondary: #dc2626;
+  --red-soft: #fef2f2;
+  --red-light: #fca5a5;
+  --red-dark: #7f1d1d;
   --background: #f5f2ea;
   --surface: #fffaf0;
   --surface-strong: #ffffff;
@@ -41,6 +46,11 @@
   --accent-mint: #74d99f;
   --accent-amber: #ffc36a;
   --accent-rose: #ff8fbd;
+  --red-primary: #ef4444;
+  --red-secondary: #dc2626;
+  --red-soft: #450a0a;
+  --red-light: #7f1d1d;
+  --red-dark: #fca5a5;
   --background: #101318;
   --surface: #171b22;
   --surface-strong: #202631;

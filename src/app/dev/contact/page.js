@@ -7,6 +7,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, isConfigValid } from "@/lib/firebase";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
+import ContactCallAnimation from "@/components/animations/ContactCallAnimation";
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
@@ -66,7 +67,19 @@ export default function Contact() {
     <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="container">
         <div className="mx-auto max-w-5xl">
-          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
+          {/* Animated Phone Illustration */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="mb-8 sm:mb-12 flex justify-center"
+          >
+            <div className="w-full max-w-md">
+              <ContactCallAnimation className="mx-auto" />
+            </div>
+          </motion.div>
+          
+          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center":
             <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
               <span className="text-sm font-medium text-primary">CONTACT US</span>
             </div>

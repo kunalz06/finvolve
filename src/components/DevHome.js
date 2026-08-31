@@ -4,15 +4,9 @@ import { motion } from "framer-motion";
 import { ArrowRight, CheckCircle, Cloud, Globe, Smartphone, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import HomeEntranceAnimation from "@/components/animations/HomeEntranceAnimation";
 
-const codeWords = [
-  { label: "ship()", x: "-170px", y: "-168px", r: "-10deg", delay: "0s" },
-  { label: "scale", x: "130px", y: "-132px", r: "9deg", delay: "0.22s" },
-  { label: "launch", x: "-42px", y: "-210px", r: "4deg", delay: "0.44s" },
-  { label: "revenue", x: "192px", y: "-212px", r: "-8deg", delay: "0.66s" },
-  { label: "automate", x: "-198px", y: "-78px", r: "12deg", delay: "0.88s" },
-  { label: "growth", x: "62px", y: "-262px", r: "-6deg", delay: "1.1s" },
-];
+
 
 export default function Home() {
   return (
@@ -52,38 +46,10 @@ export default function Home() {
               initial={false}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
-              className="welcome-film rounded-2xl"
-              aria-label="Welcome video animation showing code words bursting from a computer"
+              className="rounded-2xl overflow-hidden"
+              aria-label="Animated illustration of a person entering a home"
             >
-              <div className="welcome-caption">
-                <span>Welcome Film / DEV Infinity</span>
-                <span>Code lifts businesses</span>
-              </div>
-              <div className="welcome-camera">
-                <div className="welcome-desk" />
-                <div className="welcome-computer">
-                  <div className="welcome-screen">
-                    <span className="welcome-code-line" />
-                    <span className="welcome-code-line" />
-                    <span className="welcome-code-line" />
-                    <span className="welcome-code-line" />
-                  </div>
-                </div>
-                {codeWords.map((word) => (
-                  <span
-                    key={word.label}
-                    className="code-firework"
-                    style={{
-                      "--x": word.x,
-                      "--y": word.y,
-                      "--r": word.r,
-                      "--delay": word.delay,
-                    }}
-                  >
-                    {word.label}
-                  </span>
-                ))}
-              </div>
+              <HomeEntranceAnimation className="p-4 sm:p-6 md:p-8" />
             </motion.div>
           </div>
         </div>

@@ -48,7 +48,7 @@ export default function Footer() {
           <div className="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
               <Link href="/" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] shadow-[var(--shadow-soft)]">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--red-primary)] bg-[var(--primary)] shadow-[var(--shadow-soft)] hover:border-[var(--red-secondary)] transition-colors">
                   <Zap className="text-white" size={20} />
                 </div>
                 <span className="font-code-brand text-xl sm:text-2xl font-black text-slate-900">DEV Infinity</span>
@@ -110,10 +110,10 @@ export default function Footer() {
                 {newsletterStatus.message && (
                   <p className={`rounded-xl px-3 py-2 text-xs leading-5 ${
                     newsletterStatus.type === "error"
-                      ? "border-2 border-red-300 bg-red-50 text-red-700"
+                      ? "border-2 border-[var(--red-primary)] bg-[var(--red-soft)] text-[var(--red-dark)]"
                       : newsletterStatus.type === "warning"
-                        ? "border-2 border-amber-300 bg-amber-50 text-amber-800"
-                        : "border-2 border-emerald-300 bg-emerald-50 text-emerald-800"
+                        ? "border-2 border-[var(--accent-amber)] bg-[var(--accent-amber)]/20 text-[var(--accent-amber)]"
+                        : "border-2 border-[var(--accent-mint)] bg-[var(--accent-mint)]/20 text-[var(--accent-mint)]"
                   }`}>
                     {newsletterStatus.message}
                   </p>

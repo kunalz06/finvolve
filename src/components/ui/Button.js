@@ -18,9 +18,10 @@ export default function Button({
     secondary: "rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] !text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)] hover:!text-[var(--foreground)] font-bold",
     outline: "rounded-xl border-2 border-[var(--border)] bg-transparent !text-[var(--foreground)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)] font-bold",
     ghost: "rounded-xl border-2 border-transparent bg-transparent !text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)] font-bold",
-    danger: "rounded-full border border-red-200 bg-red-50/75 !text-red-700 hover:bg-red-100 font-semibold",
-    success: "rounded-full border border-emerald-200 bg-emerald-50/75 !text-emerald-700 hover:bg-emerald-100 font-semibold",
-    warning: "rounded-full border border-amber-200 bg-amber-50/75 !text-amber-700 hover:bg-amber-100 font-semibold",
+    danger: "rounded-xl border-2 border-[var(--red-primary)] bg-[var(--red-primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--red-secondary)] hover:!text-white font-bold",
+    success: "rounded-xl border-2 border-[var(--accent-mint)] bg-[var(--accent-mint)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--accent-mint)]/80 hover:!text-white font-bold",
+    warning: "rounded-xl border-2 border-[var(--accent-amber)] bg-[var(--accent-amber)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--accent-amber)]/80 hover:!text-white font-bold",
+    red: "rounded-xl border-2 border-[var(--red-primary)] bg-[var(--red-soft)] !text-[var(--red-primary)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--red-light)] hover:!text-[var(--red-dark)] font-bold",
     glass: "glass-chip-strong rounded-full border-transparent bg-transparent !text-slate-600 hover:bg-white/85 hover:!text-slate-900 font-semibold",
   };
 
