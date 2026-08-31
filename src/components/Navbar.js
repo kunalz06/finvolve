@@ -60,8 +60,8 @@ export default function Navbar() {
               <Zap className="text-white" size={20} />
             </div>
             <div className="min-w-0">
-              <div className="font-code-brand text-lg font-black text-slate-900 md:text-xl">DEV Infinity</div>
-              <div className="hidden font-code-brand text-[11px] uppercase text-slate-500 md:block">
+              <div className="font-code-brand text-lg font-black md:text-xl" style={{ color: 'var(--heading, #0f172a)' }}>DEV Infinity</div>
+              <div className="hidden font-code-brand text-[11px] uppercase md:block" style={{ color: 'var(--muted, #64748b)' }}>
                 Software Builders
               </div>
             </div>
@@ -82,7 +82,7 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="rounded-lg px-4 py-2 text-sm font-bold text-slate-600 transition-all duration-200 hover:bg-[var(--surface-strong)] hover:text-slate-900"
+                  className="rounded-lg px-4 py-2 text-sm font-bold transition-all duration-200 hover:bg-[var(--surface-strong)]" style={{ color: 'var(--muted, #475569)' }}
                 >
                   {link.name}
                 </Link>
@@ -95,7 +95,7 @@ export default function Navbar() {
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle compact />
             <button
-              className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-slate-900 transition-colors hover:text-primary"
+              className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:text-primary" style={{ color: 'var(--heading, #0f172a)' }}
               onClick={() => setMobileMenuOpen((open) => !open)}
               aria-label="Toggle navigation"
               type="button"
@@ -169,7 +169,7 @@ export default function Navbar() {
                       <Link
                         href={link.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block rounded-xl px-4 py-3 text-base font-bold text-slate-700 transition-all duration-200 hover:bg-[var(--surface-muted)] hover:text-slate-900"
+                        className="block rounded-xl px-4 py-3 text-base font-bold transition-all duration-200 hover:bg-[var(--surface-muted)]" style={{ color: 'var(--foreground, #1e293b)' }}
                       >
                         {link.name}
                       </Link>
