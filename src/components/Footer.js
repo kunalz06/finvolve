@@ -42,16 +42,16 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full px-3 pb-4 pt-8 md:px-6 md:pb-8 md:pt-14">
+    <footer className="w-full px-4 sm:px-6 pb-4 pt-8 md:pb-8 md:pt-14">
       <div className="container mx-auto">
-        <div className="glass-surface-strong relative overflow-hidden rounded-2xl px-5 py-10 md:px-10 md:py-14">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+        <div className="glass-surface-strong relative overflow-hidden rounded-2xl px-4 py-8 sm:px-5 sm:py-10 md:px-10 md:py-14">
+          <div className="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
               <Link href="/" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] shadow-[var(--shadow-soft)]">
                   <Zap className="text-white" size={20} />
                 </div>
-                <span className="font-code-brand text-xl font-black text-slate-900">DEV Infinity</span>
+                <span className="font-code-brand text-xl sm:text-2xl font-black text-slate-900">DEV Infinity</span>
               </Link>
               <p className="mb-6 text-center text-sm leading-relaxed text-slate-600 md:text-left">
                 Product engineering, dashboards, automation, and sharp delivery for ambitious teams.
@@ -92,7 +92,7 @@ export default function Footer() {
                     placeholder="Enter your email"
                     value={newsletterEmail}
                     onChange={(event) => setNewsletterEmail(event.target.value)}
-                    className="w-full rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400"
+                    className="w-full rounded-xl py-2.5 sm:py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400"
                     required
                   />
                 </div>
@@ -100,7 +100,8 @@ export default function Footer() {
                   type="submit"
                   disabled={newsletterLoading}
                   variant="primary"
-                  className="py-3 disabled:cursor-not-allowed disabled:opacity-70"
+                  size="large"
+                  className="touch-target py-2.5 sm:py-3 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <span className="flex items-center justify-center gap-2">
                     {newsletterLoading ? "Subscribing..." : "Subscribe"} <ArrowRight size={16} />

@@ -13,7 +13,7 @@ export default function DevLayout({ children }) {
   return (
     <div className="dev-shell min-h-screen font-sans text-gray-900 antialiased">
       <Navbar />
-      <main className="min-h-screen pt-[92px] md:pt-[104px]">
+      <main className="min-h-screen pt-[72px] sm:pt-[84px] md:pt-[92px] lg:pt-[104px]">
         {children}
       </main>
       <Footer />

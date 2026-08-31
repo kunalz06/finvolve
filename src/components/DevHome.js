@@ -16,33 +16,33 @@ const codeWords = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col gap-10 pb-8 md:pb-12">
-      <section className="page-section px-6 py-8 md:px-0">
+    <div className="flex flex-col gap-8 sm:gap-10 pb-8 md:pb-12">
+      <section className="page-section px-4 sm:px-6 py-6 md:px-0">
         <div className="container">
-          <div className="grid min-h-[calc(100vh-150px)] items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="grid min-h-[calc(100vh-120px)] sm:min-h-[calc(100vh-140px)] items-center gap-6 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr]">
             <motion.div
               initial={false}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.45, ease: "easeOut" }}
-              className="space-y-8"
+              className="space-y-6 sm:space-y-8"
             >
-              <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-2">
-                <span className="font-code-brand text-sm font-bold uppercase text-primary">Software Builders</span>
+              <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
+                <span className="font-code-brand text-xs sm:text-sm font-bold uppercase text-primary">Software Builders</span>
               </div>
 
-              <h1 className="max-w-2xl text-5xl font-black leading-[0.98] text-slate-950 md:text-6xl lg:text-7xl">
+              <h1 className="max-w-2xl text-4xl sm:text-5xl font-black leading-[1.05] sm:leading-[0.98] text-slate-950 md:text-6xl lg:text-7xl">
                 Build fast. Scale faster.
               </h1>
 
-              <p className="max-w-xl text-lg leading-relaxed text-slate-600">
+              <p className="max-w-xl text-base sm:text-lg leading-relaxed text-slate-600">
                 DEV Infinity designs and ships sturdy web apps, payment flows, dashboards, and automations for teams that need momentum without the generic agency fog.
               </p>
 
-              <div className="flex flex-wrap gap-4">
-                <Button href="/dev/request" variant="primary" size="large">
+              <div className="flex flex-wrap gap-3 sm:gap-4">
+                <Button href="/dev/request" variant="primary" size="large" className="touch-target">
                   Start Project
                 </Button>
-                <Button href="/dev/services" variant="secondary" size="large">
+                <Button href="/dev/services" variant="secondary" size="large" className="touch-target">
                   View Services
                 </Button>
               </div>

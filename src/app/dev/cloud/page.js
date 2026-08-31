@@ -251,33 +251,35 @@ export default function CloudPage() {
   };
 
   return (
-    <div className="min-h-screen px-4 py-8 md:px-6 md:py-12">
-      <div className="container space-y-12 md:space-y-16">
+    <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 md:py-12">
+      <div className="container space-y-8 sm:space-y-10 md:space-y-12 lg:space-y-16">
         {/* Hero Section */}
-        <section className="glass-surface-strong relative overflow-hidden rounded-2xl px-6 py-12 md:px-12 md:py-16">
-          <div className="relative z-10 max-w-4xl space-y-6">
-            <div className="flex flex-wrap items-center gap-3">
-              <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-2 text-xs font-black uppercase tracking-wider text-primary md:text-sm">
-                <Cloud size={18} className="text-primary" />
+        <section className="glass-surface-strong relative overflow-hidden rounded-2xl px-4 py-8 sm:px-6 sm:py-10 md:px-10 md:py-14 lg:px-12 lg:py-16">
+          <div className="relative z-10 max-w-4xl space-y-4 sm:space-y-6">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-black uppercase tracking-wider text-primary">
+                <Cloud size={16} className="text-primary sm:hidden" />
+                <Cloud size={18} className="hidden sm:text-primary sm:block" />
                 <span>DEV♾️ Cloud Infrastructure</span>
               </div>
             </div>
 
-            <h1 className="text-4xl font-black leading-[1.08] text-[var(--heading)] md:text-6xl lg:text-7xl">
-              High-Performance <br className="hidden md:inline" />
+            <h1 className="text-3xl sm:text-4xl font-black leading-[1.1] sm:leading-[1.08] text-[var(--heading)] md:text-5xl lg:text-6xl xl:text-7xl">
+              High-Performance <br className="hidden sm:inline" />
               <span className="glass-text-gradient">Compute & AI Models</span> on Demand
             </h1>
 
-            <p className="max-w-2xl text-base leading-relaxed text-[var(--foreground)] font-medium md:text-xl">
+            <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-[var(--foreground)] font-medium md:text-lg lg:text-xl">
               Deploy instantly to high-capacity compute engines and unified frontier LLM APIs (GPT-4o, Gemini, Claude). Zero infrastructure overhead, transparent pricing, and self-service control.
             </p>
 
-            <div className="flex flex-wrap items-center gap-4 pt-2">
-              <Button href="#plans" variant="primary" size="large">
-                View Pricing Plans <ArrowRight size={18} />
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
+              <Button href="#plans" variant="primary" size="large" className="touch-target">
+                View Pricing Plans <ArrowRight size={16} className="sm:hidden" />
+                <ArrowRight size={18} className="hidden sm:block" />
               </Button>
-              <Button href="/dev/cloud/dashboard" variant="secondary" size="large">
-                <Zap size={18} /> Open Cloud Dashboard
+              <Button href="/dev/cloud/dashboard" variant="secondary" size="large" className="touch-target">
+                <Zap size={16} className="sm:hidden" /> <Zap size={18} className="hidden sm:block" /> Open Cloud Dashboard
               </Button>
             </div>
 
@@ -304,7 +306,7 @@ export default function CloudPage() {
         </section>
 
         {/* Capability Highlights Grid */}
-        <section className="grid gap-6 md:grid-cols-3">
+        <section className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[
             {
               icon: Cpu,
@@ -358,15 +360,15 @@ export default function CloudPage() {
               <Sparkles size={14} />
               <span>Transparent Subscription Plans</span>
             </div>
-            <h2 className="text-3xl font-black text-[var(--heading)] md:text-5xl">
+            <h2 className="text-2xl sm:text-3xl font-black text-[var(--heading)] md:text-4xl lg:text-5xl">
               Choose Your Compute Capacity
             </h2>
-            <p className="mx-auto max-w-2xl text-base text-[var(--foreground)] font-medium md:text-lg">
+            <p className="mx-auto max-w-2xl text-sm sm:text-base text-[var(--foreground)] font-medium md:text-lg">
               Simple monthly billing with included setup fee. Enjoy 12 months of predictable, high-performance compute and AI access.
             </p>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-3 items-stretch">
+          <div className="grid gap-4 sm:gap-6 md:gap-8 md:grid-cols-2 lg:grid-cols-3 items-stretch">
             {tierOrder.map((tierKey, index) => {
               const plan = SUBSCRIPTION_TIERS[tierKey];
               const Icon = tierIcons[tierKey];
@@ -513,8 +515,8 @@ export default function CloudPage() {
           </div>
 
           {showComparison && (
-            <div id="comparison-table" className="relative overflow-x-auto">
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 hidden max-md:block" aria-hidden="true" />
+            <div id="comparison-table" className="relative overflow-x-auto -mx-4 px-4 sm:px-0">
+              <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 sm:hidden" aria-hidden="true" />
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b-2 border-[var(--border)]">
@@ -650,7 +652,7 @@ export default function CloudPage() {
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
             <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
               <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
                 <IndianRupee size={22} className="text-primary" />
@@ -873,7 +875,7 @@ export default function CloudPage() {
             </div>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
             {[
               {
                 step: "01",
@@ -903,21 +905,22 @@ export default function CloudPage() {
         </section>
 
         {/* Frequently Asked Questions Section */}
-        <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
+        <section className="glass-surface-strong rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 space-y-6 sm:space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-3">
-            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase text-primary">
-              <HelpCircle size={15} />
+            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-black uppercase text-primary">
+              <HelpCircle size={14} className="sm:hidden" />
+              <HelpCircle size={15} className="hidden sm:block" />
               <span>Frequently Asked Questions</span>
             </div>
-            <h3 className="text-3xl font-black text-[var(--heading)] md:text-4xl">
+            <h3 className="text-2xl sm:text-3xl font-black text-[var(--heading)] md:text-4xl">
               Got Questions About Cloud Services?
             </h3>
-            <p className="text-sm text-[var(--foreground)] font-medium">
+            <p className="text-sm sm:text-base text-[var(--foreground)] font-medium">
               Everything you need to know about compute hours, API keys, pause options, and billing cycles.
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto space-y-4">
+          <div className="max-w-3xl mx-auto space-y-3 sm:space-y-4">
             {faqs.map((faq, index) => {
               const isOpen = openFaq === index;
               return (
@@ -931,26 +934,30 @@ export default function CloudPage() {
                     aria-controls={"faq-answer-" + index}
                     style={{ fontFamily: 'inherit' }}
                     variant="ghost"
-                    className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 border-0 bg-transparent shadow-none hover:!bg-[var(--surface-muted)] !font-normal"
+                    className="w-full flex items-center justify-between p-3 sm:p-4 md:p-5 text-left gap-3 sm:gap-4 border-0 bg-transparent shadow-none hover:!bg-[var(--surface-muted)] !font-normal"
                   >
-                    <div className="flex items-center gap-3.5">
-                      <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
+                    <div className="flex items-center gap-2.5 sm:gap-3.5">
+                      <span className="flex-shrink-0 font-code-brand text-xs font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
                         Q{index + 1}
                       </span>
-                      <span className="text-base md:text-lg font-black text-[var(--heading)] leading-snug">
+                      <span className="text-sm sm:text-base md:text-lg font-black text-[var(--heading)] leading-snug">
                         {faq.q}
                       </span>
                     </div>
                     <div
-                      className={`flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--border)] transition-all ${
+                      className={`flex h-8 w-8 sm:h-9 sm:w-9 flex-shrink-0 items-center justify-center rounded-full border-2 border-[var(--border)] transition-all ${
                         isOpen
                           ? "bg-[var(--primary)] text-white shadow-[2px_2px_0_var(--border)]"
                           : "bg-[var(--surface-muted)] text-[var(--foreground)]"
                       }`}
                     >
                       <ChevronDown
+                        size={16}
+                        className={`sm:hidden transition-transform duration-200 ${isOpen ? "rotate-180 text-white" : ""}`}
+                      />
+                      <ChevronDown
                         size={18}
-                        className={`transition-transform duration-200 ${isOpen ? "rotate-180 text-white" : ""}`}
+                        className={`hidden sm:block transition-transform duration-200 ${isOpen ? "rotate-180 text-white" : ""}`}
                       />
                     </div>
                   </Button>
@@ -964,7 +971,7 @@ export default function CloudPage() {
                     }
                   >
                     <div className="overflow-hidden bg-[var(--surface)]">
-                      <div className="p-5 md:p-6 text-[var(--foreground)] text-base md:text-lg leading-relaxed font-semibold">
+                      <div className="p-3 sm:p-4 md:p-5 text-[var(--foreground)] text-sm sm:text-base leading-relaxed font-semibold">
                         {faq.a}
                       </div>
                     </div>
@@ -981,19 +988,19 @@ export default function CloudPage() {
             <Terminal size={24} className="text-primary" />
           </div>
           <div className="max-w-xl mx-auto space-y-2">
-            <h3 className="text-2xl font-black text-[var(--heading)] md:text-3xl">
+            <h3 className="text-xl sm:text-2xl font-black text-[var(--heading)] md:text-3xl">
               Already Have an Active Subscription?
             </h3>
             <p className="text-sm md:text-base text-[var(--foreground)] font-medium">
               Lookup your account by email to inspect real-time compute usage, view active API credentials, change plans, or pause your service.
             </p>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            <Button href="/dev/cloud/dashboard" variant="primary" size="large">
-              <Zap size={18} /> Go to Cloud Dashboard
+          <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+            <Button href="/dev/cloud/dashboard" variant="primary" size="large" className="touch-target">
+              <Zap size={16} className="sm:hidden" /><Zap size={18} className="hidden sm:block" /> Go to Cloud Dashboard
             </Button>
-            <Button href="/dev/contact" variant="secondary" size="large">
-              <Users size={18} /> Contact Enterprise Sales
+            <Button href="/dev/contact" variant="secondary" size="large" className="touch-target">
+              <Users size={16} className="sm:hidden" /><Users size={18} className="hidden sm:block" /> Contact Enterprise Sales
             </Button>
           </div>
         </section>

@@ -486,6 +486,161 @@ select:focus {
   }
 }
 
+/* ============================================
+   RESPONSIVE DESIGN - Mobile First Approach
+   ============================================
+   Breakpoints:
+   - xs: <640px (default/mobile)
+   - sm: 640px-768px (small tablets/large phones)
+   - md: 768px-1024px (tablets)
+   - lg: 1024px-1280px (small laptops)
+   - xl: 1280px-1536px (large laptops)
+   - 2xl: 1536px+ (desktops)
+*/
+
+/* Extra Small (xs) - Mobile Phones <640px */
+/* Base styles already target mobile */
+
+/* Small (sm) - 640px and up */
+@media (min-width: 640px) {
+  .container {
+    padding: 0 32px;
+  }
+  
+  h1 {
+    font-size: clamp(2.25rem, 5vw, 3rem);
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: clamp(1.875rem, 4vw, 2.25rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.5rem, 3.5vw, 1.875rem);
+  }
+  
+  p {
+    font-size: 1rem;
+  }
+}
+
+/* Medium (md) - 768px and up */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 40px;
+  }
+  
+  h1 {
+    font-size: clamp(2.5rem, 4.5vw, 3.75rem);
+    line-height: 1.05;
+  }
+  
+  h2 {
+    font-size: clamp(2rem, 3.8vw, 2.5rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.625rem, 3.2vw, 2rem);
+  }
+  
+  /* Show subtitle on tablets */
+  .hidden-md-block {
+    display: block !important;
+  }
+}
+
+/* Large (lg) - 1024px and up */
+@media (min-width: 1024px) {
+  .container {
+    padding: 0 48px;
+    max-width: 1200px;
+  }
+  
+  h1 {
+    font-size: clamp(3rem, 4vw, 4.5rem);
+  }
+  
+  h2 {
+    font-size: clamp(2.25rem, 3.5vw, 3rem);
+  }
+  
+  /* Adjust glass surfaces for larger screens */
+  .glass-surface,
+  .glass-surface-strong {
+    border-width: 2.5px;
+  }
+  
+  /* Larger touch targets for desktop */
+  .touch-target {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Extra Large (xl) - 1280px and up */
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1340px;
+  }
+  
+  /* Max width for hero sections */
+  .hero-container {
+    max-width: 1400px;
+  }
+}
+
+/* 2XL (2xl) - 1536px and up */
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1440px;
+  }
+  
+  .glass-surface,
+  .glass-surface-strong {
+    border-width: 3px;
+  }
+  
+  /* Extra large typography for big screens */
+  h1 {
+    font-size: clamp(3.5rem, 3.5vw, 5rem);
+  }
+  
+  h2 {
+    font-size: clamp(2.5rem, 3vw, 3.5rem);
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets for touch devices */
+  button,
+  [role="button"],
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Adjust hover effects for touch */
+  .glass-surface,
+  .glass-surface-strong,
+  .glass-surface-muted {
+    box-shadow: 6px 6px 0 var(--border);
+  }
+  
+  /* Larger spacing between interactive elements */
+  .touch-spacing {
+    gap: 12px !important;
+  }
+}
+
+/* High density displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .glass-surface {
+    border-width: 1.5px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
