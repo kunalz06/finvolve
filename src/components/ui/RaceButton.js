@@ -1,7 +1,8 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { forwardRef, useEffect, useState } from "react";
+import { forwardRef, useState, useRef, useEffect } from "react";
+import * as anime from "animejs";
+import { cn } from "@/lib/utils";
 
 export const RaceButton = forwardRef((
   { 
@@ -16,32 +17,27 @@ export const RaceButton = forwardRef((
   ref
 ) => {
   const [isHovered, setIsHovered] = useState(false);
-  
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 500, damping: 50 });
-  const mouseYSpring = useSpring(y, { stiffness: 500, damping: 50 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+  const buttonRef = useRef(null);
+  const x = useRef(0);
+  const y = useRef(0);
 
   const handleMouseMove = (e) => {
-    if (!ref?.current || disabled) return;
-    const rect = ref.current.getBoundingClientRect();
+    if (!buttonRef.current || disabled) return;
+    const rect = buttonRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     const xPct = mouseX / width - 0.5;
     const yPct = mouseY / height - 0.5;
-    x.set(xPct);
-    y.set(yPct);
+    x.current = xPct;
+    y.current = yPct;
+    setIsHovered(true);
   };
 
   const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+    x.current = 0;
+    y.current = 0;
     setIsHovered(false);
   };
 
@@ -57,21 +53,68 @@ export const RaceButton = forwardRef((
     ghost: `bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]`,
   };
 
+  // Apply 3D tilt effect using CSS transform
+  const getTransform = () => {
+    if (!isHovered || disabled) return "none";
+    const rotateX = y.current * -10;
+    const rotateY = x.current * 10;
+    return `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  };
+
+  // Handle tap animation
+  const handleMouseDown = () => {
+    if (disabled) return;
+    if (buttonRef.current) {
+      anime({
+        targets: buttonRef.current,
+        scale: 0.98,
+        duration: 100,
+        easing: "easeOutQuad",
+        complete: () => {
+          anime({
+            targets: buttonRef.current,
+            scale: 1.02,
+            duration: 100,
+            easing: "easeOutQuad"
+          });
+        }
+      });
+    }
+  };
+
+  // Handle hover animation
+  useEffect(() => {
+    if (buttonRef.current && isHovered && !disabled) {
+      anime({
+        targets: buttonRef.current,
+        scale: 1.02,
+        duration: 200,
+        easing: "easeOutQuad"
+      });
+    } else if (buttonRef.current && !isHovered && !disabled) {
+      anime({
+        targets: buttonRef.current,
+        scale: 1,
+        duration: 200,
+        easing: "easeOutQuad"
+      });
+    }
+  }, [isHovered, disabled]);
+
   return (
-    <motion.button
-      ref={ref}
+    <button
+      ref={buttonRef}
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onMouseDown={handleMouseDown}
       className={`${baseClasses} ${variants[variant]} ${className}`}
       disabled={disabled || loading}
-      style={isHovered ? { rotateX, rotateY, transformStyle: "preserve-3d" } : {}}
-      whileHover={{ scale: disabled ? 1 : 1.02 }}
-      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      style={{ transform: getTransform(), transformStyle: "preserve-3d" }}
       {...props}
     >
       {loading ? <span className="animate-spin" /> : <>{Icon && <Icon size={16} />}{children}</>}
-    </motion.button>
+    </button>
   );
 });
 

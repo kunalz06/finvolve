@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import * as anime from "animejs";
 import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import { AnimatedDiv } from '@/components/ui/Animated';
 import { cn } from '@/lib/utils';
 import { apiUrl } from '@/lib/api';
 
@@ -45,6 +46,12 @@ export default function ProjectWizard() {
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [showSuccessBurst, setShowSuccessBurst] = useState(false);
+  
+  // Refs for animejs animations
+  const burstOverlayRef = useRef(null);
+  const burstCircleRef = useRef(null);
+  const successIconRef = useRef(null);
+  const stepContainerRef = useRef(null);
 
   useEffect(() => {
     if (status !== 'success') return undefined;
@@ -52,6 +59,23 @@ export default function ProjectWizard() {
     const timeout = window.setTimeout(() => setShowSuccessBurst(false), 1400);
     return () => window.clearTimeout(timeout);
   }, [status]);
+
+  // Animate step transitions
+  useEffect(() => {
+    if (stepContainerRef.current) {
+      const startX = direction > 0 ? -100 : 100;
+      const endX = 0;
+      
+      anime({
+        targets: stepContainerRef.current,
+        translateX: [startX, endX],
+        opacity: [0, 1],
+        duration: 300,
+        easing: "easeOutCubic",
+        autoplay: true
+      });
+    }
+  }, [currentStep, direction]);
 
   const handleNext = () => {
     if (currentStep < STEPS.length - 1) {
@@ -135,39 +159,87 @@ export default function ProjectWizard() {
     }),
   };
 
+  // Animejs animations for success state
+  useEffect(() => {
+    if (status === 'success' && showSuccessBurst && burstOverlayRef.current) {
+      anime({
+        targets: burstOverlayRef.current,
+        opacity: [0, 1],
+        duration: 180,
+        easing: "easeInOutQuad",
+        complete: () => {
+          anime({
+            targets: burstOverlayRef.current,
+            opacity: [1, 0],
+            duration: 180,
+            delay: 550,
+            easing: "easeInOutQuad"
+          });
+        }
+      });
+    }
+  }, [status, showSuccessBurst]);
+
+  useEffect(() => {
+    if (status === 'success' && showSuccessBurst && burstCircleRef.current) {
+      anime({
+        targets: burstCircleRef.current,
+        scale: [0.35, 1.12, 1],
+        rotate: [-10, 0],
+        duration: 550,
+        easing: "easeOutBack",
+        complete: () => {
+          anime({
+            targets: burstCircleRef.current,
+            scale: [1, 0.82],
+            opacity: [1, 0],
+            duration: 180,
+            easing: "easeOutQuad"
+          });
+        }
+      });
+    }
+  }, [status, showSuccessBurst]);
+
+  useEffect(() => {
+    if (status === 'success' && successIconRef.current) {
+      anime({
+        targets: successIconRef.current,
+        scale: [0, 1],
+        duration: 400,
+        easing: "easeOutBack",
+        delay: 200
+      });
+    }
+  }, [status]);
+
   if (status === 'success') {
     return (
       <>
-        <AnimatePresence>
-          {showSuccessBurst && (
-            <motion.div
-              className="fixed inset-0 z-[80] flex items-center justify-center bg-emerald-950/35 backdrop-blur-sm"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
-              aria-hidden="true"
+        {showSuccessBurst && (
+          <div
+            ref={burstOverlayRef}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-emerald-950/35 backdrop-blur-sm"
+            style={{ opacity: 0 }}
+            aria-hidden="true"
+          >
+            <div
+              ref={burstCircleRef}
+              className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-[var(--surface-strong)] shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
+              style={{ scale: 0.35, rotate: -10 }}
             >
-              <motion.div
-                className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-[var(--surface-strong)] shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
-                initial={{ scale: 0.35, rotate: -10 }}
-                animate={{ scale: [0.35, 1.12, 1], rotate: 0 }}
-                exit={{ scale: 0.82, opacity: 0 }}
-                transition={{ duration: 0.55, ease: "easeOut" }}
-              >
-                <CheckCircle className="h-20 w-20 text-emerald-600 md:h-24 md:w-24" />
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <CheckCircle className="h-20 w-20 text-emerald-600 md:h-24 md:w-24" />
+            </div>
+          </div>
+        )}
         <div className="glass-surface-strong mx-auto max-w-2xl rounded-2xl px-8 py-16 text-center">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
+          <div
+            ref={successIconRef}
             className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-emerald-500/15"
+            style={{ scale: 0 }}
           >
             <CheckCircle className="h-12 w-12 text-emerald-600" />
-          </motion.div>
+          </div>
           <h2 className="mb-4 text-3xl font-bold text-slate-950">Message Received!</h2>
           <p className="mx-auto mb-8 max-w-md text-lg text-slate-600">
             Thank you for reaching out. We&apos;re already reviewing your concept and will respond within 24 hours.
@@ -215,7 +287,7 @@ export default function ProjectWizard() {
 
       <div className="relative mb-12 flex items-center justify-between px-4">
         <div className="glass-track absolute left-0 top-4 -z-10 h-1 w-full rounded-full" />
-        <motion.div
+        <AnimatedDiv
           className="absolute left-0 top-4 -z-10 h-1 origin-left rounded-full bg-[var(--primary)]"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: currentStep / (STEPS.length - 1) }}
@@ -236,17 +308,12 @@ export default function ProjectWizard() {
       </div>
 
       <Card hover={false} className="glass-surface-strong relative min-h-[400px] overflow-hidden">
-        <AnimatePresence initial={false} custom={direction} mode="wait">
-          <motion.div
-            key={currentStep}
-            custom={direction}
-            variants={variants}
-            initial={false}
-            animate="center"
-            exit="exit"
-            transition={{ x: { type: "spring", stiffness: 300, damping: 30 }, opacity: { duration: 0.2 } }}
-            className="w-full"
-          >
+        <div
+          ref={stepContainerRef}
+          key={currentStep}
+          className="w-full"
+          style={{ transform: `translateX(${direction > 0 ? -100 : 100}px)`, opacity: 0 }}
+        >
             <h2 className="mb-2 text-2xl font-bold text-slate-950">{STEPS[currentStep].title}</h2>
             <p className="mb-8 text-slate-600">{STEPS[currentStep].subtitle}</p>
 
@@ -378,8 +445,7 @@ export default function ProjectWizard() {
                 </div>
               </div>
             )}
-          </motion.div>
-        </AnimatePresence>
+          </div>
       </Card>
 
       {/* Navigation Buttons */}
