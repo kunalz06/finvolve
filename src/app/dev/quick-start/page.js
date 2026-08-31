@@ -118,8 +118,8 @@ export default function QuickStartPage() {
 
           {status === "success" ? (
             <Card hover={false} className="glass-surface-strong mx-auto max-w-lg text-center">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-100/90">
-                <CheckCircle className="text-emerald-600" size={40} />
+              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/15">
+                <CheckCircle className="text-emerald-500" size={40} />
               </div>
               <h2 className="mb-4 text-2xl font-bold text-slate-950">You&apos;re All Set!</h2>
               <p className="mb-8 text-slate-600">
@@ -166,12 +166,12 @@ export default function QuickStartPage() {
                     <div className="flex items-center gap-3">
                       <input type="checkbox" id="terms" required className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary" />
                       <label htmlFor="terms" className="text-sm text-slate-600">
-                        I agree to the <Link href="/dev/terms" className="text-primary hover:underline">Terms of Service</Link>
+                        I agree to the <Link href="/dev/terms" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Terms of Service</Link>
                       </label>
                     </div>
 
                     {status === "error" && (
-                      <div className="flex items-center gap-3 rounded-[22px] border border-red-200 bg-red-50/85 p-4 text-red-700">
+                      <div className="flex items-center gap-3 rounded-[22px] border border-red-500/40 bg-red-500/10 p-4 text-red-400">
                         <AlertCircle size={20} />
                         <span>{errorMessage}</span>
                       </div>

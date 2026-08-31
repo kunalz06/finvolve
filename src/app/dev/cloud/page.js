@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Bot,
+  CalendarDays,
   CheckCircle,
   ChevronDown,
   ChevronUp,
@@ -15,19 +16,25 @@ import {
   Flame,
   Gauge,
   HelpCircle,
+  IndianRupee,
   Layers,
+  Loader2,
   Minus,
   RefreshCw,
+  Server,
   Shield,
   ShieldCheck,
   Sparkles,
   Terminal,
+  Timer,
   Users,
   Zap,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { SUBSCRIPTION_TIERS } from "@/lib/server/subscription-plans";
+import { RENTAL_CONFIG } from "@/lib/server/rental-plans";
+import { apiUrl } from "@/lib/api";
 
 const tierOrder = ["base", "medium", "highest"];
 
@@ -45,9 +52,9 @@ const tierBadges = {
 
 const comparisonFeatures = [
   {
-    name: "Monthly Compute Allocation",
-    desc: "Dedicated CPU runtime per 30-day billing cycle",
-    base: "300 Hours (Split 150h/150h)",
+    name: "Compute Allocation",
+    desc: "Dedicated CPU runtime per billing cycle",
+    base: "300 Hours / 15 days (Split)",
     medium: "600 Hours (Unrestricted)",
     highest: "1,000 Hours (Dedicated)",
   },
@@ -119,7 +126,7 @@ const comparisonFeatures = [
 const faqs = [
   {
     q: "How are compute hours allocated and tracked?",
-    a: "Compute hours represent dedicated execution runtime for your workloads and scripts. Each billing cycle runs for 30 days and resets your usage metrics automatically. On the Starter plan, hours are split evenly across the month (150h first half / 150h second half), while Pro and Enterprise tiers provide unrestricted monthly pools.",
+    a: "Compute hours represent dedicated execution runtime for your workloads and scripts. Your usage resets at the start of each billing cycle automatically. The Starter plan bills every 15 days with 300 hours split across the period (150h first half / 150h second half), while Pro and Enterprise tiers provide unrestricted monthly pools that reset every 30 days.",
   },
   {
     q: "Can I pause or resume my subscription at any time?",
@@ -135,13 +142,109 @@ const faqs = [
   },
   {
     q: "How do plan upgrades and downgrades work?",
-    a: "You can transition between tiers anytime from your dashboard. Upgrades or plan switches are scheduled for your upcoming monthly renewal date so your current plan benefits continue without disruption.",
+    a: "You can transition between tiers anytime from your dashboard. Upgrades or plan switches are scheduled for your upcoming renewal date so your current plan benefits continue without disruption. For the Starter plan, changes take effect at the next 15-day renewal; for Pro and Enterprise, at the next monthly renewal.",
   },
 ];
+
+function loadRazorpayScript() {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve(true);
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 export default function CloudPage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [showComparison, setShowComparison] = useState(true);
+  const [rentalForm, setRentalForm] = useState({ name: "", email: "", phone: "", days: 7 });
+  const [rentalTermsAccepted, setRentalTermsAccepted] = useState(false);
+  const [rentalLoading, setRentalLoading] = useState(false);
+  const [rentalResult, setRentalResult] = useState(null);
+  const [rentalError, setRentalError] = useState("");
+  const [rentalUserDetails, setRentalUserDetails] = useState({ name: "", email: "", phone: "" });
+
+  const handleRentalSubmit = async (e) => {
+    e.preventDefault();
+    if (!rentalTermsAccepted) {
+      setRentalError("Please accept the Terms & Conditions to proceed.");
+      return;
+    }
+    setRentalLoading(true);
+    setRentalResult(null);
+    setRentalError("");
+    try {
+      const res = await fetch(apiUrl("/dev/api/rental/create"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(rentalForm),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Rental creation failed.");
+      setRentalResult(json);
+      setRentalUserDetails({ name: rentalForm.name, email: rentalForm.email, phone: rentalForm.phone });
+      setRentalForm({ name: "", email: "", phone: "", days: 7 });
+    } catch (err) {
+      setRentalError(err.message);
+    } finally {
+      setRentalLoading(false);
+    }
+  };
+
+  const handleRentalPay = async () => {
+    if (!rentalResult) return;
+    setRentalError("");
+
+    const loaded = await loadRazorpayScript();
+    if (!loaded) {
+      setRentalError("Failed to load payment gateway. Please check your internet connection and try again.");
+      return;
+    }
+
+    const options = {
+      key: rentalResult.checkoutKey,
+      amount: rentalResult.upfrontFee * 100,
+      currency: rentalResult.currency,
+      name: "DEV Infinity",
+      description: "Cloud Rental — " + rentalResult.days + " Days",
+      order_id: rentalResult.orderId,
+      handler: async function (response) {
+        try {
+          const verifyRes = await fetch(apiUrl("/dev/api/rental/verify"), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              rentalId: rentalResult.rentalId,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+          const verifyJson = await verifyRes.json();
+          if (verifyRes.ok) {
+            setRentalResult({ ...rentalResult, status: "active" });
+          } else {
+            setRentalError(verifyJson.error || "Payment verification failed.");
+          }
+        } catch (err) {
+          setRentalError("Verification failed. Contact support with your rental ID: " + rentalResult.rentalId);
+        }
+      },
+      prefill: { name: rentalUserDetails.name, email: rentalUserDetails.email, contact: rentalUserDetails.phone },
+      theme: { color: "#2457ff" },
+    };
+    const rzp = new window.Razorpay(options);
+    rzp.on("payment.failed", function (response) {
+      setRentalError(response?.error?.description || "Payment failed. Please try again.");
+    });
+    rzp.open();
+  };
 
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index);
@@ -332,7 +435,7 @@ export default function CloudPage() {
                           <span className="text-4xl font-black tracking-tight text-[var(--heading)] md:text-5xl">
                             ₹{plan.monthlyAmountINR.toLocaleString("en-IN")}
                           </span>
-                          <span className="text-sm font-bold text-[var(--muted)]">/ month</span>
+                          <span className="text-sm font-bold text-[var(--muted)]">{plan.billingPeriodDays ? "/ " + plan.billingPeriodDays + " days" : "/ month"}</span>
                         </div>
                         <div className="mt-2 flex items-center justify-between border-t border-[var(--border-soft)] pt-2 text-xs font-bold text-[var(--foreground)]">
                           <span>One-time Setup Fee</span>
@@ -343,7 +446,7 @@ export default function CloudPage() {
                       {/* Compute Allocation Pill */}
                       <div className="mb-6 flex items-center gap-2 rounded-lg border-2 border-primary/30 bg-primary/10 px-3.5 py-2.5 text-xs font-black text-primary">
                         <Clock size={16} />
-                        <span>{plan.computeHours.total} Compute Hours Included / Month</span>
+                        <span>{plan.computeHours.total} Compute Hours Included / {plan.billingPeriodDays ? plan.billingPeriodDays + " Days" : "Month"}</span>
                       </div>
 
                       {/* Features List */}
@@ -398,6 +501,8 @@ export default function CloudPage() {
             </div>
             <button
               onClick={() => setShowComparison(!showComparison)}
+              aria-expanded={showComparison}
+              aria-controls="comparison-table"
               className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-xs font-black uppercase text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:bg-[var(--primary-soft)] transition-all"
             >
               <span>{showComparison ? "Collapse Table" : "Expand Table"}</span>
@@ -406,7 +511,8 @@ export default function CloudPage() {
           </div>
 
           {showComparison && (
-            <div className="overflow-x-auto">
+            <div id="comparison-table" className="relative overflow-x-auto">
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 hidden max-md:block" aria-hidden="true" />
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b-2 border-[var(--border)]">
@@ -434,9 +540,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-bold text-[var(--foreground)]">
                         {typeof item.base === "boolean" ? (
                           item.base ? (
-                            <CheckCircle size={18} className="mx-auto text-primary" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-primary" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.base
@@ -445,9 +551,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)] bg-[var(--surface-muted)]">
                         {typeof item.medium === "boolean" ? (
                           item.medium ? (
-                            <CheckCircle size={18} className="mx-auto text-[var(--accent)]" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-[var(--accent)]" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.medium
@@ -456,9 +562,9 @@ export default function CloudPage() {
                       <td className="py-4 px-4 text-center text-xs font-black text-[var(--heading)]">
                         {typeof item.highest === "boolean" ? (
                           item.highest ? (
-                            <CheckCircle size={18} className="mx-auto text-emerald-600" />
+                            <span role="img" aria-label="Included"><CheckCircle size={18} className="mx-auto text-emerald-600" /></span>
                           ) : (
-                            <Minus size={18} className="mx-auto text-slate-400" />
+                            <span role="img" aria-label="Not included"><Minus size={18} className="mx-auto text-slate-400" /></span>
                           )
                         ) : (
                           item.highest
@@ -524,6 +630,234 @@ export default function CloudPage() {
                 </span>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Rent Services Section */}
+        <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase text-primary">
+              <Server size={14} />
+              <span>RENT SERVICES</span>
+            </div>
+            <h2 className="text-3xl font-black text-[var(--heading)] md:text-4xl">
+              Rent Cloud Compute On-Demand
+            </h2>
+            <p className="text-sm text-[var(--foreground)] font-medium">
+              No subscription needed. Pick a duration, pay a small upfront fee, and only pay for the compute hours you actually use.
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3 max-w-4xl mx-auto">
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <IndianRupee size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Upfront Fee</p>
+              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.upfrontFeeINR}</p>
+              <p className="text-xs text-[var(--muted)] font-medium">One-time before usage</p>
+            </div>
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <Timer size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Usage Rate</p>
+              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR}</p>
+              <p className="text-xs text-[var(--muted)] font-medium">Per {RENTAL_CONFIG.computeHoursPerUnit} hours of compute</p>
+            </div>
+            <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
+              <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
+                <CalendarDays size={22} className="text-primary" />
+              </div>
+              <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Billing</p>
+              <p className="text-2xl font-black text-[var(--heading)]">Post-Use</p>
+              <p className="text-xs text-[var(--muted)] font-medium">Bill + payment link emailed</p>
+            </div>
+          </div>
+
+          {/* Rental Form */}
+          <div className="max-w-lg mx-auto glass-surface rounded-2xl p-6 md:p-8 space-y-5">
+            {rentalResult && rentalResult.status === "active" ? (
+              <div className="space-y-5 py-2">
+                {/* Success Header */}
+                <div className="text-center space-y-3">
+                  <div className="glass-icon-plate relative mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-emerald-400 bg-emerald-50">
+                    <CheckCircle size={30} className="text-emerald-600" />
+                    <div className="absolute -top-1.5 -right-1.5 flex h-6 w-6 items-center justify-center rounded-full bg-emerald-500 border-2 border-[var(--surface-strong)]">
+                      <Sparkles size={12} className="text-white" />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="glass-chip-strong inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200">
+                      <div className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Live &amp; Provisioned</span>
+                    </div>
+                    <h4 className="text-2xl font-black text-[var(--heading)] mt-2">Rental Activated!</h4>
+                    <p className="text-sm text-[var(--foreground)] font-medium mt-1">
+                      Your {rentalResult.days}-day compute rental is now live and ready to use.
+                    </p>
+                  </div>
+                </div>
+
+                {/* Summary Card */}
+                <div className="rounded-2xl border-2 border-[var(--border)] overflow-hidden">
+                  <div className="px-4 py-3 bg-[var(--surface-muted)] border-b-2 border-[var(--border)]">
+                    <p className="text-xs font-black uppercase tracking-wider text-[var(--muted)]">Rental Summary</p>
+                  </div>
+                  <div className="divide-y divide-[var(--border-soft)]">
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <span className="font-code-brand text-xs">ID</span>
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)] font-mono">{rentalResult.rentalId}</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <Clock size={14} /> Duration
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)]">{rentalResult.days} Days</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <IndianRupee size={14} /> Upfront Fee
+                      </div>
+                      <span className="text-sm font-bold text-emerald-600">₹{RENTAL_CONFIG.upfrontFeeINR} Paid</span>
+                    </div>
+                    <div className="flex items-center justify-between px-4 py-3">
+                      <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
+                        <Timer size={14} /> Usage Rate
+                      </div>
+                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR} / {RENTAL_CONFIG.computeHoursPerUnit}hrs</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Info Box */}
+                <div className="rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3">
+                  <p className="text-xs text-[var(--foreground)] font-medium leading-relaxed">
+                    A confirmation email has been sent. After your rental period ends, your actual compute usage will be calculated and a bill with a Razorpay payment link will be emailed to you.
+                  </p>
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-col gap-3 pt-1">
+                  <Button
+                    onClick={() => setRentalResult(null)}
+                    variant="secondary"
+                    size="large"
+                    className="w-full justify-center gap-2"
+                  >
+                    <RefreshCw size={16} /> Rent Another
+                  </Button>
+                  <Button href="/dev/contact" variant="ghost" size="small" className="w-full justify-center">
+                    <Shield size={14} /> Need Help? Contact Support
+                  </Button>
+                </div>
+              </div>
+            ) : rentalResult && !rentalResult.status ? (
+              <div className="text-center space-y-4 py-4">
+                <p className="text-sm text-[var(--foreground)] font-medium">Pay the upfront fee to activate your rental.</p>
+                <Button onClick={handleRentalPay} variant="primary" size="large" className="w-full justify-center gap-2">
+                  <IndianRupee size={18} /> Pay ₹{rentalResult.upfrontFee} Upfront Fee
+                </Button>
+                <p className="font-code-brand text-xs text-[var(--muted)]">Rental ID: {rentalResult.rentalId}</p>
+              </div>
+            ) : (
+              <form onSubmit={handleRentalSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={rentalForm.name}
+                    onChange={(e) => setRentalForm({ ...rentalForm, name: e.target.value })}
+                    className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                    placeholder="Your full name"
+                  />
+                </div>
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Email</label>
+                    <input
+                      type="email"
+                      required
+                      value={rentalForm.email}
+                      onChange={(e) => setRentalForm({ ...rentalForm, email: e.target.value })}
+                      className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                      placeholder="you@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-1.5">Phone</label>
+                    <input
+                      type="tel"
+                      required
+                      value={rentalForm.phone}
+                      onChange={(e) => setRentalForm({ ...rentalForm, phone: e.target.value })}
+                      className="w-full rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-3 text-sm font-semibold text-[var(--foreground)] focus:outline-none focus:border-[var(--primary)]"
+                      placeholder="+91 98765 43210"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-2">Rental Duration</label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {RENTAL_CONFIG.timeOptions.map((opt) => (
+                      <button
+                        key={opt.days}
+                        type="button"
+                        aria-label={"Select " + opt.days + " day rental duration"}
+                        aria-pressed={rentalForm.days === opt.days}
+                        onClick={() => setRentalForm({ ...rentalForm, days: opt.days })}
+                        className={
+                          "rounded-xl border-2 py-2.5 text-xs font-black transition-all " +
+                          (rentalForm.days === opt.days
+                            ? "border-[var(--primary)] bg-[var(--primary-soft)] text-primary shadow-[var(--shadow-soft)]"
+                            : "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[var(--primary)]")
+                        }
+                      >
+                        {opt.days}D
+                      </button>
+                    ))}
+                  </div>
+                  {rentalForm.days === 7 && (
+                    <p className="mt-1.5 text-[11px] font-bold text-[var(--accent)]">Most popular choice</p>
+                  )}
+                </div>
+
+                {rentalError && (
+                  <div className="rounded-xl border-2 border-red-400 bg-red-50 dark:bg-red-950/30 p-3 text-xs font-bold text-red-800 dark:text-red-300">
+                    {rentalError}
+                  </div>
+                )}
+
+                <label className="flex items-start gap-3 cursor-pointer rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] p-4 transition-colors hover:border-[var(--primary)]">
+                  <input
+                    type="checkbox"
+                    checked={rentalTermsAccepted}
+                    onChange={(e) => { setRentalTermsAccepted(e.target.checked); if (e.target.checked) setRentalError(""); }}
+                    className="mt-0.5 h-4 w-4 flex-shrink-0 accent-[var(--primary)]"
+                  />
+                  <span className="text-sm leading-relaxed text-[var(--foreground)]">
+                    I have read and agree to the <Link href="/dev/terms" target="_blank" className="font-bold text-primary underline underline-offset-2 hover:no-underline">Terms &amp; Conditions</Link>, including the Rent Services billing terms and acceptable use policy.
+                  </span>
+                </label>
+
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="large"
+                  disabled={rentalLoading || !rentalTermsAccepted}
+                  className="w-full justify-center gap-2"
+                >
+                  {rentalLoading ? <Loader2 size={18} className="animate-spin" /> : <Zap size={18} />}
+                  {rentalLoading ? "Creating Rental..." : "Rent for " + rentalForm.days + " Days — ₹" + RENTAL_CONFIG.upfrontFeeINR + " Upfront"}
+                </Button>
+                <p className="text-center text-[11px] font-semibold text-[var(--muted)]">
+                  Secure Razorpay Checkout • Bill emailed after usage • No hidden charges
+                </p>
+              </form>
+            )}
           </div>
         </section>
 
@@ -594,13 +928,16 @@ export default function CloudPage() {
                 >
                   <button
                     onClick={() => toggleFaq(index)}
+                    aria-expanded={isOpen}
+                    aria-controls={"faq-answer-" + index}
+                    style={{ fontFamily: 'inherit' }}
                     className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[var(--surface-muted)] transition-colors"
                   >
                     <div className="flex items-center gap-3.5">
                       <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
                         Q{index + 1}
                       </span>
-                      <span className="text-base md:text-lg font-black text-slate-950 dark:text-slate-50 leading-snug">
+                      <span className="text-base md:text-lg font-black text-[var(--heading)] leading-snug">
                         {faq.q}
                       </span>
                     </div>
@@ -618,22 +955,20 @@ export default function CloudPage() {
                     </div>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {isOpen && (
-                      <motion.div
-                        key={`faq-ans-${index}`}
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25, ease: "easeInOut" }}
-                        className="overflow-hidden border-t-2 border-[var(--border-soft)] bg-[var(--surface)]"
-                      >
-                        <div className="p-5 md:p-6 text-slate-900 dark:text-slate-100 text-base md:text-lg leading-relaxed font-semibold">
-                          {faq.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <div
+                    id={"faq-answer-" + index}
+                    role="region"
+                    className={
+                      "grid transition-[grid-template-rows] duration-300 ease-in-out border-t-2 border-[var(--border-soft)] " +
+                      (isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")
+                    }
+                  >
+                    <div className="overflow-hidden bg-[var(--surface)]">
+                      <div className="p-5 md:p-6 text-[var(--foreground)] text-base md:text-lg leading-relaxed font-semibold">
+                        {faq.a}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               );
             })}
