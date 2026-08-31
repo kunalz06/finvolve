@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
+import Button from "./ui/Button";
 
 const STORAGE_KEY = "dev-theme";
 
@@ -31,15 +32,17 @@ export default function ThemeToggle({ compact = false }) {
   };
 
   return (
-    <button
+    <Button
       type="button"
       onClick={toggleTheme}
-      className={`theme-toggle rounded-full px-3 py-2 text-xs font-bold uppercase ${compact ? "h-11 w-11 justify-center px-0" : ""}`}
+      variant="secondary"
+      size="small"
+      className={`theme-toggle rounded-full ${compact ? "h-11 w-11 justify-center px-0" : "px-3 py-2 text-xs font-bold uppercase"}`}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >
       <Icon size={17} />
       {!compact && <span>{isDark ? "Light" : "Dark"}</span>}
-    </button>
+    </Button>
   );
 }

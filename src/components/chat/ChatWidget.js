@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { MessageCircle, X } from "lucide-react";
 import ChatWindow from "./ChatWindow";
+import Button from "@/components/ui/Button";
 
 const STORAGE_KEY = "dev_chat_minimized";
 const TOOLTIP_KEY = "dev_chat_tooltip_seen";
@@ -125,21 +126,23 @@ export default function ChatWidget() {
       )}
 
       {mounted && !isOpen && (
-        <button
+        <Button
           className={`chat-fab ${isMinimized ? "chat-fab-muted" : ""} ${fabVisible ? "chat-fab-visible" : ""}`}
           onClick={handleOpen}
           type="button"
           aria-label="Open chat assistant"
+          variant="primary"
+          size="icon"
         >
           <MessageCircle size={24} />
           {isMinimized && <span className="chat-fab-badge" />}
-        </button>
+        </Button>
       )}
 
       {mounted && tooltipVisible && !isOpen && (
         <div className="chat-tooltip chat-tooltip-visible">
           <span>Need help? Chat with DEV&#8734;</span>
-          <button
+          <Button
             className="chat-tooltip-close"
             onClick={(e) => {
               e.stopPropagation();
@@ -149,9 +152,11 @@ export default function ChatWidget() {
             }}
             type="button"
             aria-label="Dismiss tooltip"
+            variant="ghost"
+            size="icon"
           >
             <X size={12} />
-          </button>
+          </Button>
         </div>
       )}
     </div>

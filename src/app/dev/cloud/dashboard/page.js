@@ -401,9 +401,9 @@ export default function DashboardPage() {
                                                 <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">Switch Plan</p>
                                                 <h2 className="mt-2 text-2xl font-bold text-slate-950">Change to a different plan</h2>
                                             </div>
-                                            <button className="glass-chip-strong inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-600 hover:bg-white/85" onClick={() => setShowTierModal(false)}>
+                                            <Button variant="glass" size="icon" onClick={() => setShowTierModal(false)}>
                                                 <span className="text-lg leading-none">×</span>
-                                            </button>
+                                            </Button>
                                         </div>
                                         <div className="space-y-4 p-6">
                                             <div className="rounded-xl bg-blue-50/85 border border-blue-200 p-4 text-sm text-blue-700">

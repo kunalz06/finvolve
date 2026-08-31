@@ -384,15 +384,16 @@ export default function ProjectWizard() {
 
       {/* Navigation Buttons */}
       <div className="mt-8 flex flex-col-reverse items-center justify-between gap-4 border-t border-[var(--border-soft)] pt-8 sm:flex-row">
-        <button
+        <Button
           onClick={handleBack}
+          variant="ghost"
           className={cn(
-            "flex items-center gap-2 font-medium text-slate-600 transition-colors hover:text-primary",
+            "font-medium text-slate-600 hover:!text-primary",
             currentStep === 0 && "opacity-0 pointer-events-none"
           )}
         >
           <ArrowLeft size={20} /> Back
-        </button>
+        </Button>
 
         {currentStep === STEPS.length - 1 ? (
           <Button

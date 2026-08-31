@@ -457,10 +457,10 @@ export default function AdminPage() {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
                         return (
-                            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`inline-flex items-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-all ${active ? "border-2 border-[var(--border)] bg-[var(--primary)] text-white shadow-[var(--shadow-soft)]" : "text-slate-600 hover:bg-[var(--surface-muted)] hover:text-slate-900"}`}>
+                            <Button key={tab.id} variant={active ? "primary" : "ghost"} size="default" onClick={() => setActiveTab(tab.id)} className={`rounded-lg ${!active ? "!border-transparent !bg-transparent text-slate-600 hover:!bg-[var(--surface-muted)] hover:!text-slate-900" : ""}`}>
                                 <Icon size={16} />
                                 {tab.label}
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
@@ -494,7 +494,7 @@ export default function AdminPage() {
                                     </div>
                                     <div className="flex gap-3">
                                         <Button type="button" variant="secondary" className="flex-1" onClick={() => setSelectedRequest(item)}>View<Eye size={18} /></Button>
-                                        <button type="button" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => handleDeleteRequest(item.id)} disabled={deletingRequestId === item.id}><Trash2 size={16} />{deletingRequestId === item.id ? "Deleting..." : "Delete"}</button>
+                                        <Button type="button" variant="danger" className="flex-1" onClick={() => handleDeleteRequest(item.id)} disabled={deletingRequestId === item.id}><Trash2 size={16} />{deletingRequestId === item.id ? "Deleting..." : "Delete"}</Button>
                                     </div>
                                 </div>
                             </Card>
@@ -520,7 +520,7 @@ export default function AdminPage() {
                                 <div className="mt-5 text-xs text-slate-500">{formatDate(item.createdAt)}</div>
                                 <div className="mt-5 flex gap-3">
                                     {item.status === "unread" && <Button type="button" variant="secondary" className="flex-1" onClick={() => updateDoc(doc(db, "contact_messages", item.id), { status: "read" })}>Mark Read<CheckCircle size={18} /></Button>}
-                                    <button type="button" className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "contact_messages", item.id))}><Trash2 size={16} />Delete</button>
+                                    <Button type="button" variant="danger" className="flex-1" onClick={() => deleteDoc(doc(db, "contact_messages", item.id))}><Trash2 size={16} />Delete</Button>
                                 </div>
                             </Card>
                         ))}
@@ -553,7 +553,7 @@ export default function AdminPage() {
                                     <div className="font-semibold">Payment link ready{generatedLink.emailSent ? " and emailed" : ""}</div>
                                     {!generatedLink.emailSent && <div className="mt-1 text-xs">The link was created, but the email could not be sent. You can share it manually.</div>}
                                     <div className="mt-2 break-all">{generatedLink.paymentUrl}</div>
-                                    <button type="button" className="mt-3 rounded-full border border-emerald-300 bg-white/70 px-4 py-2 text-xs font-semibold text-emerald-800 transition-colors hover:bg-white" onClick={() => navigator.clipboard.writeText(generatedLink.paymentUrl)}>Copy link</button>
+                                    <Button type="button" variant="success" size="xsmall" className="mt-3 bg-white/70 !text-emerald-800 border-emerald-300" onClick={() => navigator.clipboard.writeText(generatedLink.paymentUrl)}>Copy link</Button>
                                 </div>
                             )}
                         </Card>
@@ -573,7 +573,7 @@ export default function AdminPage() {
                                     <div className="mt-5 text-4xl font-bold text-slate-950">{formatCurrency(item.amount)}</div>
                                     {item.tokenExpiresAt && <div className="mt-2 text-xs text-slate-500">Expires: {formatDate(item.tokenExpiresAt)}</div>}
                                     {item.razorpayPaymentId && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">Payment ID: {item.razorpayPaymentId}</div>}
-                                    <button type="button" className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</button>
+                                    <Button type="button" variant="danger" className="mt-5 w-full" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</Button>
                                 </Card>
                             ))}
                         </div>
@@ -618,7 +618,7 @@ export default function AdminPage() {
                                         </div>
                                         <div className="mt-5 flex flex-wrap gap-2">
                                             {sub.status === "active" && (
-                                                <button type="button" className="rounded-full border border-amber-200 bg-amber-50/75 px-4 py-2 text-xs font-semibold text-amber-700 hover:bg-amber-100" onClick={async () => {
+                                                <Button type="button" variant="warning" size="xsmall" onClick={async () => {
                                                     setSubActionLoading(sub.id);
                                                     try {
                                                         const idToken = await auth.currentUser.getIdToken(true);
@@ -628,10 +628,10 @@ export default function AdminPage() {
                                                         });
                                                     } catch (e) { setError(e.message); }
                                                     finally { setSubActionLoading(null); }
-                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Pause"}</button>
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Pause"}</Button>
                                             )}
                                             {sub.status === "paused" && (
-                                                <button type="button" className="rounded-full border border-emerald-200 bg-emerald-50/75 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100" onClick={async () => {
+                                                <Button type="button" variant="success" size="xsmall" onClick={async () => {
                                                     setSubActionLoading(sub.id);
                                                     try {
                                                         const idToken = await auth.currentUser.getIdToken(true);
@@ -641,10 +641,10 @@ export default function AdminPage() {
                                                         });
                                                     } catch (e) { setError(e.message); }
                                                     finally { setSubActionLoading(null); }
-                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Resume"}</button>
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Resume"}</Button>
                                             )}
                                             {(sub.status === "active" || sub.status === "paused") && (
-                                                <button type="button" className="rounded-full border border-red-200 bg-red-50/75 px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-100" onClick={async () => {
+                                                <Button type="button" variant="danger" size="xsmall" onClick={async () => {
                                                     if (!confirm("Cancel this subscription?")) return;
                                                     setSubActionLoading(sub.id);
                                                     try {
@@ -655,7 +655,7 @@ export default function AdminPage() {
                                                         });
                                                     } catch (e) { setError(e.message); }
                                                     finally { setSubActionLoading(null); }
-                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Cancel"}</button>
+                                                }} disabled={subActionLoading === sub.id}>{subActionLoading === sub.id ? "..." : "Cancel"}</Button>
                                             )}
                                         </div>
                                     </Card>
@@ -855,13 +855,14 @@ export default function AdminPage() {
                                                     {session.status === "resolved" ? "Reopen" : "Mark Resolved"}
                                                     <CheckCircle size={16} />
                                                 </Button>
-                                                <button
+                                                <Button
                                                     type="button"
-                                                    className="inline-flex items-center gap-2 rounded-full border border-red-200 bg-red-50/75 px-4 py-2.5 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100"
+                                                    variant="danger"
+                                                    size="small"
                                                     onClick={() => deleteDoc(doc(db, "chat_sessions", session.id))}
                                                 >
                                                     <Trash2 size={14} />Delete
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
                                     )}
@@ -880,7 +881,7 @@ export default function AdminPage() {
                                 <h2 className="mt-2 text-2xl font-bold text-slate-950">{selectedRequest.name || "Unnamed lead"}</h2>
                                 <p className="mt-1 text-sm text-slate-600">{selectedRequest.projectType || "Project request"}</p>
                             </div>
-                            <button type="button" className="glass-chip-strong inline-flex h-11 w-11 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-white/85 hover:text-slate-900" onClick={() => setSelectedRequest(null)} aria-label="Close request modal"><X size={18} /></button>
+                            <Button type="button" variant="glass" size="icon" onClick={() => setSelectedRequest(null)} aria-label="Close request modal"><X size={18} /></Button>
                         </div>
                         <div className="max-h-[calc(90vh-144px)] overflow-y-auto px-6 py-6 md:px-8">
                             <div className="grid gap-4 md:grid-cols-2">
@@ -899,7 +900,7 @@ export default function AdminPage() {
                         </div>
                         <div className="flex flex-col gap-3 border-t border-white/45 px-6 py-5 sm:flex-row sm:justify-end md:px-8">
                             <Button type="button" variant="secondary" onClick={() => setSelectedRequest(null)}>Close</Button>
-                            <button type="button" className="inline-flex items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50/80 px-5 py-3 text-sm font-semibold text-red-700 transition-colors hover:bg-red-100" onClick={() => handleDeleteRequest(selectedRequest.id)} disabled={deletingRequestId === selectedRequest.id}><Trash2 size={16} />{deletingRequestId === selectedRequest.id ? "Deleting..." : "Delete Request"}</button>
+                            <Button type="button" variant="danger" onClick={() => handleDeleteRequest(selectedRequest.id)} disabled={deletingRequestId === selectedRequest.id}><Trash2 size={16} />{deletingRequestId === selectedRequest.id ? "Deleting..." : "Delete Request"}</Button>
                         </div>
                     </div>
                 </div>

@@ -499,15 +499,17 @@ export default function CloudPage() {
                 Compare Plan Specifications
               </h3>
             </div>
-            <button
+            <Button
               onClick={() => setShowComparison(!showComparison)}
               aria-expanded={showComparison}
               aria-controls="comparison-table"
-              className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-xs font-black uppercase text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:bg-[var(--primary-soft)] transition-all"
+              variant="secondary"
+              size="small"
+              className="text-xs font-black uppercase"
             >
               <span>{showComparison ? "Collapse Table" : "Expand Table"}</span>
               {showComparison ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </button>
+            </Button>
           </div>
 
           {showComparison && (
@@ -803,21 +805,18 @@ export default function CloudPage() {
                   <label className="block text-xs font-black uppercase tracking-wider text-[var(--muted)] mb-2">Rental Duration</label>
                   <div className="grid grid-cols-5 gap-2">
                     {RENTAL_CONFIG.timeOptions.map((opt) => (
-                      <button
+                      <Button
                         key={opt.days}
                         type="button"
                         aria-label={"Select " + opt.days + " day rental duration"}
                         aria-pressed={rentalForm.days === opt.days}
                         onClick={() => setRentalForm({ ...rentalForm, days: opt.days })}
-                        className={
-                          "rounded-xl border-2 py-2.5 text-xs font-black transition-all " +
-                          (rentalForm.days === opt.days
-                            ? "border-[var(--primary)] bg-[var(--primary-soft)] text-primary shadow-[var(--shadow-soft)]"
-                            : "border-[var(--border)] bg-[var(--surface-strong)] text-[var(--foreground)] hover:border-[var(--primary)]")
-                        }
+                        variant={rentalForm.days === opt.days ? "primary" : "secondary"}
+                        size="small"
+                        className="text-xs font-black"
                       >
                         {opt.days}D
-                      </button>
+                      </Button>
                     ))}
                   </div>
                   {rentalForm.days === 7 && (
@@ -926,12 +925,13 @@ export default function CloudPage() {
                   key={index}
                   className="rounded-2xl border-2 border-[var(--border)] bg-[var(--surface-strong)] shadow-[var(--shadow-soft)] overflow-hidden transition-all duration-200"
                 >
-                  <button
+                  <Button
                     onClick={() => toggleFaq(index)}
                     aria-expanded={isOpen}
                     aria-controls={"faq-answer-" + index}
                     style={{ fontFamily: 'inherit' }}
-                    className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[var(--surface-muted)] transition-colors"
+                    variant="ghost"
+                    className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 border-0 bg-transparent shadow-none hover:!bg-[var(--surface-muted)] !font-normal"
                   >
                     <div className="flex items-center gap-3.5">
                       <span className="flex-shrink-0 font-code-brand text-xs font-black px-2.5 py-1 rounded-lg border-2 border-[var(--border)] bg-[var(--surface-muted)] text-[var(--foreground)]">
@@ -953,7 +953,7 @@ export default function CloudPage() {
                         className={`transition-transform duration-200 ${isOpen ? "rotate-180 text-white" : ""}`}
                       />
                     </div>
-                  </button>
+                  </Button>
 
                   <div
                     id={"faq-answer-" + index}

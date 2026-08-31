@@ -7,6 +7,7 @@ import { getSessionId, saveChatSession, saveContactMessage, loadPreviousSession,
 import ChatMessage from "./ChatMessage";
 import QuickReplies from "./QuickReplies";
 import TypingIndicator from "./TypingIndicator";
+import Button from "@/components/ui/Button";
 
 const WELCOME = {
   role: "bot",
@@ -220,30 +221,36 @@ export default function ChatWindow({ onClose, onMinimize }) {
           </div>
         </div>
         <div className="chat-header-actions">
-          <button
+          <Button
             className="chat-header-btn"
             onClick={handleReset}
             title="Reset conversation"
             type="button"
+            variant="ghost"
+            size="icon"
           >
             <RotateCcw size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             className="chat-header-btn"
             onClick={onMinimize}
             title="Minimize"
             type="button"
+            variant="ghost"
+            size="icon"
           >
             <Minus size={14} />
-          </button>
-          <button
+          </Button>
+          <Button
             className="chat-header-btn"
             onClick={onClose}
             title="Close"
             type="button"
+            variant="ghost"
+            size="icon"
           >
             <X size={14} />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -274,7 +281,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
       {/* Input */}
       <div className="chat-input-area">
         {isInFlow && (
-          <button
+          <Button
             className="chat-cancel-flow"
             onClick={() => {
               engine.cancelFlow();
@@ -289,9 +296,11 @@ export default function ChatWindow({ onClose, onMinimize }) {
               ]);
             }}
             type="button"
+            variant="outline"
+            size="xsmall"
           >
             Cancel
-          </button>
+          </Button>
         )}
         <input
           ref={inputRef}
@@ -303,18 +312,20 @@ export default function ChatWindow({ onClose, onMinimize }) {
           disabled={isTyping || restoring}
           autoComplete="off"
         />
-        <button
+        <Button
           className="chat-send-btn"
           onClick={() => handleSend()}
           disabled={!input.trim() || isTyping || restoring}
           type="button"
           aria-label="Send message"
+          variant="primary"
+          size="icon"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 2L11 13" />
             <path d="M22 2L15 22L11 13L2 9L22 2Z" />
           </svg>
-        </button>
+        </Button>
       </div>
     </div>
   );

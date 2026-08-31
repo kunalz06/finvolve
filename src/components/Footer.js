@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { ArrowRight, Github, Linkedin, Mail, Zap } from "lucide-react";
 import { apiUrl } from "@/lib/api";
+import Button from "@/components/ui/Button";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -95,15 +96,16 @@ export default function Footer() {
                     required
                   />
                 </div>
-                <button
+                <Button
                   type="submit"
                   disabled={newsletterLoading}
-                  className="rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] py-3 text-sm font-bold text-white shadow-[var(--shadow-soft)] transition-all duration-200 hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-70"
+                  variant="primary"
+                  className="py-3 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   <span className="flex items-center justify-center gap-2">
                     {newsletterLoading ? "Subscribing..." : "Subscribe"} <ArrowRight size={16} />
                   </span>
-                </button>
+                </Button>
                 {newsletterStatus.message && (
                   <p className={`rounded-xl px-3 py-2 text-xs leading-5 ${
                     newsletterStatus.type === "error"

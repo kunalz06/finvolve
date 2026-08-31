@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Menu, X, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import ThemeToggle from "@/components/ThemeToggle";
+import Button from "@/components/ui/Button";
 
 const HOME_PATH = "/dev";
 
@@ -94,11 +95,14 @@ export default function Navbar() {
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 md:hidden">
             <ThemeToggle compact />
-            <button
-              className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:text-primary" style={{ color: 'var(--heading, #0f172a)' }}
+            <Button
+              className="glass-surface flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-colors hover:text-primary" 
+              style={{ color: 'var(--heading, #0f172a)' }}
               onClick={() => setMobileMenuOpen((open) => !open)}
               aria-label="Toggle navigation"
               type="button"
+              variant="glass"
+              size="icon"
             >
               <AnimatePresence mode="wait" initial={false}>
                 {mobileMenuOpen ? (
@@ -125,7 +129,7 @@ export default function Navbar() {
                   </motion.span>
                 )}
               </AnimatePresence>
-            </button>
+            </Button>
           </div>
         </div>
       </div>

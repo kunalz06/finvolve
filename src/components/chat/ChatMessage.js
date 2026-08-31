@@ -5,6 +5,7 @@ import { ThumbsUp, ThumbsDown, ExternalLink } from "lucide-react";
 import { parseInlineBold } from "@/lib/chat/chat-utils";
 import { saveFeedback } from "@/lib/chat/chat-utils";
 import { getSessionId } from "@/lib/chat/chat-utils";
+import Button from "@/components/ui/Button";
 
 export default function ChatMessage({ message, onFeedback }) {
   const isBot = message.role === "bot";
@@ -77,24 +78,28 @@ function FeedbackRow({ messageText, intent, onFeedback }) {
     <div className="chat-feedback-row">
       {sent === null ? (
         <>
-          <button
+          <Button
             className="chat-feedback-btn"
             onClick={() => handleFeedback("up")}
             type="button"
             aria-label="Helpful"
             title="Helpful"
+            variant="ghost"
+            size="icon"
           >
             <ThumbsUp size={12} />
-          </button>
-          <button
+          </Button>
+          <Button
             className="chat-feedback-btn"
             onClick={() => handleFeedback("down")}
             type="button"
             aria-label="Not helpful"
             title="Not helpful"
+            variant="ghost"
+            size="icon"
           >
             <ThumbsDown size={12} />
-          </button>
+          </Button>
         </>
       ) : (
         <span className={`chat-feedback-sent ${sent === "up" ? "feedback-up" : "feedback-down"}`}>
