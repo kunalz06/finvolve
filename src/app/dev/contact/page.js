@@ -67,17 +67,8 @@ export default function Contact() {
     <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="container">
         <div className="mx-auto max-w-5xl">
-          {/* Animated Phone Illustration */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-8 sm:mb-12 flex justify-center"
-          >
-            <div className="w-full max-w-md">
-              <ContactCallAnimation className="mx-auto" />
-            </div>
-          </motion.div>
+          {/* Animated Phone Illustration - Overlay */}
+          <ContactCallAnimation className="mb-8 sm:mb-12" />
           
           <motion.div initial={false} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
             <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">

@@ -42,15 +42,7 @@ export default function Home() {
               </div>
             </motion.div>
 
-            <motion.div
-              initial={false}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.45, ease: "easeOut", delay: 0.1 }}
-              className="rounded-2xl overflow-hidden"
-              aria-label="Animated illustration of a person entering a home"
-            >
-              <HomeEntranceAnimation className="p-4 sm:p-6 md:p-8" />
-            </motion.div>
+            <HomeEntranceAnimation className="rounded-2xl" />
           </div>
         </div>
       </section>
