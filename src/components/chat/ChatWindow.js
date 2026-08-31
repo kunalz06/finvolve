@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { X, Minus, RotateCcw } from "lucide-react";
 import { ChatEngine } from "@/lib/chat/chat-engine";
-import { getSessionId, saveChatSession, saveContactMessage } from "@/lib/chat/chat-utils";
+import { getSessionId, saveChatSession, saveContactMessage, loadPreviousSession, setLastChatTime, getLastChatTime } from "@/lib/chat/chat-utils";
 import ChatMessage from "./ChatMessage";
 import QuickReplies from "./QuickReplies";
 import TypingIndicator from "./TypingIndicator";
@@ -14,6 +14,8 @@ const WELCOME = {
   quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Contact Us"],
 };
 
+const SESSION_RESTORE_HOURS = 24; // Restore sessions less than 24h old
+
 export default function ChatWindow({ onClose, onMinimize }) {
   const [messages, setMessages] = useState([WELCOME]);
   const [input, setInput] = useState("");
@@ -21,6 +23,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
   const [activeReplies, setActiveReplies] = useState(WELCOME.quickReplies);
   const [initialized, setInitialized] = useState(false);
   const [engine, setEngine] = useState(null);
+  const [restoring, setRestoring] = useState(true);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -32,15 +35,40 @@ export default function ChatWindow({ onClose, onMinimize }) {
     eng.init().then(() => setInitialized(true));
   }, []);
 
+  // Restore previous session
+  useEffect(() => {
+    async function restore() {
+      const lastTime = getLastChatTime();
+      const now = Date.now();
+      const hoursSince = (now - lastTime) / (1000 * 60 * 60);
+
+      if (hoursSince < SESSION_RESTORE_HOURS && lastTime > 0) {
+        const sessionId = getSessionId();
+        const prev = await loadPreviousSession(sessionId);
+        if (prev && prev.messages && prev.messages.length > 1) {
+          const restored = prev.messages.map((m) => ({
+            role: m.role,
+            text: m.text,
+            timestamp: m.timestamp,
+          }));
+          setMessages(restored);
+          setActiveReplies([]);
+        }
+      }
+      setRestoring(false);
+    }
+    restore();
+  }, []);
+
   // Auto-scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isTyping]);
 
-  // Focus input when chat opens
+  // Focus input
   useEffect(() => {
-    setTimeout(() => inputRef.current?.focus(), 300);
-  }, []);
+    if (!restoring) setTimeout(() => inputRef.current?.focus(), 300);
+  }, [restoring]);
 
   // Debounced Firestore save
   const scheduleSave = useCallback(
@@ -49,6 +77,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
       saveTimerRef.current = setTimeout(() => {
         const sessionId = getSessionId();
         if (sessionId) saveChatSession(sessionId, msgs);
+        setLastChatTime();
       }, 3000);
     },
     []
@@ -58,7 +87,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
   const addBotResponse = useCallback(
     (response) => {
       setIsTyping(true);
-      const delay = 300 + Math.random() * 400; // 300-700ms
+      const delay = 300 + Math.random() * 400;
 
       setTimeout(() => {
         setIsTyping(false);
@@ -67,6 +96,8 @@ export default function ChatWindow({ onClose, onMinimize }) {
           role: "bot",
           text: response.text,
           timestamp: Date.now(),
+          cards: response.cards || undefined,
+          intent: response.confidence > 0 ? null : undefined,
         };
 
         setMessages((prev) => {
@@ -84,12 +115,12 @@ export default function ChatWindow({ onClose, onMinimize }) {
           }, 800);
         }
 
-        // Handle message sent → save to contact_messages
+        // Handle message sent
         if (response.action === "message_sent" && response.actionData) {
           saveContactMessage(response.actionData);
         }
 
-        // Handle project brief → navigate to form with params
+        // Handle project brief
         if (response.action === "project_brief_complete" && response.actionData) {
           const d = response.actionData;
           const params = new URLSearchParams({
@@ -106,7 +137,6 @@ export default function ChatWindow({ onClose, onMinimize }) {
     [scheduleSave]
   );
 
-  // Handle send
   const handleSend = useCallback(
     async (text) => {
       const trimmed = (text || input).trim();
@@ -115,7 +145,6 @@ export default function ChatWindow({ onClose, onMinimize }) {
       setInput("");
       setActiveReplies([]);
 
-      // Add user message
       const userMsg = { role: "user", text: trimmed, timestamp: Date.now() };
       setMessages((prev) => {
         const next = [...prev, userMsg];
@@ -123,19 +152,16 @@ export default function ChatWindow({ onClose, onMinimize }) {
         return next;
       });
 
-      // Process through engine
       const response = await engine.processMessage(trimmed);
       addBotResponse(response);
     },
     [engine, input, addBotResponse, scheduleSave]
   );
 
-  // Handle quick reply
   const handleQuickReply = useCallback(
     (label) => {
       setActiveReplies([]);
 
-      // Add user message showing the quick reply
       const userMsg = { role: "user", text: label, timestamp: Date.now() };
       setMessages((prev) => {
         const next = [...prev, userMsg];
@@ -143,14 +169,12 @@ export default function ChatWindow({ onClose, onMinimize }) {
         return next;
       });
 
-      // Get engine response
       const response = engine.handleQuickReply(label);
       addBotResponse(response);
     },
     [engine, addBotResponse, scheduleSave]
   );
 
-  // Handle keyboard
   const handleKeyDown = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -158,9 +182,11 @@ export default function ChatWindow({ onClose, onMinimize }) {
     }
   };
 
-  // Reset chat
   const handleReset = () => {
     engine.cancelFlow();
+    // Clear persisted session
+    localStorage.removeItem("dev_chat_session_id");
+    localStorage.removeItem("dev_chat_last_time");
     setMessages([WELCOME]);
     setActiveReplies(WELCOME.quickReplies);
     setInput("");
@@ -212,6 +238,16 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
       {/* Messages */}
       <div className="chat-messages">
+        {restoring && (
+          <div className="chat-msg bot-msg">
+            <div className="chat-msg-avatar">DEV</div>
+            <div className="chat-typing">
+              <span className="chat-typing-dot" />
+              <span className="chat-typing-dot" />
+              <span className="chat-typing-dot" />
+            </div>
+          </div>
+        )}
         {messages.map((msg, i) => (
           <ChatMessage key={i} message={msg} />
         ))}
@@ -253,14 +289,15 @@ export default function ChatWindow({ onClose, onMinimize }) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={isInFlow ? "Type your response..." : "Ask about services, pricing, projects..."}
-          disabled={isTyping}
+          disabled={isTyping || restoring}
           autoComplete="off"
         />
         <button
           className="chat-send-btn"
           onClick={() => handleSend()}
-          disabled={!input.trim() || isTyping}
+          disabled={!input.trim() || isTyping || restoring}
           type="button"
+          aria-label="Send message"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M22 2L11 13" />

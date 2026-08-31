@@ -1,10 +1,17 @@
 /**
- * DEV∞ Chatbot — Main Engine
- * Orchestrates: ML inference → knowledge lookup → action flows → context tracking
+ * DEV∞ Chatbot — Main Engine v2
+ * Orchestrates: ML inference → keyword match → knowledge lookup → action flows → context tracking
  */
 
 import { predict, loadModel } from "./chat-inference";
-import { KNOWLEDGE, QUICK_REPLY_ROUTES, FALLBACK_RESPONSES } from "./chat-knowledge";
+import {
+  KNOWLEDGE,
+  QUICK_REPLY_ROUTES,
+  FALLBACK_RESPONSES,
+  KEYWORD_INTENTS,
+  HUMAN_HANDOFF_THRESHOLD,
+  getText,
+} from "./chat-knowledge";
 
 // ── State machine for multi-turn flows ───────────────────────────
 
@@ -48,7 +55,7 @@ function extractEntities(text) {
     { pattern: /\b(1[0-2]|ten|eleven|twelve|1\s*month|a\s*month)\s*(?:week|wk)?s?/i, value: "8-12 weeks" },
     { pattern: /\b(1[3-9]|2[0-4]|two\s*to\s*four\s*month|2\s*to\s*4\s*month|couple\s*of\s*month)s?/i, value: "12-16 weeks" },
     { pattern: /\b(6\s*month|six\s*month|half\s*year|24\s*week)/i, value: "16-24 weeks" },
-    { pattern: /\b(urgent|asap|rush|immediate|asap)/i, value: "1-2 weeks" },
+    { pattern: /\b(urgent|asap|rush|immediate)/i, value: "1-2 weeks" },
   ];
   for (const { pattern, value } of timelinePatterns) {
     if (pattern.test(text)) {
@@ -59,7 +66,7 @@ function extractEntities(text) {
 
   // Budget
   const budgetPatterns = [
-    { pattern: /\b(?:₹|rs\.?|inr\s*)\s*([\d,]+)\s*(?:k|thousand)/i, value: (m) => `<₹5,000 (MVP)` },
+    { pattern: /\b(?:₹|rs\.?|inr\s*)\s*([\d,]+)\s*(?:k|thousand)/i, value: () => `<₹5,000 (MVP)` },
     { pattern: /\bless\s*than\s*(?:₹|rs\.?|inr)\s*5[,.]?0?00/i, value: () => `<₹5,000 (MVP)` },
     { pattern: /\b(?:₹|rs\.?|inr\s*)\s*([\d,]+)\s*(?:k|thousand)/i, value: (m) => { const num = parseInt(m[1].replace(",", "")); if (num >= 5 && num <= 20) return `₹5,000-₹20,000 (Full Build)`; if (num > 20 && num <= 50) return `₹20,000-₹50,000 (Enterprise)`; if (num > 50) return `₹50,000+ (Complex)`; return `₹5,000-₹20,000 (Full Build)`; } },
     { pattern: /\b(?:₹|rs\.?|inr\s*)\s*([\d,]+)(?!\s*k)(?!\s*lakh)/i, value: (m) => { const num = parseInt(m[1].replace(",", "")); if (num < 5000) return `<₹5,000 (MVP)`; if (num <= 20000) return `₹5,000-₹20,000 (Full Build)`; if (num <= 50000) return `₹20,000-₹50,000 (Enterprise)`; return `₹50,000+ (Complex)`; } },
@@ -79,22 +86,33 @@ function extractEntities(text) {
   return entities;
 }
 
+// ── Keyword matching for intents not in the ML model ──────────
+
+function matchKeywords(text) {
+  const lower = text.toLowerCase();
+  for (const [intent, keywords] of Object.entries(KEYWORD_INTENTS)) {
+    for (const kw of keywords) {
+      if (lower.includes(kw)) {
+        return intent;
+      }
+    }
+  }
+  return null;
+}
+
 // ── Main Engine ──────────────────────────────────────────────────
 
 export class ChatEngine {
   constructor() {
     this.model = null;
     this.modelReady = false;
-    this.history = []; // { role, text, intent?, entities? }
+    this.history = [];
     this.flowState = FLOW_STATES.IDLE;
     this.flowData = {};
     this.fallbackCount = 0;
     this.lastTopic = null;
   }
 
-  /**
-   * Initialize — load ML model
-   */
   async init() {
     if (this.modelReady) return;
     this.model = await loadModel();
@@ -103,7 +121,6 @@ export class ChatEngine {
 
   /**
    * Process a user message and return a bot response
-   * Returns: { text, quickReplies, links?, action?, actionData? }
    */
   async processMessage(text) {
     const trimmed = text.trim();
@@ -114,79 +131,105 @@ export class ChatEngine {
       return this.handleFlowInput(trimmed);
     }
 
-    // ML inference
+    // 1. ML inference
     let intent = null;
     if (this.modelReady) {
       intent = predict(trimmed, this.model);
     }
 
-    // High confidence → serve knowledge response
+    // 2. High confidence ML → serve knowledge response
     if (intent && intent.confidence >= 0.5) {
-      this.lastTopic = intent.tag;
-      this.fallbackCount = 0;
-      this.history.push({ role: "user", text: trimmed, intent: intent.tag });
-
-      const entry = KNOWLEDGE[intent.tag];
-      if (entry) {
-        return {
-          text: entry.text,
-          quickReplies: entry.quickReplies || [],
-          links: entry.links || null,
-          action: entry.action || null,
-          confidence: intent.confidence,
-        };
-      }
+      return this.serveIntent(intent.tag, trimmed, intent.confidence);
     }
 
-    // Medium confidence — try to match anyway but note uncertainty
+    // 3. Medium confidence ML → try anyway
     if (intent && intent.confidence >= 0.3) {
       const entry = KNOWLEDGE[intent.tag];
       if (entry) {
-        this.lastTopic = intent.tag;
-        this.fallbackCount = 0;
-        this.history.push({ role: "user", text: trimmed, intent: intent.tag });
-        return {
-          text: entry.text,
-          quickReplies: entry.quickReplies || [],
-          links: entry.links || null,
-          action: entry.action || null,
-          confidence: intent.confidence,
-        };
+        return this.serveIntent(intent.tag, trimmed, intent.confidence);
       }
     }
 
-    // Context-aware: check if user is referring to last topic
+    // 4. Keyword matching (for intents not in ML model)
+    const kwIntent = matchKeywords(trimmed);
+    if (kwIntent && KNOWLEDGE[kwIntent]) {
+      return this.serveIntent(kwIntent, trimmed, 0.6);
+    }
+
+    // 5. Context-aware follow-ups
     const contextResult = this.handleContext(trimmed);
     if (contextResult) return contextResult;
 
-    // Check for entity-rich project request in free text
+    // 6. Entity-rich project request in free text
     const entities = extractEntities(trimmed);
     if (entities.projectType) {
       this.flowData = { ...this.flowData, ...entities };
       this.history.push({ role: "user", text: trimmed, entities });
-
-      const type = entities.projectType;
-      let response = `A **${type}** project — great choice! `;
-
-      if (entities.timeline) {
-        response += `I see you're looking at a **${entities.timeline}** timeline. `;
-        if (entities.budget) {
-          response += `And a budget around **${entities.budget}**. That gives me a good picture!\n\nWant me to take you to the full project request form where you can share more details?`;
-          this.flowState = FLOW_STATES.IDLE;
-          return { text: response, quickReplies: ["Yes, take me there", "I want to add more"], action: "suggest_project_form" };
-        }
-        response += "Do you have a budget range in mind?";
-        return { text: response, quickReplies: ["<₹5,000 (MVP)", "₹5k-₹20k (Full Build)", "₹20k-₹50k (Enterprise)", "₹50,000+ (Complex)"] };
-      }
-
-      response += "What's your preferred timeline?";
-      return { text: response, quickReplies: ["1-2 weeks", "2-4 weeks", "4-8 weeks", "8-12 weeks", "16-24 weeks"] };
+      return this.handleProjectEntityExtraction(entities);
     }
 
-    // Fallback
+    // 7. Fallback with human handoff check
     this.fallbackCount++;
     this.history.push({ role: "user", text: trimmed, intent: "unknown" });
+
+    // Human handoff after consecutive fallbacks
+    if (this.fallbackCount >= HUMAN_HANDOFF_THRESHOLD) {
+      this.fallbackCount = 0;
+      const entry = KNOWLEDGE.human_handoff;
+      return {
+        text: getText(entry),
+        quickReplies: entry.quickReplies || [],
+        cards: entry.cards || null,
+        links: entry.links || null,
+        confidence: 0,
+        action: "human_handoff",
+      };
+    }
+
     return this.fallback();
+  }
+
+  /**
+   * Serve a matched intent response
+   */
+  serveIntent(tag, userText, confidence) {
+    this.lastTopic = tag;
+    this.fallbackCount = 0;
+    this.history.push({ role: "user", text: userText, intent: tag });
+
+    const entry = KNOWLEDGE[tag];
+    if (!entry) return this.fallback();
+
+    return {
+      text: getText(entry),
+      quickReplies: entry.quickReplies || [],
+      cards: entry.cards || null,
+      links: entry.links || null,
+      action: entry.action || null,
+      confidence,
+    };
+  }
+
+  /**
+   * Handle entity extraction for project requests
+   */
+  handleProjectEntityExtraction(entities) {
+    const type = entities.projectType;
+    let response = `A **${type}** project — great choice! `;
+
+    if (entities.timeline) {
+      response += `I see you're looking at a **${entities.timeline}** timeline. `;
+      if (entities.budget) {
+        response += `And a budget around **${entities.budget}**. That gives me a good picture!\n\nWant me to take you to the full project request form where you can share more details?`;
+        this.flowState = FLOW_STATES.IDLE;
+        return { text: response, quickReplies: ["Yes, take me there", "I want to add more"], action: "suggest_project_form" };
+      }
+      response += "Do you have a budget range in mind?";
+      return { text: response, quickReplies: ["<₹5,000 (MVP)", "₹5k-₹20k (Full Build)", "₹20k-₹50k (Enterprise)", "₹50,000+ (Complex)"] };
+    }
+
+    response += "What's your preferred timeline?";
+    return { text: response, quickReplies: ["1-2 weeks", "2-4 weeks", "4-8 weeks", "8-12 weeks", "16-24 weeks"] };
   }
 
   /**
@@ -195,33 +238,30 @@ export class ChatEngine {
   handleQuickReply(label) {
     const route = QUICK_REPLY_ROUTES[label];
     if (!route) {
-      // Treat as normal message
       return this.processMessage(label);
     }
 
-    // Direct link navigation
     if (route.link) {
       return { text: `Taking you to **${label}**...`, quickReplies: [], link: route.link, action: "navigate" };
     }
 
-    // Override text
     if (route.override) {
       this.history.push({ role: "user", text: label, intent: "quick_reply" });
       const qr = KNOWLEDGE[route.intent]?.quickReplies || [];
-      return { text: route.override, quickReplies: qr, links: KNOWLEDGE[route.intent]?.links || null };
+      const cards = KNOWLEDGE[route.intent]?.cards || null;
+      const links = KNOWLEDGE[route.intent]?.links || null;
+      return { text: route.override, quickReplies: qr, cards, links };
     }
 
-    // Action
     if (route.action) {
       return this.handleAction(route.action, route.value);
     }
 
-    // Intent lookup
     if (route.intent) {
       const entry = KNOWLEDGE[route.intent];
       if (entry) {
         this.history.push({ role: "user", text: label, intent: route.intent });
-        return { text: entry.text, quickReplies: entry.quickReplies, links: entry.links || null, action: entry.action || null };
+        return { text: getText(entry), quickReplies: entry.quickReplies, cards: entry.cards || null, links: entry.links || null, action: entry.action || null };
       }
     }
 
@@ -357,23 +397,21 @@ export class ChatEngine {
   }
 
   /**
-   * Handle context-aware follow-ups ("tell me more", "yes", etc.)
+   * Handle context-aware follow-ups
    */
   handleContext(text) {
     const lower = text.toLowerCase();
 
-    // "tell me more" / "more details" → elaborate on last topic
     if (/^(tell me more|more details?|more info|elaborate|tell me about that|can you elaborate)/.test(lower)) {
       if (this.lastTopic) {
         const entry = KNOWLEDGE[this.lastTopic];
         if (entry) {
           this.history.push({ role: "user", text, intent: this.lastTopic });
-          return { text: entry.text, quickReplies: entry.quickReplies || [], links: entry.links || null };
+          return { text: getText(entry), quickReplies: entry.quickReplies || [], links: entry.links || null, cards: entry.cards || null };
         }
       }
     }
 
-    // "yes, take me there" → navigate to project form
     if (/^(yes|yeah|yep|sure|ok|okay|yup|please|let's go|lets go)/.test(lower)) {
       const last = this.history[this.history.length - 1];
       if (last?.intent === "project_request") {
@@ -386,11 +424,12 @@ export class ChatEngine {
       }
     }
 
-    // "no" / "contact us instead" → navigate to contact
     if (/^(no|nope|nah|contact us instead|talk to someone|human|real person)/.test(lower)) {
+      const entry = KNOWLEDGE.human_handoff;
       return {
-        text: "Sure, let me take you to the contact page.",
-        quickReplies: [],
+        text: getText(entry),
+        quickReplies: entry.quickReplies || [],
+        cards: entry.cards || null,
         link: "/dev/contact",
         action: "navigate",
       };
@@ -404,23 +443,19 @@ export class ChatEngine {
    */
   fallback() {
     const idx = Math.min(this.fallbackCount - 1, FALLBACK_RESPONSES.length - 1);
+    const fb = FALLBACK_RESPONSES[idx];
     return {
-      ...FALLBACK_RESPONSES[idx],
+      text: fb.texts ? fb.texts[0] : (fb.text || ""),
+      quickReplies: fb.quickReplies || [],
       confidence: 0,
     };
   }
 
-  /**
-   * Cancel current flow
-   */
   cancelFlow() {
     this.flowState = FLOW_STATES.IDLE;
     this.flowData = {};
   }
 
-  /**
-   * Get current flow state (for UI to know if in a form flow)
-   */
   get isInFlow() {
     return this.flowState !== FLOW_STATES.IDLE;
   }

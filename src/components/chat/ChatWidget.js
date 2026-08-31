@@ -6,53 +6,80 @@ import ChatWindow from "./ChatWindow";
 
 const STORAGE_KEY = "dev_chat_minimized";
 const TOOLTIP_KEY = "dev_chat_tooltip_seen";
+const PROACTIVE_DELAY = 15000; // 15 seconds
+const EXIT_INTENT_Y = 10; // Cursor within 10px of top = likely leaving
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(true);
+  const [showTooltip, setShowTooltip] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [windowVisible, setWindowVisible] = useState(false);
   const [fabVisible, setFabVisible] = useState(false);
   const [tooltipVisible, setTooltipVisible] = useState(false);
   const tooltipTimerRef = useRef(null);
+  const proactiveTimerRef = useRef(null);
   const closeTimerRef = useRef(null);
 
-  // Client-only mount: kick off CSS-transition-driven entrances
+  // Client-only mount
   useEffect(() => {
     setMounted(true);
     setIsMinimized(sessionStorage.getItem(STORAGE_KEY) === "true");
     const tooltipSeen = sessionStorage.getItem(TOOLTIP_KEY);
     setShowTooltip(!tooltipSeen);
 
-    // Staggered entrance: FAB first, then tooltip
+    // FAB entrance animation
     requestAnimationFrame(() => {
       setFabVisible(true);
-      if (!tooltipSeen) {
-        setTimeout(() => setTooltipVisible(true), 200);
-      }
     });
+
+    // Proactive tooltip: show after delay if user hasn't interacted
+    proactiveTimerRef.current = setTimeout(() => {
+      if (!isOpen && !tooltipSeen) {
+        setTooltipVisible(true);
+        sessionStorage.setItem(TOOLTIP_KEY, "true");
+      }
+    }, PROACTIVE_DELAY);
+
+    // Exit intent detection
+    const handleMouseLeave = (e) => {
+      if (e.clientY <= EXIT_INTENT_Y && !isOpen) {
+        // Show tooltip proactively on exit intent
+        if (!showTooltip) {
+          setTooltipVisible(true);
+          setShowTooltip(true);
+          sessionStorage.setItem(TOOLTIP_KEY, "true");
+        }
+      }
+    };
+    document.addEventListener("mouseleave", handleMouseLeave);
+
+    return () => {
+      clearTimeout(proactiveTimerRef.current);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+    };
   }, []);
 
-  // Sync tooltip visibility when showTooltip changes after mount
+  // Sync tooltip visibility
   useEffect(() => {
     if (!mounted) return;
     if (showTooltip) {
-      setTimeout(() => setTooltipVisible(true), 50);
+      const t = setTimeout(() => setTooltipVisible(true), 100);
+      return () => clearTimeout(t);
     } else {
       setTooltipVisible(false);
     }
   }, [showTooltip, mounted]);
 
-  // Hide tooltip after 6 seconds
+  // Auto-dismiss tooltip after 6s
   useEffect(() => {
-    if (!showTooltip) return;
-    tooltipTimerRef.current = setTimeout(() => {
+    if (!tooltipVisible) return;
+    const t = setTimeout(() => {
+      setTooltipVisible(false);
       setShowTooltip(false);
-      sessionStorage.setItem(TOOLTIP_KEY, "true");
     }, 6000);
-    return () => clearTimeout(tooltipTimerRef.current);
-  }, [showTooltip]);
+    return () => clearTimeout(t);
+  }, [tooltipVisible]);
 
   const handleOpen = useCallback(() => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
@@ -60,15 +87,14 @@ export default function ChatWidget() {
     setWindowVisible(true);
     setFabVisible(false);
     setTooltipVisible(false);
+    setShowTooltip(false);
     setIsMinimized(false);
     sessionStorage.removeItem(STORAGE_KEY);
-    setShowTooltip(false);
     sessionStorage.setItem(TOOLTIP_KEY, "true");
   }, []);
 
   const handleClose = useCallback(() => {
     setWindowVisible(false);
-    // Wait for CSS transition to finish before unmounting
     closeTimerRef.current = setTimeout(() => {
       setIsOpen(false);
       setFabVisible(true);
@@ -114,6 +140,7 @@ export default function ChatWidget() {
             className="chat-tooltip-close"
             onClick={(e) => {
               e.stopPropagation();
+              setTooltipVisible(false);
               setShowTooltip(false);
               sessionStorage.setItem(TOOLTIP_KEY, "true");
             }}

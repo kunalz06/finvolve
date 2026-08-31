@@ -55,7 +55,7 @@ export default function Navbar() {
     <nav className="fixed left-0 top-0 z-50 w-full px-3 pt-3 md:px-6 md:pt-5">
       <div className={"container mx-auto transition-all duration-200 " + (scrolled ? "max-w-6xl" : "max-w-[1340px]")}>
         <div className={"glass-surface-strong flex items-center justify-between rounded-2xl px-3 py-3 transition-transform duration-200 md:px-6 " + (scrolled ? "-translate-y-1" : "")}>
-          <Link href="/" className="group flex items-center gap-3">
+          <Link href="/dev" className="group flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] shadow-[var(--shadow-soft)] transition-transform duration-200 group-hover:-translate-y-0.5">
               <Zap className="text-white" size={20} />
             </div>
