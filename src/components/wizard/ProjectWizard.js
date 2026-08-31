@@ -383,7 +383,7 @@ export default function ProjectWizard() {
       </Card>
 
       {/* Navigation Buttons */}
-      <div className="mt-8 flex flex-col-reverse items-center justify-between gap-4 border-t border-white/45 pt-8 sm:flex-row">
+      <div className="mt-8 flex flex-col-reverse items-center justify-between gap-4 border-t border-[var(--border-soft)] pt-8 sm:flex-row">
         <button
           onClick={handleBack}
           className={cn(

@@ -445,7 +445,7 @@ export class ChatEngine {
     const idx = Math.min(this.fallbackCount - 1, FALLBACK_RESPONSES.length - 1);
     const fb = FALLBACK_RESPONSES[idx];
     return {
-      text: fb.texts ? fb.texts[0] : (fb.text || ""),
+      text: getText(fb),
       quickReplies: fb.quickReplies || [],
       confidence: 0,
     };

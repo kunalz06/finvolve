@@ -25,8 +25,14 @@ export default function ChatMessage({ message, onFeedback }) {
                 target={card.external ? "_blank" : undefined}
                 rel={card.external ? "noopener noreferrer" : undefined}
                 onClick={(e) => {
-                  if (!card.external) {
-                    e.preventDefault();
+                  if (card.external) return; // Let default <a> behavior handle it
+                  e.preventDefault();
+                  const url = new URL(card.link, window.location.origin);
+                  const isSamePage = url.pathname === window.location.pathname;
+                  if (isSamePage && url.hash) {
+                    const el = document.getElementById(url.hash.slice(1));
+                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  } else {
                     window.location.href = card.link;
                   }
                 }}

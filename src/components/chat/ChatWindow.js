@@ -108,10 +108,21 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
         setActiveReplies(response.quickReplies || []);
 
-        // Handle navigation
+        // Handle navigation (supports #hash deep-links for section scrolling)
         if (response.action === "navigate" && response.link) {
           setTimeout(() => {
-            window.location.href = response.link;
+            const url = new URL(response.link, window.location.origin);
+            const isSamePage = url.pathname === window.location.pathname;
+            if (isSamePage && url.hash) {
+              // Same page — smooth scroll to section
+              const el = document.getElementById(url.hash.slice(1));
+              if (el) {
+                el.scrollIntoView({ behavior: "smooth", block: "start" });
+              }
+            } else {
+              // Different page — navigate (browser will handle #hash)
+              window.location.href = response.link;
+            }
           }, 800);
         }
 

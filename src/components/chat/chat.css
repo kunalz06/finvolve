@@ -655,6 +655,19 @@
    Mobile Optimization
    ═══════════════════════════════════════════════════════ */
 
+/* Tablet: slightly smaller window */
+@media (max-width: 640px) and (min-width: 481px) {
+  .chat-window-wrapper {
+    width: 340px;
+  }
+
+  .chat-window {
+    height: 520px;
+    max-height: calc(100vh - 80px);
+  }
+}
+
+/* Mobile: full-screen takeover */
 @media (max-width: 480px) {
   .chat-widget {
     bottom: 0;

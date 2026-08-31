@@ -501,6 +501,8 @@ export default function CloudPage() {
             </div>
             <button
               onClick={() => setShowComparison(!showComparison)}
+              aria-expanded={showComparison}
+              aria-controls="comparison-table"
               className="inline-flex items-center gap-2 rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] px-4 py-2.5 text-xs font-black uppercase text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:bg-[var(--primary-soft)] transition-all"
             >
               <span>{showComparison ? "Collapse Table" : "Expand Table"}</span>
@@ -509,7 +511,7 @@ export default function CloudPage() {
           </div>
 
           {showComparison && (
-            <div className="relative overflow-x-auto">
+            <div id="comparison-table" className="relative overflow-x-auto">
               <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[var(--surface-strong)] to-transparent pointer-events-none z-10 hidden max-md:block" aria-hidden="true" />
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -804,6 +806,8 @@ export default function CloudPage() {
                       <button
                         key={opt.days}
                         type="button"
+                        aria-label={"Select " + opt.days + " day rental duration"}
+                        aria-pressed={rentalForm.days === opt.days}
                         onClick={() => setRentalForm({ ...rentalForm, days: opt.days })}
                         className={
                           "rounded-xl border-2 py-2.5 text-xs font-black transition-all " +
@@ -924,6 +928,8 @@ export default function CloudPage() {
                 >
                   <button
                     onClick={() => toggleFaq(index)}
+                    aria-expanded={isOpen}
+                    aria-controls={"faq-answer-" + index}
                     style={{ fontFamily: 'inherit' }}
                     className="w-full flex items-center justify-between p-5 md:p-6 text-left gap-4 hover:bg-[var(--surface-muted)] transition-colors"
                   >
@@ -950,6 +956,8 @@ export default function CloudPage() {
                   </button>
 
                   <div
+                    id={"faq-answer-" + index}
+                    role="region"
                     className={
                       "grid transition-[grid-template-rows] duration-300 ease-in-out border-t-2 border-[var(--border-soft)] " +
                       (isOpen ? "grid-rows-[1fr]" : "grid-rows-[0fr]")
