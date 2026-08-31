@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/ui/Animated";
 import { ArrowRight, Brain, CheckCircle, Cloud, Code, Database, Globe, Palette, Shield, Smartphone } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -88,7 +88,7 @@ export default function ServicesPage() {
 
         <section className="grid gap-6 sm:gap-8 md:grid-cols-2">
           {services.map((service, index) => (
-            <motion.div key={service.id} initial={false} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: index * 0.05 }}>
+            <AnimatedDiv key={service.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.05 }}>
               <Card className="group h-full">
                 <div className={`mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl border-2 border-[var(--border)] ${service.color} shadow-[var(--shadow-soft)] transition-transform duration-200 group-hover:-translate-y-0.5`}>
                   <service.icon className="text-white size-6 sm:size-7" />
@@ -110,7 +110,7 @@ export default function ServicesPage() {
                   </Button>
                 </div>
               </Card>
-            </motion.div>
+            </AnimatedDiv>
           ))}
         </section>
 

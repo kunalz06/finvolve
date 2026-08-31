@@ -1,29 +1,18 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
 
-export default function Card({
-    children,
-    className = "",
-    delay = 0,
-    hover = true,
-    ...props
-}) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: delay }}
-            viewport={{ once: true }}
-            className={cn(
-                "relative bg-white border border-gray-200 rounded-xl p-6",
-                hover && "hover:shadow-card-hover hover:border-primary/30 transition-all duration-300",
-                className
-            )}
-            {...props}
-        >
-            {children}
-        </motion.div>
-    );
+export default function RaceCard({ children, className = "" }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className={`glass-surface rounded-xl p-4 backdrop-blur-md ${className}`}
+      whileHover={{ scale: 1.02, y: -2, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}
+    >
+      {children}
+    </motion.div>
+  );
 }

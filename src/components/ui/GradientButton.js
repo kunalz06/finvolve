@@ -1,23 +1,27 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { cn } from "@/lib/utils";
+import { forwardRef } from "react";
 
-export default function GradientButton({ children, className, onClick, ...props }) {
-    return (
-        <motion.button
-            className={cn(
-                "relative px-8 py-3 rounded-lg font-semibold text-white overflow-hidden group",
-                "bg-gradient-primary shadow-button",
-                className
-            )}
-            whileHover={{ scale: 1.02, boxShadow: "0 8px 25px rgba(139, 92, 246, 0.4)" }}
-            whileTap={{ scale: 0.98 }}
-            onClick={onClick}
-            {...props}
-        >
-            <span className="relative z-10 flex items-center justify-center gap-2">{children}</span>
-            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-        </motion.button>
-    );
-}
+export const GradientButton = forwardRef(({ children, className = "", ...props }, ref) => {
+  return (
+    <motion.button
+      ref={ref}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4 }}
+      className={`relative overflow-hidden rounded-full px-6 py-3 text-sm font-semibold text-white transition-all duration-300 ${className}`}
+      whileHover={{ scale: 1.05, boxShadow: "0 5px 15px rgba(0,0,0,0.2)" }}
+      whileTap={{ scale: 0.95 }}
+      {...props}
+    >
+      <span className="relative z-10">{children}</span>
+      <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+    </motion.button>
+  );
+});
+
+GradientButton.displayName = "GradientButton";
+
+export default GradientButton;

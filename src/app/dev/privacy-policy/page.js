@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
+import { AnimatedDiv } from "@/components/ui/Animated";
 import { Shield, ChevronLeft } from 'lucide-react';
 import Link from 'next/link';
 import Card from '@/components/ui/Card';
@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
           Back to Home
         </Link>
 
-        <motion.div
+        <AnimatedDiv
           initial={false}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -92,7 +92,7 @@ export default function PrivacyPolicy() {
               </section>
             </div>
           </Card>
-        </motion.div>
+        </AnimatedDiv>
       </div>
     </div>
   );

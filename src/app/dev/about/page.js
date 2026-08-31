@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/ui/Animated";
 import { ExternalLink, Rocket, Target, Users, Zap } from "lucide-react";
 import { FaFigma, FaNodeJs, FaReact, FaSwift } from "react-icons/fa";
 import { SiFirebase, SiFlutter, SiKotlin, SiNextdotjs, SiPostgresql, SiSupabase, SiTailwindcss } from "react-icons/si";
@@ -13,7 +13,7 @@ export default function About() {
       <div className="container space-y-10">
         <section className="page-section">
           <div className="glass-surface-strong grid items-center gap-12 rounded-2xl px-8 py-10 lg:grid-cols-2 lg:px-12">
-            <motion.div initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
+            <AnimatedDiv initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
               <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
                 <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">About Us</span>
               </div>
@@ -27,9 +27,9 @@ export default function About() {
                 <Button href="/dev/contact" variant="primary" size="large">Get in Touch</Button>
                 <Button href="/dev/services" variant="secondary" size="large">View Services</Button>
               </div>
-            </motion.div>
+            </AnimatedDiv>
 
-            <motion.div initial={false} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
+            <AnimatedDiv initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
               <div className="relative mx-auto aspect-square max-w-md">
                 <div className="glass-chip absolute inset-0 rotate-3 rounded-2xl" />
                 <div className="relative flex h-full items-center justify-center rounded-2xl border-2 border-[var(--border)] bg-[var(--primary)] p-8 text-center text-white shadow-[var(--shadow)]">
@@ -39,7 +39,7 @@ export default function About() {
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </AnimatedDiv>
           </div>
         </section>
 
@@ -97,7 +97,7 @@ export default function About() {
             <p className="mx-auto max-w-2xl text-slate-600">A modern stack chosen for maintainability, speed, and product momentum.</p>
           </div>
 
-          <motion.div className="grid grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-6" initial={false} whileInView={{ opacity: 1 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
+          <AnimatedDiv className="grid grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <TechLogo icon={FaReact} name="React" color="text-cyan-500" />
             <TechLogo icon={SiNextdotjs} name="Next.js" color="text-slate-950" />
             <TechLogo icon={SiTailwindcss} name="Tailwind" color="text-teal-500" />
@@ -110,7 +110,7 @@ export default function About() {
             <TechLogo icon={FaSwift} name="Swift" color="text-orange-500" />
             <TechLogo icon={FaFigma} name="Figma" color="text-pink-500" />
             <TechLogo icon={SiFirebase} name="GCP" color="text-blue-500" />
-          </motion.div>
+          </AnimatedDiv>
         </section>
 
         <section>

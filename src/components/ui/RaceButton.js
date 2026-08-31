@@ -1,59 +1,80 @@
 "use client";
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { forwardRef, useEffect, useState } from "react";
 
-export default function Button({
-    href,
-    children,
-    className = "",
-    onClick,
+export const RaceButton = forwardRef((
+  { 
+    children, 
+    className = "", 
+    disabled = false,
+    loading = false,
+    icon: Icon = null,
     variant = "primary",
-    size = "default",
-    icon: Icon,
-    ...props
-}) {
-    const baseStyles = "relative inline-flex items-center justify-center gap-2 font-semibold rounded-lg transition-all duration-300";
+    ...props 
+  }, 
+  ref
+) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
 
-    const variants = {
-        primary: "bg-primary text-white hover:bg-primary-hover shadow-button hover:shadow-lg",
-        secondary: "bg-white text-gray-900 border border-gray-200 hover:border-primary hover:text-primary",
-        outline: "bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-white",
-        ghost: "bg-transparent text-gray-600 hover:text-primary hover:bg-gray-100",
-    };
+  const mouseXSpring = useSpring(x, { stiffness: 500, damping: 50 });
+  const mouseYSpring = useSpring(y, { stiffness: 500, damping: 50 });
 
-    const sizes = {
-        small: "px-4 py-2 text-sm",
-        default: "px-6 py-3 text-base",
-        large: "px-8 py-4 text-lg",
-    };
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
 
-    const content = (
-        <>
-            {Icon && <Icon size={size === "small" ? 16 : size === "large" ? 24 : 20} />}
-            <span>{children}</span>
-        </>
-    );
+  const handleMouseMove = (e) => {
+    if (!ref?.current || disabled) return;
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
 
-    const combinedClassName = cn(baseStyles, variants[variant], sizes[size], className);
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+    setIsHovered(false);
+  };
 
-    if (href) {
-        return (
-            <Link href={href} className={combinedClassName} {...props}>
-                {content}
-            </Link>
-        );
-    }
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+  };
 
-    return (
-        <motion.button
-            whileTap={{ scale: 0.98 }}
-            onClick={onClick}
-            className={combinedClassName}
-            {...props}
-        >
-            {content}
-        </motion.button>
-    );
-}
+  const baseClasses = `relative flex items-center justify-center gap-2 overflow-hidden rounded-2xl border-2 border-transparent text-sm font-bold transition-all duration-500`;
+  
+  const variants = {
+    primary: `bg-[var(--primary)] text-white shadow-[inset_0_0_0_1px_var(--border),inset_0_2px_8px_rgba(0,0,0,0.1)] hover:bg-[var(--primary-soft)] hover:border-[var(--border)]`,
+    secondary: `bg-[var(--surface-strong)] text-[var(--foreground)] border-2 border-[var(--border)] hover:bg-[var(--surface-muted)]`,
+    ghost: `bg-transparent text-[var(--foreground)] hover:bg-[var(--surface-muted)]`,
+  };
+
+  return (
+    <motion.button
+      ref={ref}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`${baseClasses} ${variants[variant]} ${className}`}
+      disabled={disabled || loading}
+      style={isHovered ? { rotateX, rotateY, transformStyle: "preserve-3d" } : {}}
+      whileHover={{ scale: disabled ? 1 : 1.02 }}
+      whileTap={{ scale: disabled ? 1 : 0.98 }}
+      {...props}
+    >
+      {loading ? <span className="animate-spin" /> : <>{Icon && <Icon size={16} />}{children}</>}
+    </motion.button>
+  );
+});
+
+RaceButton.displayName = "RaceButton";
+
+export default RaceButton;

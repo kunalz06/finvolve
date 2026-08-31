@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatedDiv } from "@/components/ui/Animated";
 import {
   ArrowRight,
   Bot,
@@ -330,11 +330,10 @@ export default function CloudPage() {
               color: "bg-[var(--accent-cool)]",
             },
           ].map((feature, i) => (
-            <motion.div
+            <AnimatedDiv
               key={feature.title}
-              initial={false}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: i * 0.1 }}
             >
               <Card hover={true} className="h-full space-y-4">
@@ -349,7 +348,7 @@ export default function CloudPage() {
                 <h3 className="text-xl font-black text-[var(--heading)]">{feature.title}</h3>
                 <p className="text-sm leading-relaxed text-[var(--foreground)] font-medium">{feature.desc}</p>
               </Card>
-            </motion.div>
+            </AnimatedDiv>
           ))}
         </section>
 
@@ -376,11 +375,10 @@ export default function CloudPage() {
               const isHighlighted = plan.highlight;
 
               return (
-                <motion.div
+                <AnimatedDiv
                   key={tierKey}
-                  initial={false}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.45, delay: index * 0.1 }}
                   className="flex"
                 >
@@ -483,7 +481,7 @@ export default function CloudPage() {
                       </p>
                     </div>
                   </Card>
-                </motion.div>
+                </AnimatedDiv>
               );
             })}
           </div>
