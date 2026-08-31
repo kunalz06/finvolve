@@ -674,6 +674,7 @@
     right: 0;
     left: 0;
     align-items: stretch;
+    flex-direction: column;
   }
 
   .chat-window-wrapper {
@@ -684,7 +685,7 @@
     bottom: 0;
     width: 100%;
     max-height: 100vh;
-    z-index: 10000;
+    z-index: 10001;
     padding: 0;
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -699,10 +700,16 @@
   }
 
   .chat-fab {
-    position: relative;
-    width: 52px;
-    height: 52px;
-    margin-bottom: env(safe-area-inset-bottom, 8px);
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom, 16px));
+    right: max(16px, env(safe-area-inset-right, 16px));
+    width: 54px;
+    height: 54px;
+    margin-bottom: 0;
+    z-index: 9999;
+    align-self: flex-end;
   }
 
   .chat-tooltip {
@@ -776,8 +783,25 @@
   }
 
   .chat-feedback-btn {
-  width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+  }
+
+  .chat-header-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+  }
+
+  .chat-card {
+    padding: 12px 14px;
+    border-radius: 12px;
+  }
+
+  .chat-cancel-flow {
+    padding: 8px 12px;
+    font-size: 0.72rem;
   }
 }
 

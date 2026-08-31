@@ -6,8 +6,8 @@ import ChatWindow from "./ChatWindow";
 
 const STORAGE_KEY = "dev_chat_minimized";
 const TOOLTIP_KEY = "dev_chat_tooltip_seen";
-const PROACTIVE_DELAY = 15000; // 15 seconds
-const EXIT_INTENT_Y = 10; // Cursor within 10px of top = likely leaving
+const PROACTIVE_DELAY = 15000;
+const EXIT_INTENT_Y = 10;
 
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,19 +21,14 @@ export default function ChatWidget() {
   const proactiveTimerRef = useRef(null);
   const closeTimerRef = useRef(null);
 
-  // Client-only mount
   useEffect(() => {
     setMounted(true);
     setIsMinimized(sessionStorage.getItem(STORAGE_KEY) === "true");
     const tooltipSeen = sessionStorage.getItem(TOOLTIP_KEY);
     setShowTooltip(!tooltipSeen);
 
-    // FAB entrance animation
-    requestAnimationFrame(() => {
-      setFabVisible(true);
-    });
+    requestAnimationFrame(() => setFabVisible(true));
 
-    // Proactive tooltip: show after delay if user hasn't interacted
     proactiveTimerRef.current = setTimeout(() => {
       if (!isOpen && !tooltipSeen) {
         setTooltipVisible(true);
@@ -41,10 +36,8 @@ export default function ChatWidget() {
       }
     }, PROACTIVE_DELAY);
 
-    // Exit intent detection
     const handleMouseLeave = (e) => {
       if (e.clientY <= EXIT_INTENT_Y && !isOpen) {
-        // Show tooltip proactively on exit intent
         if (!showTooltip) {
           setTooltipVisible(true);
           setShowTooltip(true);
@@ -60,7 +53,6 @@ export default function ChatWidget() {
     };
   }, []);
 
-  // Sync tooltip visibility
   useEffect(() => {
     if (!mounted) return;
     if (showTooltip) {
@@ -71,7 +63,6 @@ export default function ChatWidget() {
     }
   }, [showTooltip, mounted]);
 
-  // Auto-dismiss tooltip after 6s
   useEffect(() => {
     if (!tooltipVisible) return;
     const t = setTimeout(() => {
@@ -80,6 +71,18 @@ export default function ChatWidget() {
     }, 6000);
     return () => clearTimeout(t);
   }, [tooltipVisible]);
+
+  // Lock body scroll when chat is open on mobile
+  useEffect(() => {
+    if (!mounted) return;
+    const isMobile = window.innerWidth <= 480;
+    if (isMobile && isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [isOpen, mounted]);
 
   const handleOpen = useCallback(() => {
     if (closeTimerRef.current) clearTimeout(closeTimerRef.current);
