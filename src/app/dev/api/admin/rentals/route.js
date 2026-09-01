@@ -1,6 +1,5 @@
-import { getAdminDb } from "@/lib/firebase-admin";
+import { getAdminDb, getAdminAuth } from "@/lib/firebase-admin";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
-import { auth } from "@/lib/firebase-admin";
 
 /**
  * GET — List all rentals (admin, auth-gated).
@@ -20,7 +19,7 @@ export async function GET(request) {
         const token = authHeader.split("Bearer ")[1];
         let decodedClaims;
         try {
-            decodedClaims = await auth.verifyIdToken(token);
+            decodedClaims = await getAdminAuth().verifyIdToken(token);
         } catch {
             return corsJson(request, { error: "Invalid or expired token." }, { status: 401 });
         }
