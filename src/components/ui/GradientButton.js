@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect, forwardRef } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 
 export const GradientButton = forwardRef(({ children, className = "", ...props }, ref) => {
   const buttonRef = useRef(null);
@@ -10,7 +10,7 @@ export const GradientButton = forwardRef(({ children, className = "", ...props }
   useEffect(() => {
     if (buttonRef.current) {
       const handleMouseEnter = () => {
-        anime({
+        animate({
           targets: buttonRef.current,
           scale: 1.05,
           boxShadow: "0 5px 15px rgba(0,0,0,0.2)",
@@ -18,7 +18,7 @@ export const GradientButton = forwardRef(({ children, className = "", ...props }
           easing: "easeOutQuad"
         });
         if (innerRef.current) {
-          anime({
+          animate({
             targets: innerRef.current,
             opacity: 1,
             duration: 300,
@@ -28,7 +28,7 @@ export const GradientButton = forwardRef(({ children, className = "", ...props }
       };
 
       const handleMouseLeave = () => {
-        anime({
+        animate({
           targets: buttonRef.current,
           scale: 1,
           boxShadow: "",
@@ -36,7 +36,7 @@ export const GradientButton = forwardRef(({ children, className = "", ...props }
           easing: "easeOutQuad"
         });
         if (innerRef.current) {
-          anime({
+          animate({
             targets: innerRef.current,
             opacity: 0,
             duration: 300,

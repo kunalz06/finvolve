@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 import { X } from "lucide-react";
 
 export default function ContactCallAnimation({ className = "", onClose }) {
@@ -34,86 +34,86 @@ export default function ContactCallAnimation({ className = "", onClose }) {
 
   useEffect(() => {
     if (telephoneRef.current) {
-      anime({ targets: telephoneRef.current, opacity: [0, 1], scale: [0.8, 1], translateY: [40, 0], duration: 800, easing: "easeOutCubic", autoplay: true });
+      animate({ targets: telephoneRef.current, opacity: [0, 1], scale: [0.8, 1], translateY: [40, 0], duration: 800, easing: "easeOutCubic", autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (!receiverRef.current) return;
     if (isRinging) {
-      anime({ targets: receiverRef.current, translateX: [0, 5, 0, -5, 0], translateY: [0, -3, 0, 3, 0], rotate: [0, 5, 0, -5, 0], duration: 300, easing: "easeInOutSine", loop: true, autoplay: true });
+      animate({ targets: receiverRef.current, translateX: [0, 5, 0, -5, 0], translateY: [0, -3, 0, 3, 0], rotate: [0, 5, 0, -5, 0], duration: 300, easing: "easeInOutSine", loop: true, autoplay: true });
     } else if (isTalking) {
-      anime({ targets: receiverRef.current, translateX: 12, translateY: -20, rotate: -15, duration: 800, easing: "easeOutCubic", autoplay: true });
+      animate({ targets: receiverRef.current, translateX: 12, translateY: -20, rotate: -15, duration: 800, easing: "easeOutCubic", autoplay: true });
     } else {
-      anime({ targets: receiverRef.current, translateX: 0, translateY: 0, rotate: 0, duration: 800, easing: "easeOutCubic", autoplay: true });
+      animate({ targets: receiverRef.current, translateX: 0, translateY: 0, rotate: 0, duration: 800, easing: "easeOutCubic", autoplay: true });
     }
   }, [isRinging, isTalking]);
 
   useEffect(() => {
     if (!receiverCordRef.current) return;
     const opacity = isTalking ? 1 : isRinging ? 0.7 : 0;
-    anime({ targets: receiverCordRef.current, opacity: [receiverCordRef.current.style.opacity || 0, opacity], duration: 500, easing: "easeOutQuad", autoplay: true });
+    animate({ targets: receiverCordRef.current, opacity: [receiverCordRef.current.style.opacity || 0, opacity], duration: 500, easing: "easeOutQuad", autoplay: true });
   }, [isRinging, isTalking]);
 
   useEffect(() => {
     if (!displayTextRef.current) return;
     if (isRinging) {
-      anime({ targets: displayTextRef.current, opacity: [0.5, 1, 0.5], duration: 500, easing: "easeInOutSine", loop: true, autoplay: true });
+      animate({ targets: displayTextRef.current, opacity: [0.5, 1, 0.5], duration: 500, easing: "easeInOutSine", loop: true, autoplay: true });
     } else {
-      anime({ targets: displayTextRef.current, opacity: 1, duration: 500, easing: "easeOutQuad", autoplay: true });
+      animate({ targets: displayTextRef.current, opacity: 1, duration: 500, easing: "easeOutQuad", autoplay: true });
     }
   }, [isRinging, isTalking]);
 
   useEffect(() => {
     if (personRef.current) {
-      anime({ targets: personRef.current, translateX: [-50, 0], opacity: [0, 1], duration: 1000, easing: "easeOutCubic", delay: 800, autoplay: true });
+      animate({ targets: personRef.current, translateX: [-50, 0], opacity: [0, 1], duration: 1000, easing: "easeOutCubic", delay: 800, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (!headRef.current) return;
     if (isTalking) {
-      anime({ targets: headRef.current, translateY: [0, -2, 0], duration: 400, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
+      animate({ targets: headRef.current, translateY: [0, -2, 0], duration: 400, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
     }
   }, [isTalking]);
 
   useEffect(() => {
     if (!bodyRef.current) return;
     if (isTalking) {
-      anime({ targets: bodyRef.current, translateX: [0, 2, 0, -2, 0], duration: 2000, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
+      animate({ targets: bodyRef.current, translateX: [0, 2, 0, -2, 0], duration: 2000, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
     }
   }, [isTalking]);
 
   useEffect(() => {
     if (!legsRef.current) return;
     if (isTalking) {
-      anime({ targets: legsRef.current, translateY: [0, 1, 0, -1, 0], duration: 1500, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
+      animate({ targets: legsRef.current, translateY: [0, 1, 0, -1, 0], duration: 1500, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
     }
   }, [isTalking]);
 
   useEffect(() => {
     if (!mouthRef.current) return;
     if (isTalking) {
-      anime({ targets: mouthRef.current, scaleY: [1, 0.4, 1, 0.7, 1], height: [12, 8, 12, 10, 12], duration: 300, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
+      animate({ targets: mouthRef.current, scaleY: [1, 0.4, 1, 0.7, 1], height: [12, 8, 12, 10, 12], duration: 300, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
     }
   }, [isTalking]);
 
   useEffect(() => {
     if (!leftArmRef.current) return;
     if (isTalking) {
-      anime({ targets: leftArmRef.current, rotate: [-10, -15, -10, -20, -10], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
+      animate({ targets: leftArmRef.current, rotate: [-10, -15, -10, -20, -10], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3500, autoplay: true });
     }
   }, [isTalking]);
 
   useEffect(() => {
     if (!callBubble1Ref.current) return;
     if (isTalking) {
-      const a1 = anime({ targets: callBubble1Ref.current, scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5], duration: 1500, easing: "easeInOutSine", loop: true, delay: 4000, autoplay: true });
-      const a2 = anime({ targets: callBubble2Ref.current, scale: [0.6, 1, 0.6], opacity: [0.3, 0.8, 0.3], duration: 2000, easing: "easeInOutSine", loop: true, delay: 4500, autoplay: true });
-      const a3 = anime({ targets: callBubble3Ref.current, scale: [0.5, 0.9, 0.5], opacity: [0.2, 0.6, 0.2], duration: 1800, easing: "easeInOutSine", loop: true, delay: 5000, autoplay: true });
+      const a1 = animate({ targets: callBubble1Ref.current, scale: [0.8, 1.2, 0.8], opacity: [0.5, 1, 0.5], duration: 1500, easing: "easeInOutSine", loop: true, delay: 4000, autoplay: true });
+      const a2 = animate({ targets: callBubble2Ref.current, scale: [0.6, 1, 0.6], opacity: [0.3, 0.8, 0.3], duration: 2000, easing: "easeInOutSine", loop: true, delay: 4500, autoplay: true });
+      const a3 = animate({ targets: callBubble3Ref.current, scale: [0.5, 0.9, 0.5], opacity: [0.2, 0.6, 0.2], duration: 1800, easing: "easeInOutSine", loop: true, delay: 5000, autoplay: true });
       return () => { a1.pause(); a2.pause(); a3.pause(); };
     } else {
-      anime({ targets: [callBubble1Ref.current, callBubble2Ref.current, callBubble3Ref.current], scale: 0, opacity: 0, duration: 500, easing: "easeOutQuad", autoplay: true });
+      animate({ targets: [callBubble1Ref.current, callBubble2Ref.current, callBubble3Ref.current], scale: 0, opacity: 0, duration: 500, easing: "easeOutQuad", autoplay: true });
     }
   }, [isTalking]);
 

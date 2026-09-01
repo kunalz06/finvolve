@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 import { Zap } from "lucide-react";
 
 export default function LoadingScreen() {
@@ -13,7 +13,7 @@ export default function LoadingScreen() {
 
     useEffect(() => {
         if (containerRef.current) {
-            anime({
+            animate({
                 targets: containerRef.current,
                 opacity: [1, 0],
                 duration: 500,
@@ -26,7 +26,7 @@ export default function LoadingScreen() {
 
     useEffect(() => {
         if (logoRef.current) {
-            anime({
+            animate({
                 targets: logoRef.current,
                 scale: [0.8, 1],
                 opacity: [0, 1],
@@ -35,7 +35,7 @@ export default function LoadingScreen() {
             });
         }
         if (textRef.current) {
-            anime({
+            animate({
                 targets: textRef.current,
                 opacity: [0, 1],
                 y: [10, 0],
@@ -49,7 +49,7 @@ export default function LoadingScreen() {
     useEffect(() => {
         if (dotsRef.current.length > 0) {
             dotsRef.current.forEach((dot, i) => {
-                anime({
+                animate({
                     targets: dot,
                     scale: [1, 1.2, 1],
                     opacity: [0.5, 1, 0.5],

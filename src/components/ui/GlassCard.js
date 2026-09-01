@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 
 export default function GlassCard({ children, className = "", hoverEffect = true }) {
   const cardRef = useRef(null);
@@ -9,7 +9,7 @@ export default function GlassCard({ children, className = "", hoverEffect = true
   useEffect(() => {
     if (cardRef.current && hoverEffect) {
       const handleMouseEnter = () => {
-        anime({
+        animate({
           targets: cardRef.current,
           scale: 1.02,
           y: -2,
@@ -20,7 +20,7 @@ export default function GlassCard({ children, className = "", hoverEffect = true
       };
 
       const handleMouseLeave = () => {
-        anime({
+        animate({
           targets: cardRef.current,
           scale: 1,
           y: 0,

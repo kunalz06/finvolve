@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 import { X } from "lucide-react";
 
 export default function HomeEntranceAnimation({ className = "", onClose }) {
@@ -29,65 +29,65 @@ export default function HomeEntranceAnimation({ className = "", onClose }) {
 
   useEffect(() => {
     if (houseRef.current) {
-      anime({ targets: houseRef.current, opacity: [0, 1], translateY: [40, 0], duration: 1000, easing: "easeOutCubic", autoplay: true });
+      animate({ targets: houseRef.current, opacity: [0, 1], translateY: [40, 0], duration: 1000, easing: "easeOutCubic", autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (doorRef.current) {
       if (isVisible) {
-        anime({ targets: doorRef.current, translateY: [0, -14], duration: 1500, easing: "easeInOutCubic", delay: 1800, autoplay: true });
+        animate({ targets: doorRef.current, translateY: [0, -14], duration: 1500, easing: "easeInOutCubic", delay: 1800, autoplay: true });
       }
     }
   }, [isVisible]);
 
   useEffect(() => {
     if (personRef.current) {
-      anime({ targets: personRef.current, translateX: [-150, 0], translateY: [0, 0], opacity: [0, 1], duration: 2000, easing: "easeOutCubic", delay: 800, autoplay: true });
+      animate({ targets: personRef.current, translateX: [-150, 0], translateY: [0, 0], opacity: [0, 1], duration: 2000, easing: "easeOutCubic", delay: 800, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (headRef.current) {
-      anime({ targets: headRef.current, translateY: [0, -2, 0], duration: 600, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
+      animate({ targets: headRef.current, translateY: [0, -2, 0], duration: 600, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (bodyRef.current) {
-      anime({ targets: bodyRef.current, opacity: [0, 1], duration: 500, delay: 1200, easing: "easeOutQuad", autoplay: true });
+      animate({ targets: bodyRef.current, opacity: [0, 1], duration: 500, delay: 1200, easing: "easeOutQuad", autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (leftArmRef.current) {
-      anime({ targets: leftArmRef.current, rotate: [0, -20, 0, 15, 0], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
+      animate({ targets: leftArmRef.current, rotate: [0, -20, 0, 15, 0], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (rightArmRef.current) {
-      anime({ targets: rightArmRef.current, rotate: [0, 20, 0, -15, 0], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
+      animate({ targets: rightArmRef.current, rotate: [0, 20, 0, -15, 0], duration: 2500, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (leftLegRef.current) {
-      anime({ targets: leftLegRef.current, rotate: [0, 8, 0, -8, 0], duration: 1000, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
+      animate({ targets: leftLegRef.current, rotate: [0, 8, 0, -8, 0], duration: 1000, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (rightLegRef.current) {
-      anime({ targets: rightLegRef.current, rotate: [0, -8, 0, 8, 0], duration: 1000, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
+      animate({ targets: rightLegRef.current, rotate: [0, -8, 0, 8, 0], duration: 1000, easing: "easeInOutSine", loop: true, delay: 3000, autoplay: true });
     }
   }, []);
 
   useEffect(() => {
     if (isVisible && smoke1Ref.current && smoke2Ref.current && smoke3Ref.current) {
-      const s1 = anime({ targets: smoke1Ref.current, scale: [0, 0.8, 0.5, 0], translateY: [-20, -35, -50, -65], opacity: [1, 0.8, 0.4, 0], duration: 2000, easing: "easeInOutQuad", loop: true, delay: 3000, autoplay: true });
-      const s2 = anime({ targets: smoke2Ref.current, scale: [0, 0.6, 0.4, 0], translateY: [-30, -50, -75, -95], opacity: [1, 0.6, 0.3, 0], duration: 2500, easing: "easeInOutQuad", loop: true, delay: 3500, autoplay: true });
-      const s3 = anime({ targets: smoke3Ref.current, scale: [0, 0.4, 0.3, 0], translateY: [-40, -65, -85, -105], opacity: [1, 0.5, 0.2, 0], duration: 3000, easing: "easeInOutQuad", loop: true, delay: 4000, autoplay: true });
+      const s1 = animate({ targets: smoke1Ref.current, scale: [0, 0.8, 0.5, 0], translateY: [-20, -35, -50, -65], opacity: [1, 0.8, 0.4, 0], duration: 2000, easing: "easeInOutQuad", loop: true, delay: 3000, autoplay: true });
+      const s2 = animate({ targets: smoke2Ref.current, scale: [0, 0.6, 0.4, 0], translateY: [-30, -50, -75, -95], opacity: [1, 0.6, 0.3, 0], duration: 2500, easing: "easeInOutQuad", loop: true, delay: 3500, autoplay: true });
+      const s3 = animate({ targets: smoke3Ref.current, scale: [0, 0.4, 0.3, 0], translateY: [-40, -65, -85, -105], opacity: [1, 0.5, 0.2, 0], duration: 3000, easing: "easeInOutQuad", loop: true, delay: 4000, autoplay: true });
       return () => { s1.pause(); s2.pause(); s3.pause(); };
     }
   }, [isVisible]);

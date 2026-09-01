@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import * as anime from "animejs";
+import { animate } from "animejs";
 
 export default function RaceCard({ children, className = "" }) {
   const cardRef = useRef(null);
@@ -9,7 +9,7 @@ export default function RaceCard({ children, className = "" }) {
   useEffect(() => {
     if (cardRef.current) {
       const handleMouseEnter = () => {
-        anime({
+        animate({
           targets: cardRef.current,
           scale: 1.02,
           y: -2,
@@ -20,7 +20,7 @@ export default function RaceCard({ children, className = "" }) {
       };
 
       const handleMouseLeave = () => {
-        anime({
+        animate({
           targets: cardRef.current,
           scale: 1,
           y: 0,
