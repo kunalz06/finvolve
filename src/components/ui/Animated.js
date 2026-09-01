@@ -4,6 +4,12 @@ import { useEffect, useRef, forwardRef } from "react";
 import { useAnimejs } from "@/hooks/useAnimejs";
 import { animate as animeAnimate } from "animejs";
 
+// animejs v4 uses animate(targets, params) but code uses v3-style animate({targets, ...params})
+const runAnim = (params) => {
+  const { targets, ...rest } = params;
+  return animeAnimate(targets, rest);
+};
+
 /**
  * Animated component - a drop-in replacement for framer-motion's motion components
  * Uses animejs for animations
@@ -214,7 +220,7 @@ export const AnimatedDiv = forwardRef(({
       },
     };
 
-    animationRef.current = animeAnimate(animOptions);
+    animationRef.current = runAnim(animOptions);
   };
 
   // Handle hover animations
@@ -222,7 +228,7 @@ export const AnimatedDiv = forwardRef(({
     if (!elementRef.current || !whileHover) return;
 
     const handleMouseEnter = () => {
-      const anim = animeAnimate({
+      const anim = runAnim({
         targets: elementRef.current,
         ...convertValues({}, whileHover),
         duration: 200,
@@ -235,7 +241,7 @@ export const AnimatedDiv = forwardRef(({
     const handleMouseLeave = () => {
       // Animate back to original state
       if (animationRef.current) {
-        animeAnimate({
+        runAnim({
           targets: elementRef.current,
           ...convertValues(initial, animate),
           duration: 200,
@@ -259,14 +265,14 @@ export const AnimatedDiv = forwardRef(({
     if (!elementRef.current || !whileTap) return;
 
     const handleClick = () => {
-      const anim = animeAnimate({
+      const anim = runAnim({
         targets: elementRef.current,
         scale: 0.95,
         duration: 100,
         easing: "easeOutQuad",
         autoplay: true,
         complete: () => {
-          animeAnimate({
+          runAnim({
             targets: elementRef.current,
             scale: 1,
             duration: 100,
@@ -334,7 +340,7 @@ export const AnimatedSpan = forwardRef(({
   useEffect(() => {
     if (!elementRef.current) return;
 
-    const anim = animeAnimate({
+    const anim = runAnim({
       targets: elementRef.current,
       ...convertValues(initial, animate),
       ...convertTransition(transition),
@@ -388,7 +394,7 @@ export const AnimatedButton = forwardRef(({
   useEffect(() => {
     if (!elementRef.current) return;
 
-    const anim = animeAnimate({
+    const anim = runAnim({
       targets: elementRef.current,
       ...convertValues(initial, animate),
       ...convertTransition(transition),
@@ -406,7 +412,7 @@ export const AnimatedButton = forwardRef(({
 
     const handleMouseEnter = () => {
       if (whileHover) {
-        animeAnimate({
+        runAnim({
           targets: elementRef.current,
           ...convertValues({}, whileHover),
           duration: 200,
@@ -418,7 +424,7 @@ export const AnimatedButton = forwardRef(({
 
     const handleMouseLeave = () => {
       if (whileHover) {
-        animeAnimate({
+        runAnim({
           targets: elementRef.current,
           ...convertValues(initial, animate),
           duration: 200,
@@ -430,14 +436,14 @@ export const AnimatedButton = forwardRef(({
 
     const handleClick = (e) => {
       if (whileTap) {
-        animeAnimate({
+        runAnim({
           targets: elementRef.current,
           scale: 0.95,
           duration: 100,
           easing: "easeOutQuad",
           autoplay: true,
           complete: () => {
-            animeAnimate({
+            runAnim({
               targets: elementRef.current,
               scale: 1,
               duration: 100,
@@ -505,7 +511,7 @@ export const createAnimatedComponent = (tag, displayName) => {
     useEffect(() => {
       if (!elementRef.current) return;
 
-      const anim = animeAnimate({
+      const anim = runAnim({
         targets: elementRef.current,
         ...convertValues(initial, animate),
         ...convertTransition(transition),

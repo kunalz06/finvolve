@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef, useState, useRef, useEffect } from "react";
-import { animate } from "animejs";
+import { animate as _aa } from "animejs";const runAnim=(p)=>{const{targets,...r}=p;return _aa(targets,r);};
 import { cn } from "@/lib/utils";
 
 export const RaceButton = forwardRef((
@@ -65,13 +65,13 @@ export const RaceButton = forwardRef((
   const handleMouseDown = () => {
     if (disabled) return;
     if (buttonRef.current) {
-      animate({
+      runAnim({
         targets: buttonRef.current,
         scale: 0.98,
         duration: 100,
         easing: "easeOutQuad",
         complete: () => {
-          animate({
+          runAnim({
             targets: buttonRef.current,
             scale: 1.02,
             duration: 100,
@@ -85,14 +85,14 @@ export const RaceButton = forwardRef((
   // Handle hover animation
   useEffect(() => {
     if (buttonRef.current && isHovered && !disabled) {
-      animate({
+      runAnim({
         targets: buttonRef.current,
         scale: 1.02,
         duration: 200,
         easing: "easeOutQuad"
       });
     } else if (buttonRef.current && !isHovered && !disabled) {
-      animate({
+      runAnim({
         targets: buttonRef.current,
         scale: 1,
         duration: 200,

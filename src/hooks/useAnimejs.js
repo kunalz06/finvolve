@@ -1,7 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { animate } from "animejs";
+import { animate as animeAnimate } from "animejs";
+
+// animejs v4 uses animate(targets, params) but code uses v3-style animate({targets, ...params})
+const runAnim = (params) => {
+  const { targets, ...rest } = params;
+  return animeAnimate(targets, rest);
+};
 
 /**
  * Custom hook for animejs animations
@@ -30,7 +36,7 @@ export function useAnimejs() {
   const fadeIn = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       duration: options.duration || 500,
@@ -57,7 +63,7 @@ export function useAnimejs() {
   const slideInUp = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       translateY: [options.distance || 20, 0],
@@ -83,7 +89,7 @@ export function useAnimejs() {
   const slideInLeft = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       translateX: [options.distance || -20, 0],
@@ -109,7 +115,7 @@ export function useAnimejs() {
   const slideInRight = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       translateX: [options.distance || 20, 0],
@@ -135,7 +141,7 @@ export function useAnimejs() {
   const scaleIn = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       scale: [options.from || 0.8, options.to || 1],
@@ -161,7 +167,7 @@ export function useAnimejs() {
   const bounceIn = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       translateY: [100, -20, 0],
@@ -187,7 +193,7 @@ export function useAnimejs() {
   const fadeInScale = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [0, 1],
       scale: [options.from || 0, options.to || 1],
@@ -252,7 +258,7 @@ export function useAnimejs() {
   const pulse = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       opacity: [1, options.opacity || 0.7, 1],
       scale: [1, options.scale || 1.02, 1],
@@ -277,7 +283,7 @@ export function useAnimejs() {
   const shake = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       translateX: [0, -10, 10, -10, 10, 0],
       duration: options.duration || 400,
@@ -300,7 +306,7 @@ export function useAnimejs() {
   const float = useCallback((element, options = {}) => {
     if (!element) return null;
 
-    const anim = animate({
+    const anim = runAnim({
       targets: element,
       translateY: [0, options.distance || -5, 0],
       duration: options.duration || 3000,
@@ -345,7 +351,7 @@ export function useAnimejs() {
 
     const animations = elements.map((el, index) => {
       const angle = (index / elements.length) * 360;
-      const anim = animate({
+      const anim = runAnim({
         targets: el,
         translateX: radius * Math.cos((angle * Math.PI) / 180),
         translateY: radius * Math.sin((angle * Math.PI) / 180),

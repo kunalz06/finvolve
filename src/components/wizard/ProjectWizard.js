@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { animate } from "animejs";
+import { animate as _aa } from "animejs";const runAnim=(p)=>{const{targets,...r}=p;return _aa(targets,r);};
 import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -66,7 +66,7 @@ export default function ProjectWizard() {
       const startX = direction > 0 ? -100 : 100;
       const endX = 0;
       
-      animate({
+      runAnim({
         targets: stepContainerRef.current,
         translateX: [startX, endX],
         opacity: [0, 1],
@@ -162,13 +162,13 @@ export default function ProjectWizard() {
   // Animejs animations for success state
   useEffect(() => {
     if (status === 'success' && showSuccessBurst && burstOverlayRef.current) {
-      animate({
+      runAnim({
         targets: burstOverlayRef.current,
         opacity: [0, 1],
         duration: 180,
         easing: "easeInOutQuad",
         complete: () => {
-          animate({
+          runAnim({
             targets: burstOverlayRef.current,
             opacity: [1, 0],
             duration: 180,
@@ -182,14 +182,14 @@ export default function ProjectWizard() {
 
   useEffect(() => {
     if (status === 'success' && showSuccessBurst && burstCircleRef.current) {
-      animate({
+      runAnim({
         targets: burstCircleRef.current,
         scale: [0.35, 1.12, 1],
         rotate: [-10, 0],
         duration: 550,
         easing: "easeOutBack",
         complete: () => {
-          animate({
+          runAnim({
             targets: burstCircleRef.current,
             scale: [1, 0.82],
             opacity: [1, 0],
@@ -203,7 +203,7 @@ export default function ProjectWizard() {
 
   useEffect(() => {
     if (status === 'success' && successIconRef.current) {
-      animate({
+      runAnim({
         targets: successIconRef.current,
         scale: [0, 1],
         duration: 400,
