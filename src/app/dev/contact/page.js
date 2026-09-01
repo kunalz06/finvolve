@@ -25,7 +25,13 @@ export default function Contact() {
     setErrorMessage("");
 
     try {
-      if (!isConfigValid || !db) throw new Error("Database is not configured. Please contact support.");
+      if (!isConfigValid || !db) {
+        throw new Error("Database is not configured. Please contact support.");
+      }
+
+      if (!db) {
+        throw new Error("Database connection failed.");
+      }
 
       await addDoc(collection(db, "contact_messages"), {
         name: formData.name,

@@ -191,6 +191,10 @@ export default function AdminPage() {
         // Subscriptions — fetched via API (admin SDK, not client Firebase)
         const fetchSubscriptions = async () => {
             try {
+                if (!auth?.currentUser) {
+                    console.warn("Cannot fetch subscriptions: user not authenticated");
+                    return;
+                }
                 const idToken = await auth.currentUser.getIdToken(true);
                 const res = await fetch(apiUrl("/dev/api/admin/subscriptions"), {
                     headers: { Authorization: `Bearer ${idToken}` },
@@ -519,8 +523,8 @@ export default function AdminPage() {
                                 <p className="line-clamp-5 text-sm leading-6 text-slate-600">{item.message || "No content."}</p>
                                 <div className="mt-5 text-xs text-slate-500">{formatDate(item.createdAt)}</div>
                                 <div className="mt-5 flex gap-3">
-                                    {item.status === "unread" && <Button type="button" variant="secondary" className="flex-1" onClick={() => updateDoc(doc(db, "contact_messages", item.id), { status: "read" })}>Mark Read<CheckCircle size={18} /></Button>}
-                                    <Button type="button" variant="danger" className="flex-1" onClick={() => deleteDoc(doc(db, "contact_messages", item.id))}><Trash2 size={16} />Delete</Button>
+                                    {item.status === "unread" && <Button type="button" variant="secondary" className="flex-1" onClick={() => { if (db) updateDoc(doc(db, "contact_messages", item.id), { status: "read" }); }}>Mark Read<CheckCircle size={18} /></Button>}
+                                    <Button type="button" variant="danger" className="flex-1" onClick={() => { if (db) deleteDoc(doc(db, "contact_messages", item.id)); }}><Trash2 size={16} />Delete</Button>
                                 </div>
                             </Card>
                         ))}
@@ -573,7 +577,7 @@ export default function AdminPage() {
                                     <div className="mt-5 text-4xl font-bold text-slate-950">{formatCurrency(item.amount)}</div>
                                     {item.tokenExpiresAt && <div className="mt-2 text-xs text-slate-500">Expires: {formatDate(item.tokenExpiresAt)}</div>}
                                     {item.razorpayPaymentId && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">Payment ID: {item.razorpayPaymentId}</div>}
-                                    <Button type="button" variant="danger" className="mt-5 w-full" onClick={() => deleteDoc(doc(db, "payment_requests", item.id))}><Trash2 size={16} />Delete</Button>
+                                    <Button type="button" variant="danger" className="mt-5 w-full" onClick={() => { if (db) deleteDoc(doc(db, "payment_requests", item.id)); }}><Trash2 size={16} />Delete</Button>
                                 </Card>
                             ))}
                         </div>
@@ -621,6 +625,9 @@ export default function AdminPage() {
                                                 <Button type="button" variant="warning" size="xsmall" onClick={async () => {
                                                     setSubActionLoading(sub.id);
                                                     try {
+                                                        if (!auth?.currentUser) {
+                                                            throw new Error("Session expired. Please sign in again.");
+                                                        }
                                                         const idToken = await auth.currentUser.getIdToken(true);
                                                         await fetch(apiUrl("/dev/api/admin/subscriptions"), {
                                                             method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
@@ -634,6 +641,9 @@ export default function AdminPage() {
                                                 <Button type="button" variant="success" size="xsmall" onClick={async () => {
                                                     setSubActionLoading(sub.id);
                                                     try {
+                                                        if (!auth?.currentUser) {
+                                                            throw new Error("Session expired. Please sign in again.");
+                                                        }
                                                         const idToken = await auth.currentUser.getIdToken(true);
                                                         await fetch(apiUrl("/dev/api/admin/subscriptions"), {
                                                             method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
@@ -648,6 +658,9 @@ export default function AdminPage() {
                                                     if (!confirm("Cancel this subscription?")) return;
                                                     setSubActionLoading(sub.id);
                                                     try {
+                                                        if (!auth?.currentUser) {
+                                                            throw new Error("Session expired. Please sign in again.");
+                                                        }
                                                         const idToken = await auth.currentUser.getIdToken(true);
                                                         await fetch(apiUrl("/dev/api/admin/subscriptions"), {
                                                             method: "PATCH", headers: { "Content-Type": "application/json", Authorization: `Bearer ${idToken}` },
@@ -768,6 +781,9 @@ export default function AdminPage() {
                                                         setSubActionLoading(r.id);
                                                         setError("");
                                                         try {
+                                                            if (!auth?.currentUser) {
+                                                                throw new Error("Session expired. Please sign in again.");
+                                                            }
                                                             const idToken = await auth.currentUser.getIdToken(true);
                                                             const res = await fetch(apiUrl("/dev/api/rental/bill"), {
                                                                 method: "POST",
@@ -850,7 +866,7 @@ export default function AdminPage() {
                                                 <Button
                                                     variant="secondary"
                                                     size="small"
-                                                    onClick={() => updateDoc(doc(db, "chat_sessions", session.id), { status: session.status === "resolved" ? "open" : "resolved" })}
+                                                    onClick={() => { if (db) updateDoc(doc(db, "chat_sessions", session.id), { status: session.status === "resolved" ? "open" : "resolved" }); }}
                                                 >
                                                     {session.status === "resolved" ? "Reopen" : "Mark Resolved"}
                                                     <CheckCircle size={16} />
@@ -859,7 +875,7 @@ export default function AdminPage() {
                                                     type="button"
                                                     variant="danger"
                                                     size="small"
-                                                    onClick={() => deleteDoc(doc(db, "chat_sessions", session.id))}
+                                                    onClick={() => { if (db) deleteDoc(doc(db, "chat_sessions", session.id)); }}
                                                 >
                                                     <Trash2 size={14} />Delete
                                                 </Button>

@@ -31,32 +31,45 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
   // Initialize ML engine
   useEffect(() => {
-    const eng = new ChatEngine();
-    setEngine(eng);
-    eng.init().then(() => setInitialized(true));
+    try {
+      const eng = new ChatEngine();
+      setEngine(eng);
+      eng.init().then(() => setInitialized(true)).catch((err) => {
+        console.warn("Engine init failed:", err);
+        setInitialized(true); // Still mark as ready to avoid infinite loading
+      });
+    } catch (err) {
+      console.warn("Engine setup error:", err);
+      setInitialized(true);
+    }
   }, []);
 
   // Restore previous session
   useEffect(() => {
     async function restore() {
-      const lastTime = getLastChatTime();
-      const now = Date.now();
-      const hoursSince = (now - lastTime) / (1000 * 60 * 60);
+      try {
+        const lastTime = getLastChatTime();
+        const now = Date.now();
+        const hoursSince = (now - lastTime) / (1000 * 60 * 60);
 
-      if (hoursSince < SESSION_RESTORE_HOURS && lastTime > 0) {
-        const sessionId = getSessionId();
-        const prev = await loadPreviousSession(sessionId);
-        if (prev && prev.messages && prev.messages.length > 1) {
-          const restored = prev.messages.map((m) => ({
-            role: m.role,
-            text: m.text,
-            timestamp: m.timestamp,
-          }));
-          setMessages(restored);
-          setActiveReplies([]);
+        if (hoursSince < SESSION_RESTORE_HOURS && lastTime > 0) {
+          const sessionId = getSessionId();
+          const prev = await loadPreviousSession(sessionId);
+          if (prev && prev.messages && prev.messages.length > 1) {
+            const restored = prev.messages.map((m) => ({
+              role: m.role,
+              text: m.text,
+              timestamp: m.timestamp,
+            }));
+            setMessages(restored);
+            setActiveReplies([]);
+          }
         }
+      } catch (err) {
+        console.warn("Session restore error:", err);
+      } finally {
+        setRestoring(false);
       }
-      setRestoring(false);
     }
     restore();
   }, []);
@@ -164,25 +177,41 @@ export default function ChatWindow({ onClose, onMinimize }) {
         return next;
       });
 
-      const response = await engine.processMessage(trimmed);
-      addBotResponse(response);
+      try {
+        const response = await engine.processMessage(trimmed);
+        addBotResponse(response);
+      } catch (err) {
+        console.warn("Message processing error:", err);
+        addBotResponse({
+          text: "Sorry, I encountered an error. Please try again.",
+          quickReplies: ["Start Over", "Contact Us"],
+        });
+      }
     },
     [engine, input, addBotResponse, scheduleSave]
   );
 
   const handleQuickReply = useCallback(
     (label) => {
-      setActiveReplies([]);
+      try {
+        setActiveReplies([]);
 
-      const userMsg = { role: "user", text: label, timestamp: Date.now() };
-      setMessages((prev) => {
-        const next = [...prev, userMsg];
-        scheduleSave(next);
-        return next;
-      });
+        const userMsg = { role: "user", text: label, timestamp: Date.now() };
+        setMessages((prev) => {
+          const next = [...prev, userMsg];
+          scheduleSave(next);
+          return next;
+        });
 
-      const response = engine.handleQuickReply(label);
-      addBotResponse(response);
+        const response = engine.handleQuickReply(label);
+        addBotResponse(response);
+      } catch (err) {
+        console.warn("Quick reply error:", err);
+        addBotResponse({
+          text: "Sorry, I encountered an error. Please try again.",
+          quickReplies: ["Start Over", "Contact Us"],
+        });
+      }
     },
     [engine, addBotResponse, scheduleSave]
   );
