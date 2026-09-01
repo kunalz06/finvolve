@@ -1,10 +1,8 @@
 "use client";
 
-import { AnimatedDiv } from "@/components/ui/Animated";
 import { ArrowRight, CheckCircle, Cloud, Globe, Smartphone, Zap } from "lucide-react";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import HomeEntranceAnimation from "@/components/animations/HomeEntranceAnimation";
 
 
 export default function Home() {
@@ -13,10 +11,7 @@ export default function Home() {
       <section className="page-section px-4 sm:px-6 py-6 md:px-0">
         <div className="container">
           <div className="grid min-h-[calc(100vh-120px)] sm:min-h-[calc(100vh-140px)] items-center gap-6 sm:gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-            <AnimatedDiv
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.45, ease: "easeOut" }}
+            <div
               className="space-y-6 sm:space-y-8"
             >
               <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
@@ -39,19 +34,14 @@ export default function Home() {
                   View Services
                 </Button>
               </div>
-            </AnimatedDiv>
-
-            <HomeEntranceAnimation className="rounded-2xl" />
+            </div>
           </div>
         </div>
       </section>
 
       <section className="page-section px-6 py-8 md:px-0">
         <div className="container">
-          <AnimatedDiv
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+          <div
             className="dev-section-title mb-12"
           >
             <p className="mb-3 font-code-brand text-sm font-bold uppercase text-primary">Build stack</p>
@@ -59,7 +49,7 @@ export default function Home() {
             <p className="text-lg text-slate-600">
               Clear systems, fast implementation, and interfaces that are pleasant to operate every day.
             </p>
-          </AnimatedDiv>
+          </div>
 
           <div className="grid gap-8 md:grid-cols-3">
             <Card delay={0.1}>
@@ -121,10 +111,7 @@ export default function Home() {
 
       <section className="px-6 py-8 md:px-0">
         <div className="container">
-          <AnimatedDiv
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
+          <div
             className="glass-surface-strong rounded-2xl p-10 md:p-14"
           >
             <div className="grid items-center gap-8 md:grid-cols-[1fr_auto]">
@@ -141,7 +128,7 @@ export default function Home() {
                 Start Engine
               </Button>
             </div>
-          </AnimatedDiv>
+          </div>
         </div>
       </section>
     </div>

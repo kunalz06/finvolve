@@ -6,8 +6,7 @@ import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, isConfigValid } from "@/lib/firebase";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
-import { AnimatedDiv } from "@/components/ui/Animated";
-import ContactCallAnimation from "@/components/animations/ContactCallAnimation";
+
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: "", email: "", subject: "", message: "" });
@@ -57,9 +56,9 @@ export default function Contact() {
       <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
         <div className="container">
           <div className="glass-surface-strong mx-auto max-w-lg rounded-2xl px-6 py-12 sm:px-8 sm:py-16 text-center">
-            <AnimatedDiv initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ duration: 0.5, easing: "easeOutBack" }} className="mx-auto mb-6 sm:mb-8 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-emerald-100/90">
+            <div className="mx-auto mb-6 sm:mb-8 flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-emerald-100/90">
               <CheckCircle className="h-10 w-10 sm:h-12 sm:w-12 text-emerald-600" />
-            </AnimatedDiv>
+            </div>
             <h1 className="mb-4 text-2xl sm:text-3xl font-bold text-slate-950">Message Sent!</h1>
             <p className="mb-6 sm:mb-8 text-base sm:text-lg text-slate-600">Thank you for reaching out. We&apos;ll get back to you within 24 hours.</p>
             <Button onClick={() => setStatus("idle")} variant="primary" className="touch-target">Send Another Message</Button>
@@ -73,19 +72,17 @@ export default function Contact() {
     <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
       <div className="container">
         <div className="mx-auto max-w-5xl">
-          {/* Animated Phone Illustration - Overlay */}
-          <ContactCallAnimation className="mb-8 sm:mb-12" />
-          
-          <AnimatedDiv initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="mb-12 sm:mb-16 text-center">
+          {/* Contact Info Side */}
+          <div className="mb-12 sm:mb-16 text-center">
             <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2">
               <span className="text-sm font-medium text-primary">CONTACT US</span>
             </div>
             <h1 className="mb-4 sm:mb-6 text-3xl sm:text-4xl font-bold text-slate-950 md:text-5xl">Let&apos;s Start a Conversation</h1>
             <p className="mx-auto max-w-2xl text-base sm:text-lg text-slate-600">Have a project in mind? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.</p>
-          </AnimatedDiv>
+          </div>
 
           <div className="grid gap-6 sm:gap-8 lg:grid-cols-5">
-            <AnimatedDiv initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.1 }} className="space-y-4 sm:space-y-6 lg:col-span-2">
+            <div className="space-y-4 sm:space-y-6 lg:col-span-2">
               <Card hover={false} className="glass-surface-strong">
                 <h3 className="mb-4 sm:mb-6 text-base sm:text-lg font-bold text-slate-950">Contact Information</h3>
                 <div className="space-y-4 sm:space-y-6">
@@ -125,9 +122,9 @@ export default function Contact() {
                 <p className="mb-3 sm:mb-4 text-sm text-slate-600">Jump straight to our project wizard and get started today.</p>
                 <Button href="/dev/request" variant="primary" size="small" className="w-full touch-target">Start a Project</Button>
               </Card>
-            </AnimatedDiv>
+            </div>
 
-            <AnimatedDiv initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 }} className="lg:col-span-3">
+            <div className="lg:col-span-3">
               <Card hover={false} className="glass-surface-strong">
                 <h3 className="mb-4 sm:mb-6 text-lg sm:text-xl font-bold text-slate-950">Send us a message</h3>
                 <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
@@ -172,7 +169,7 @@ export default function Contact() {
                   </Button>
                 </form>
               </Card>
-            </AnimatedDiv>
+            </div>
           </div>
         </div>
       </div>
