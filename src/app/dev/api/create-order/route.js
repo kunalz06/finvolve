@@ -11,12 +11,18 @@ import {
 } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import { getCanonicalSiteUrl } from "@/lib/server/site-url";
+import { createCashfreeOrder, getCashfreeServerConfig } from "@/lib/server/cashfree";
 
 const payloadSchema = z.object({
     source: z.enum([PAYMENT_SOURCE.QUICK_START, PAYMENT_SOURCE.PAYMENT_PORTAL]),
     amount: z.number().int().positive().optional(),
     paymentRequestId: z.string().min(6).optional(),
     token: z.string().min(16).optional(),
+    provider: z.enum(["razorpay", "cashfree"]).optional(),
+}).superRefine((data, ctx) => {
+    if (data.source === PAYMENT_SOURCE.QUICK_START && data.provider) {
+        ctx.addIssue({ code: "custom", path: ["provider"], message: "Provider selection is only available for payment portal requests." });
+    }
 });
 
 const MAX_PAYMENT_INR = 5_00_000;
@@ -52,13 +58,8 @@ export async function POST(request) {
             );
         }
 
-        const { keyId, keySecret } = getRazorpayServerCredentials();
-        const razorpay = new Razorpay({
-            key_id: keyId,
-            key_secret: keySecret,
-        });
-
         const { source, amount, paymentRequestId, token } = parsed.data;
+        const provider = parsed.data.provider || "razorpay";
         let amountInInr = QUICK_START_AMOUNT_INR;
         let notes = { source };
 
@@ -83,6 +84,9 @@ export async function POST(request) {
             }
 
             const payment = snapshot.data();
+            if (provider === "cashfree" && payment.source !== PAYMENT_SOURCE.PAYMENT_PORTAL) {
+                return corsJson(request, { error: "Payment request source mismatch." }, { status: 400 });
+            }
             const providedHash = hashToken(token);
             const expiresAtMs = payment.tokenExpiresAt?.toMillis?.() ?? 0;
             const tokenMatches = payment.tokenHash && payment.tokenHash === providedHash;
@@ -136,6 +140,38 @@ export async function POST(request) {
         }
 
         const amountInPaisa = amountInInr * 100;
+        if (provider === "cashfree") {
+            const paymentRef = getAdminDb().collection("payment_requests").doc(paymentRequestId);
+            const payment = (await paymentRef.get()).data();
+            if (payment.currency !== "INR" || !payment.clientName || !payment.clientEmail) {
+                return corsJson(request, { error: "Payment request is missing required trusted customer or currency data." }, { status: 400 });
+            }
+            const providerOrderId = `portal_${paymentRequestId}_${Date.now()}`.replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 45);
+            const siteUrl = getCanonicalSiteUrl(request);
+            const cashfreeOrder = await createCashfreeOrder({
+                orderId: providerOrderId,
+                amount: amountInInr,
+                currency: payment.currency,
+                paymentRequestId,
+                clientName: payment.clientName,
+                clientEmail: payment.clientEmail,
+                notifyUrl: `${siteUrl}/dev/api/cashfree/webhook`,
+            });
+            await paymentRef.update({ provider, providerOrderId, providerStatus: cashfreeOrder.order_status, lastOrderInitiatedAt: FieldValue.serverTimestamp() });
+            return corsJson(request, {
+                id: cashfreeOrder.order_id,
+                paymentSessionId: cashfreeOrder.payment_session_id,
+                amount: cashfreeOrder.order_amount,
+                currency: cashfreeOrder.order_currency,
+                provider,
+                cashfreeMode: getCashfreeServerConfig().environment,
+                source,
+                paymentRequestId,
+            });
+        }
+
+        const { keyId, keySecret } = getRazorpayServerCredentials();
+        const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
         const order = await razorpay.orders.create({
             amount: amountInPaisa,
             currency: "INR",
@@ -150,10 +186,11 @@ export async function POST(request) {
             source,
             paymentRequestId: paymentRequestId || null,
             checkoutKey: keyId,
+            provider,
             returnUrl: `${getCanonicalSiteUrl(request)}/dev/payments`,
         });
     } catch (error) {
-        console.error("Failed to create Razorpay order:", error.message);
+        console.error("Failed to create payment order:", error.message);
         return corsJson(
             request,
             { error: "Unable to create payment order right now." },

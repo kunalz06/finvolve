@@ -576,7 +576,7 @@ export default function AdminPage() {
                                     </div>
                                     <div className="mt-5 text-4xl font-bold text-slate-950">{formatCurrency(item.amount)}</div>
                                     {item.tokenExpiresAt && <div className="mt-2 text-xs text-slate-500">Expires: {formatDate(item.tokenExpiresAt)}</div>}
-                                    {item.razorpayPaymentId && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">Payment ID: {item.razorpayPaymentId}</div>}
+                                    {(item.providerPaymentId || item.razorpayPaymentId) && <div className="mt-3 break-all rounded-[18px] border border-emerald-200 bg-emerald-50/80 px-3 py-2 text-xs text-emerald-700">{item.provider ? `${item.provider} ` : ""}Payment ID: {item.providerPaymentId || item.razorpayPaymentId}</div>}
                                     <Button type="button" variant="danger" className="mt-5 w-full" onClick={() => { if (db) deleteDoc(doc(db, "payment_requests", item.id)); }}><Trash2 size={16} />Delete</Button>
                                 </Card>
                             ))}
@@ -924,4 +924,3 @@ export default function AdminPage() {
         </div>
     );
 }
-

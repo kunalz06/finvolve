@@ -9,7 +9,7 @@ DEV♾️ is a Next.js App Router project with:
 
 - Node.js 20+
 - Firebase project (Firestore + Auth + Storage)
-- Razorpay account keys
+- Razorpay account keys and/or a Cashfree Payments account
 - Firebase Admin service account credentials for server routes
 
 ## Environment Setup
@@ -21,6 +21,10 @@ Copy `.env.example` to `.env.local` and fill values:
   - `NEXT_PUBLIC_RAZORPAY_KEY_ID`
   - `RAZORPAY_KEY_ID`
   - `RAZORPAY_KEY_SECRET`
+- Cashfree server credentials (configure only on the backend deployment):
+  - `CASHFREE_CLIENT_ID`
+  - `CASHFREE_CLIENT_SECRET`
+  - `CASHFREE_ENVIRONMENT` (`sandbox` or `production`)
 - Firebase Admin credentials (`FIREBASE_SERVICE_ACCOUNT_KEY` or split vars)
 - Optional `NEXT_PUBLIC_SITE_URL` for absolute payment links
 - Optional `DEV_APP_SITE_URL` as a server-only override for DEV payment links
@@ -75,6 +79,13 @@ NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 
 Do not set server secrets on Netlify, including `RAZORPAY_KEY_SECRET`, Firebase Admin private keys, or SMTP passwords. This deployment is frontend-only; server API routes and payment logic continue to run on Vercel.
 
+Cashfree credentials must likewise be set only on the backend deployment. Never create
+`NEXT_PUBLIC_CASHFREE_*` variables: the browser receives only Cashfree's short-lived
+payment session ID. In the Cashfree dashboard, configure the signed payment webhook as
+`https://<your-backend-domain>/dev/api/cashfree/webhook` and enable successful payment
+events. The backend verifies Cashfree's `x-webhook-signature` and timestamp, then fetches
+the order and payment directly from Cashfree before updating Firestore.
+
 The public browser keys are intentionally bundled into the frontend, so `netlify.toml` omits the `NEXT_PUBLIC_*` keys from Netlify secret scanning. Do not add private server credentials to that omit list.
 
 Set this on Vercel so Netlify can call the backend:
@@ -87,6 +98,9 @@ NEXT_PUBLIC_API_BASE_URL=https://your-vercel-app.vercel.app
 NEXT_PUBLIC_RAZORPAY_KEY_ID=...
 RAZORPAY_KEY_ID=...
 RAZORPAY_KEY_SECRET=...
+CASHFREE_CLIENT_ID=...
+CASHFREE_CLIENT_SECRET=...
+CASHFREE_ENVIRONMENT=production
 ```
 
 This repo helper applies:
@@ -110,4 +124,4 @@ npm run set-admin -- FIREBASE_UID
 
 - Firestore rules are deny-by-default for sensitive reads/writes.
 - Payment links are tokenized and server-verified before marking paid.
-- Payment verification happens via `/dev/api/verify-payment`.
+- Payment verification happens via `/dev/api/verify-payment`; signed Cashfree notifications use `/dev/api/cashfree/webhook`.

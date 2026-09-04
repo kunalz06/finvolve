@@ -15,6 +15,7 @@ import {
     sendNewsletterMail,
 } from "@/lib/server/newsletter";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
+import { fetchSuccessfulCashfreePayment, markCashfreePaymentPaid } from "@/lib/server/cashfree";
 
 const quickStartDataSchema = z.object({
     name: z.string().trim().min(2).max(120),
@@ -26,12 +27,23 @@ const quickStartDataSchema = z.object({
 
 const payloadSchema = z.object({
     source: z.enum([PAYMENT_SOURCE.QUICK_START, PAYMENT_SOURCE.PAYMENT_PORTAL]),
-    razorpay_payment_id: z.string().min(8),
-    razorpay_order_id: z.string().min(8),
-    razorpay_signature: z.string().min(16),
+    provider: z.enum(["razorpay", "cashfree"]).optional(),
+    providerOrderId: z.string().min(8).optional(),
+    razorpay_payment_id: z.string().min(8).optional(),
+    razorpay_order_id: z.string().min(8).optional(),
+    razorpay_signature: z.string().min(16).optional(),
     paymentRequestId: z.string().min(6).optional(),
     token: z.string().min(16).optional(),
     quickStartData: quickStartDataSchema.optional(),
+}).superRefine((data, ctx) => {
+    if (data.provider === "cashfree") {
+        if (data.source !== PAYMENT_SOURCE.PAYMENT_PORTAL) ctx.addIssue({ code: "custom", path: ["provider"], message: "Cashfree is only available for payment portal requests." });
+        if (!data.providerOrderId) ctx.addIssue({ code: "custom", path: ["providerOrderId"], message: "Cashfree order id is required." });
+    } else {
+        for (const field of ["razorpay_payment_id", "razorpay_order_id", "razorpay_signature"]) {
+            if (!data[field]) ctx.addIssue({ code: "custom", path: [field], message: `${field} is required.` });
+        }
+    }
 });
 
 export function OPTIONS(request) {
@@ -64,6 +76,26 @@ export async function POST(request) {
         }
 
         const data = parsed.data;
+        if (data.provider === "cashfree") {
+            if (!data.paymentRequestId || !data.token) {
+                return corsJson(request, { error: "Missing payment request id/token." }, { status: 400 });
+            }
+            const db = getAdminDb();
+            const paymentSnap = await db.collection("payment_requests").doc(data.paymentRequestId).get();
+            if (!paymentSnap.exists) return corsJson(request, { error: "Payment request not found." }, { status: 404 });
+            const record = paymentSnap.data();
+            const expiresAtMs = record.tokenExpiresAt?.toMillis?.() ?? 0;
+            if (record.source !== PAYMENT_SOURCE.PAYMENT_PORTAL || record.tokenHash !== hashToken(data.token) || !expiresAtMs || Date.now() > expiresAtMs) {
+                return corsJson(request, { error: "Payment link is invalid or expired." }, { status: 401 });
+            }
+            if (record.providerOrderId !== data.providerOrderId) {
+                return corsJson(request, { error: "Payment order association mismatch." }, { status: 400 });
+            }
+            const authoritative = await fetchSuccessfulCashfreePayment(data.providerOrderId);
+            const result = await markCashfreePaymentPaid({ db, paymentRequestId: data.paymentRequestId, providerOrderId: data.providerOrderId, ...authoritative });
+            return corsJson(request, { success: true, ...result, paymentRequestId: data.paymentRequestId });
+        }
+
         const { keyId, keySecret } = getRazorpayServerCredentials();
 
         const signatureValid = verifyRazorpaySignature({
@@ -230,6 +262,10 @@ export async function POST(request) {
 
         await paymentRef.update({
             status: "paid",
+            provider: "razorpay",
+            providerOrderId: data.razorpay_order_id,
+            providerPaymentId: data.razorpay_payment_id,
+            providerStatus: "paid",
             razorpayPaymentId: data.razorpay_payment_id,
             razorpayOrderId: data.razorpay_order_id,
             paidAt: FieldValue.serverTimestamp(),

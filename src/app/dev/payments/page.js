@@ -21,6 +21,17 @@ function loadRazorpayScript() {
   });
 }
 
+function loadCashfreeScript() {
+  return new Promise((resolve) => {
+    if (window.Cashfree) return resolve(true);
+    const script = document.createElement("script");
+    script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
+
 function PaymentPortalContent() {
   const searchParams = useSearchParams();
   const token = useMemo(() => searchParams.get("token") || "", [searchParams]);
@@ -29,6 +40,7 @@ function PaymentPortalContent() {
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
+  const [provider, setProvider] = useState("razorpay");
 
   useEffect(() => {
     let cancelled = false;
@@ -67,16 +79,32 @@ function PaymentPortalContent() {
     setError("");
 
     try {
-      const loaded = await loadRazorpayScript();
-      if (!loaded) throw new Error("Failed to load Razorpay checkout.");
+      const loaded = await (provider === "cashfree" ? loadCashfreeScript() : loadRazorpayScript());
+      if (!loaded) throw new Error(`Failed to load ${provider === "cashfree" ? "Cashfree" : "Razorpay"} checkout.`);
 
       const orderResponse = await fetch(apiUrl("/dev/api/create-order"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ source: "payment_portal", amount: Number(session.amount), paymentRequestId: session.id, token }),
+        body: JSON.stringify({ source: "payment_portal", provider, amount: Number(session.amount), paymentRequestId: session.id, token }),
       });
       const order = await orderResponse.json();
       if (!orderResponse.ok) throw new Error(order.error || "Failed to create payment order.");
+
+      if (provider === "cashfree") {
+        const cashfree = window.Cashfree({ mode: order.cashfreeMode });
+        const result = await cashfree.checkout({ paymentSessionId: order.paymentSessionId, redirectTarget: "_modal" });
+        if (result?.error) throw new Error(result.error.message || "Cashfree checkout failed.");
+        const verifyResponse = await fetch(apiUrl("/dev/api/verify-payment"), {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ source: "payment_portal", provider: "cashfree", providerOrderId: order.id, paymentRequestId: session.id, token }),
+        });
+        const verifyJson = await verifyResponse.json();
+        if (!verifyResponse.ok) throw new Error(verifyJson.error || "Cashfree payment verification failed.");
+        setSession((prev) => ({ ...prev, status: "paid" }));
+        setProcessing(false);
+        return;
+      }
 
       const options = {
         key: order.checkoutKey,
@@ -162,6 +190,18 @@ function PaymentPortalContent() {
                     <CheckCircle size={20} /> Payment Complete
                   </div>
                 ) : (
+                  <>
+                  <fieldset className="mb-5 text-left" disabled={processing}>
+                    <legend className="mb-2 text-sm font-semibold text-slate-700">Payment provider</legend>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[{ id: "razorpay", label: "Razorpay" }, { id: "cashfree", label: "Cashfree" }].map((option) => (
+                        <label key={option.id} className={`cursor-pointer rounded-[18px] border px-4 py-3 text-center text-sm font-semibold ${provider === option.id ? "border-primary bg-violet-50 text-primary" : "border-slate-200 text-slate-600"}`}>
+                          <input className="sr-only" type="radio" name="provider" value={option.id} checked={provider === option.id} onChange={() => setProvider(option.id)} />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
                   <Button onClick={handlePayment} variant="primary" size="large" className="w-full" disabled={processing}>
                     {processing ? (
                       <>
@@ -173,6 +213,7 @@ function PaymentPortalContent() {
                       </>
                     )}
                   </Button>
+                  </>
                 )}
               </>
             ) : (
