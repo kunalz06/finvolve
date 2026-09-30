@@ -57,7 +57,7 @@ export default function PrivacyPolicy() {
                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
                   <li>Provide, maintain, and improve our software development services and Cloud platform.</li>
                   <li>Process Cloud subscription payments, manage billing cycles, and track compute and API usage against your plan limits.</li>
-                  <li>Process Cloud rental requests, manage upfront fee collection, track compute usage during rental periods, and generate post-usage bills with Razorpay payment links.</li>
+                  <li>Process Cloud rental requests, manage upfront fee collection, track compute usage during rental periods, and generate post-usage bills with secure DEV Infinity payment portal links.</li>
                   <li>Send you transactional emails related to your Cloud subscription (activation confirmations, billing receipts, pause/resume/cancellation notifications, and plan change updates) and Cloud rental (rental activation confirmations, usage bill notifications with payment links, and bill payment receipts).</li>
                   <li>Process transactions and send you related information, including confirmations and invoices.</li>
                   <li>Communicate with you about your project requirements, updates, and support.</li>
@@ -72,7 +72,7 @@ export default function PrivacyPolicy() {
                   We do not share your personal information with third parties except in the following cases:
                 </p>
                 <ul className="list-disc pl-6 space-y-2 marker:text-primary">
-                  <li><strong className="text-slate-950">Service Providers:</strong> We share transaction data with Razorpay (payment processor) to facilitate Cloud subscription billing, rental upfront fee collection, and rental usage bill payments via payment links. We use Firebase (Google) for database and authentication services. We use SMTP email services to send transactional subscription and rental emails.</li>
+                  <li><strong className="text-slate-950">Service Providers:</strong> We share transaction data with Razorpay and Cashfree (payment processors) to facilitate project payments, Cloud subscription billing, rental upfront fee collection, and rental usage bill payments through the DEV Infinity payment portal. Razorpay may also deliver an SMS payment link for a rental bill as a secondary channel. We use Firebase (Google) for database and authentication services and SMTP email services for transactional subscription and rental emails.</li>
                   <li><strong className="text-slate-950">Legal Compliance:</strong> We may disclose information if we believe disclosure is in accordance with, or required by, any applicable law or legal process.</li>
                 </ul>
               </section>
