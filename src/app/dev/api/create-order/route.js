@@ -131,7 +131,7 @@ export async function POST(request) {
             );
         }
 
-        if (typeof amount === "number" && amount !== amountInInr) {
+        if (typeof amount === "number" && Math.abs(amount - amountInInr) > 0.001) {
             return corsJson(
                 request,
                 { error: "Amount mismatch detected." },
