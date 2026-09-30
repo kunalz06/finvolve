@@ -50,7 +50,7 @@ export default function Navbar() {
         <div className={`container mx-auto transition-all duration-200 ${scrolled ? "max-w-6xl" : ""}`}>
           <div className="glass-surface-strong flex min-h-16 items-center justify-between rounded-2xl px-3 py-2.5 sm:px-4 md:px-5">
             <Link href="/dev" className="group flex min-w-0 items-center gap-3" aria-label="DEV Infinity home">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--primary)] text-white shadow-[var(--shadow-soft)] transition-transform duration-200 group-hover:-translate-y-0.5">
+              <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-[var(--shadow-color)] transition-transform duration-200 group-hover:-translate-y-0.5">
                 <Zap size={20} />
               </span>
               <span className="min-w-0">
@@ -73,7 +73,7 @@ export default function Navbar() {
                       href={link.href}
                       aria-current={active ? "page" : undefined}
                       className={`rounded-lg px-3 py-2 text-sm font-bold transition-colors ${active
-                        ? "bg-[var(--surface-strong)] text-[var(--heading)] shadow-sm"
+                        ? "brand-gradient !text-white shadow-sm"
                         : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--heading)]"
                       }`}
                     >
@@ -124,7 +124,7 @@ export default function Navbar() {
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     className={`rounded-xl px-4 py-3 text-sm font-bold ${active
-                      ? "bg-[var(--primary-soft)] text-[var(--primary)]"
+                      ? "brand-gradient !text-white"
                       : "text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
                     }`}
                   >

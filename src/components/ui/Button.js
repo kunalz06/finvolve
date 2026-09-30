@@ -16,11 +16,11 @@ export default function Button({
 
   const variants = {
     primary:
-      "border border-[var(--primary)] bg-[var(--primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] hover:!text-white hover:shadow-[var(--shadow)]",
+      "brand-gradient border border-white/15 !text-white shadow-[var(--shadow-soft)] hover:-translate-y-1 hover:!text-white hover:shadow-[var(--shadow-color)]",
     secondary:
-      "border border-[var(--border-soft)] bg-[var(--surface-strong)] !text-[var(--heading)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-[var(--border)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
+      "border border-[var(--border-soft)] bg-[var(--surface-strong)] !text-[var(--heading)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-[var(--primary)]/25 hover:bg-[var(--primary-soft)] hover:!text-[var(--heading)]",
     outline:
-      "border border-[var(--border)] bg-transparent !text-[var(--heading)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
+      "border border-[var(--primary)]/35 bg-transparent !text-[var(--primary)] hover:bg-[var(--primary-soft)] hover:!text-[var(--primary)]",
     ghost:
       "border border-transparent bg-transparent !text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
     danger:
