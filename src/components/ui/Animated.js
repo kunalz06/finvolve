@@ -290,14 +290,11 @@ export const AnimatedDiv = forwardRef(({
     };
   }, [whileTap]);
 
-  // Combine className and style
+  // Keep server-rendered content visible. Anime.js receives explicit from/to
+  // values in animateIn(), so hiding content in the SSR markup is unnecessary
+  // and leaves sections invisible when hydration or animation is delayed.
   const combinedStyle = {
     ...style,
-    // Ensure element starts with initial state
-    opacity: initial.opacity || initial.opacity === 0 ? initial.opacity : undefined,
-    transform: initial.scale || initial.x || initial.y || initial.translateX || initial.translateY 
-      ? `scale(${initial.scale || 1}) translate(${initial.translateX || initial.x || 0}px, ${initial.translateY || initial.y || 0}px)`
-      : undefined,
   };
 
   return (
