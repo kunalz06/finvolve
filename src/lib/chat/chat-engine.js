@@ -97,6 +97,7 @@ function extractEntities(text) {
     /\bi am\s+([a-z][a-z .'-]{1,60})(?:[,.;]|$)/i,
     /\bi'm\s+([a-z][a-z .'-]{1,60})(?:[,.;]|$)/i,
     /\bname\s*[:=-]\s*([a-z][a-z .'-]{1,60})/i,
+    /\b(?:change|set|use)\s+(?:my\s+)?name\s+(?:to|as)\s+([a-z][a-z .'-]{1,60})/i,
   ];
   for (const pattern of namePatterns) {
     const match = value.match(pattern);
@@ -106,10 +107,10 @@ function extractEntities(text) {
     }
   }
 
-  const contactMessageMatch = value.match(/(?:message|note|tell (?:the )?team|send (?:this|a message))\s*(?:is|:|-)?\s+(.{8,})$/i);
+  const contactMessageMatch = value.match(/(?:message|note|tell (?:the )?team|send (?:this|a message)|change (?:the )?message to)\s*(?:is|:|-)?\s+(.{8,})$/i);
   if (contactMessageMatch) entities.contactMessage = contactMessageMatch[1].trim();
 
-  const descriptionSignals = /\b(build|need|want|project|platform|app|website|software|system|dashboard|automation|integrat|develop|create)\b/i;
+  const descriptionSignals = /\b(build|need|want|project|platform|app|website|software|system|dashboard|automation|integrat|develop|create|description|brief)\b/i;
   if (value.length >= 24 && descriptionSignals.test(value) && !/\b(submit|send|share|forward|deliver)\b/i.test(value)) {
     entities.projectDescription = value;
   }
@@ -206,6 +207,12 @@ export class ChatEngine {
 
   clearRequestedAction() {
     this.requestedAction = null;
+  }
+
+  requestAction(type) {
+    if (type === "contact_message" || type === "project_request") {
+      this.requestedAction = type;
+    }
   }
 
   async processMessage(text) {
