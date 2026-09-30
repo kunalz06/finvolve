@@ -800,9 +800,9 @@ export default function AdminPage() {
                                                         onChange={(e) => setBillHoursInput(e.target.value)}
                                                         className="flex-1 rounded-[16px] border-2 border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-slate-900"
                                                     />
-                                                    <Button variant="primary" size="small" disabled={subActionLoading === r.id || !billHoursInput} onClick={async () => {
+                                                    <Button variant="primary" size="small" disabled={subActionLoading === r.id || billHoursInput === ""} onClick={async () => {
                                                         const hours = parseFloat(billHoursInput);
-                                                        if (!hours || hours <= 0) return;
+                                                        if (!Number.isFinite(hours) || hours < 0) return;
                                                         setSubActionLoading(r.id);
                                                         setError("");
                                                         try {
