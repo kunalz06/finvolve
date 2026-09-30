@@ -2,34 +2,44 @@
 
 import Link from "next/link";
 
-export default function Button({ 
-  children, 
-  href, 
-  variant = "primary", 
+export default function Button({
+  children,
+  href,
+  variant = "primary",
   size = "default",
   className = "",
   icon: Icon,
-  ...props 
+  ...props
 }) {
-  const baseStyles = "inline-flex items-center justify-center gap-2 text-center transition-all duration-200";
-  
+  const baseStyles =
+    "inline-flex items-center justify-center gap-2 rounded-xl text-center font-bold transition-all duration-200 focus-visible:outline-none";
+
   const variants = {
-    primary: "rounded-xl border-2 border-[var(--border)] bg-[var(--primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] hover:!text-white font-bold",
-    secondary: "rounded-xl border-2 border-[var(--border)] bg-[var(--surface-strong)] !text-[var(--foreground)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-soft)] hover:!text-[var(--foreground)] font-bold",
-    outline: "rounded-xl border-2 border-[var(--border)] bg-transparent !text-[var(--foreground)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)] font-bold",
-    ghost: "rounded-xl border-2 border-transparent bg-transparent !text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:!text-[var(--foreground)] font-bold",
-    danger: "rounded-xl border-2 border-[var(--red-primary)] bg-[var(--red-primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--red-secondary)] hover:!text-white font-bold",
-    success: "rounded-xl border-2 border-[var(--accent-mint)] bg-[var(--accent-mint)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--accent-mint)]/80 hover:!text-white font-bold",
-    warning: "rounded-xl border-2 border-[var(--accent-amber)] bg-[var(--accent-amber)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--accent-amber)]/80 hover:!text-white font-bold",
-    red: "rounded-xl border-2 border-[var(--red-primary)] bg-[var(--red-soft)] !text-[var(--red-primary)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--red-light)] hover:!text-[var(--red-dark)] font-bold",
-    glass: "glass-chip-strong rounded-full border-transparent bg-transparent !text-slate-600 hover:bg-white/85 hover:!text-slate-900 font-semibold",
+    primary:
+      "border border-[var(--primary)] bg-[var(--primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--primary-hover)] hover:!text-white hover:shadow-[var(--shadow)]",
+    secondary:
+      "border border-[var(--border-soft)] bg-[var(--surface-strong)] !text-[var(--heading)] shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:border-[var(--border)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
+    outline:
+      "border border-[var(--border)] bg-transparent !text-[var(--heading)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
+    ghost:
+      "border border-transparent bg-transparent !text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
+    danger:
+      "border border-[var(--red-primary)] bg-[var(--red-primary)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:bg-[var(--red-secondary)] hover:!text-white",
+    success:
+      "border border-[var(--accent-mint)] bg-[var(--accent-mint)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:opacity-90 hover:!text-white",
+    warning:
+      "border border-[var(--accent-amber)] bg-[var(--accent-amber)] !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:opacity-90 hover:!text-white",
+    red:
+      "border border-[var(--red-primary)] bg-[var(--red-soft)] !text-[var(--red-primary)] hover:-translate-y-0.5 hover:!text-[var(--red-dark)]",
+    glass:
+      "border border-[var(--border-soft)] bg-[var(--surface)] !text-[var(--foreground)] hover:bg-[var(--surface-strong)] hover:!text-[var(--heading)]",
   };
 
   const sizes = {
     xsmall: "px-3 py-1.5 text-xs",
-    small: "px-4 py-2 text-sm",
+    small: "px-4 py-2.5 text-sm",
     default: "px-5 py-3 text-sm md:px-6",
-    large: "px-6 py-3.5 text-sm md:px-8 md:py-4 md:text-base",
+    large: "px-6 py-3.5 text-sm md:px-7 md:py-4 md:text-base",
     icon: "h-11 w-11 p-0",
   };
 
