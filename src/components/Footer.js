@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowRight, Github, Linkedin, Mail, Zap } from "lucide-react";
+import { ArrowRight, Github, Linkedin, Mail } from "lucide-react";
 import { apiUrl } from "@/lib/api";
 import Button from "@/components/ui/Button";
+import BrandMark from "@/components/BrandMark";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -44,15 +45,11 @@ export default function Footer() {
   return (
     <footer className="w-full px-4 sm:px-6 pb-4 pt-8 md:pb-8 md:pt-14">
       <div className="container mx-auto">
-        <div className="gradient-section glass-surface-strong relative overflow-hidden rounded-[28px] px-4 py-8 sm:px-5 sm:py-10 md:px-10 md:py-14">
-          <div className="spectrum-line absolute inset-x-0 top-0" />
+        <div className="glass-surface-strong relative overflow-hidden rounded-2xl px-4 py-8 sm:px-5 sm:py-10 md:px-10 md:py-14">
           <div className="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
               <Link href="/" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
-                <div className="brand-gradient flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-[var(--shadow-color)] transition-transform hover:-translate-y-0.5">
-                  <Zap className="text-white" size={20} />
-                </div>
-                <span className="font-code-brand text-xl sm:text-2xl font-black text-[var(--heading)]">DEV Infinity</span>
+                <BrandMark withWordmark />
               </Link>
               <p className="mb-6 text-center text-sm leading-relaxed text-[var(--muted)] md:text-left">
                 Product engineering, dashboards, automation, and sharp delivery for ambitious teams.
