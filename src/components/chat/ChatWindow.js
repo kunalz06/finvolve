@@ -20,7 +20,7 @@ import BrandMark from "@/components/BrandMark";
 const WELCOME = {
   role: "bot",
   text: "Hi, I’m the DEV Infinity assistant. I can help you compare services, understand cloud plans, find pricing information, or prepare a project request.",
-  quickReplies: ["Explore services", "Compare cloud plans", "Start a project", "Contact the team"],
+  quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Contact Us"],
 };
 
 const SESSION_RESTORE_HOURS = 24;
@@ -192,7 +192,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
         console.warn("Message processing error:", err);
         addBotResponse({
           text: "I couldn’t process that message. You can try again or contact the team directly.",
-          quickReplies: ["Start over", "Contact the team"],
+          quickReplies: ["Our Services", "Contact Us"],
         });
       }
     },
@@ -219,7 +219,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
         console.warn("Quick reply error:", err);
         addBotResponse({
           text: "I couldn’t open that option. Try another suggestion or type your question below.",
-          quickReplies: ["Start over", "Contact the team"],
+          quickReplies: ["Our Services", "Contact Us"],
         });
       }
     },
@@ -254,7 +254,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
   const cancelFlow = () => {
     engine?.cancelFlow?.();
-    setActiveReplies(["Explore services", "Compare cloud plans", "Contact the team"]);
+    setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
     setMessages((prev) => [
       ...prev,
       {
