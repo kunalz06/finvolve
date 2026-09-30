@@ -78,7 +78,7 @@ export default function ServicesPage() {
       <div className="container space-y-6 sm:space-y-8 lg:space-y-10">
         <section className="gradient-section glass-surface-strong relative overflow-hidden rounded-[28px] px-4 py-8 sm:px-6 sm:py-10 md:px-8 lg:px-12 text-left">
           <div className="spectrum-line absolute inset-x-0 top-0" />
-          <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
+          <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
             <span className="text-sm font-bold uppercase text-primary">Our Services</span>
           </div>
           <h1 className="mb-4 sm:mb-6 max-w-4xl text-3xl sm:text-4xl font-black text-[var(--heading)] md:text-5xl lg:text-6xl">Solutions That <span className="brand-gradient-text">Scale</span></h1>

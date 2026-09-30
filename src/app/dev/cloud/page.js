@@ -393,7 +393,7 @@ export default function CloudPage() {
                   >
                     {/* Highlight Ribbon */}
                     {isHighlighted && (
-                      <div className="absolute -top-3.5 right-6 rounded-full border-2 border-[var(--border)] bg-[var(--accent)] px-3.5 py-1 text-[11px] font-black uppercase tracking-wider !text-white shadow-[var(--shadow-soft)]">
+                      <div className="absolute -top-3.5 right-6 rounded-md border border-[var(--border)] bg-[var(--accent)] px-3.5 py-1 text-[11px] font-black uppercase tracking-wider !text-white shadow-[var(--shadow-soft)]">
                         ★ MOST POPULAR
                       </div>
                     )}

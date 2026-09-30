@@ -6,13 +6,14 @@ import { parseInlineBold } from "@/lib/chat/chat-utils";
 import { saveFeedback } from "@/lib/chat/chat-utils";
 import { getSessionId } from "@/lib/chat/chat-utils";
 import Button from "@/components/ui/Button";
+import BrandMark from "@/components/BrandMark";
 
 export default function ChatMessage({ message, onFeedback }) {
   const isBot = message.role === "bot";
 
   return (
     <div className={`chat-msg ${isBot ? "bot-msg" : "user-msg"}`}>
-      {isBot && <div className="chat-msg-avatar">DEV</div>}
+      {isBot && <BrandMark size="small" className="chat-msg-brand" />}
       <div className={`chat-bubble ${isBot ? "bot-bubble" : "user-bubble"}`}>
         <MessageContent text={message.text} />
         {/* Link Cards */}

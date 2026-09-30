@@ -66,8 +66,8 @@ export default function Home() {
         <div className="container">
           <div className="grid items-center gap-8 lg:min-h-[700px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
             <div className="max-w-3xl">
-              <div className="glass-chip-strong mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full brand-gradient text-white shadow-sm">
+              <div className="glass-chip-strong mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md brand-gradient text-white shadow-sm">
                   <Sparkles size={13} />
                 </span>
                 <span className="font-code-brand text-[11px] font-bold uppercase tracking-[0.16em] text-primary sm:text-xs">
@@ -101,7 +101,7 @@ export default function Home() {
                   ["Launch-ready systems", "bg-orange-50 text-[var(--accent)] dark:bg-orange-950/40"],
                 ].map(([item, tone]) => (
                   <div key={item} className="flex items-center gap-2 text-sm font-semibold text-[var(--muted)]">
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-full ${tone}`}>
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-md ${tone}`}>
                       <Check size={14} strokeWidth={3} />
                     </span>
                     {item}
@@ -111,8 +111,6 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <div className="absolute -left-12 top-16 hidden h-44 w-44 rounded-full bg-[var(--violet)]/20 blur-3xl lg:block" />
-              <div className="absolute -right-10 bottom-10 hidden h-52 w-52 rounded-full bg-[var(--accent-cool)]/18 blur-3xl lg:block" />
 
               <div className="hero-vibrant-panel glass-surface-strong relative overflow-hidden rounded-[30px] p-4 sm:p-5 md:p-6">
                 <div className="spectrum-line absolute inset-x-0 top-0" />
@@ -138,7 +136,7 @@ export default function Home() {
                       className={`${step.tone} rounded-2xl border border-[var(--border-soft)] p-4 `}
                     >
                       <div className="flex items-start gap-3">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black shadow-sm ${step.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xs font-black shadow-sm ${step.badge}`}>
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <div>
@@ -199,7 +197,6 @@ export default function Home() {
         <div className="container">
           <div className="gradient-section glass-surface-strong relative overflow-hidden rounded-[30px] p-6 sm:p-8 md:p-10 lg:p-12">
             <div className="spectrum-line absolute inset-x-0 top-0" />
-            <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[var(--accent-rose)]/12 blur-3xl" />
             <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
               <div className="max-w-3xl">
                 <p className="font-code-brand text-xs font-bold uppercase tracking-[0.18em] text-primary">Have something to build?</p>

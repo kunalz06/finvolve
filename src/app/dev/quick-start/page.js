@@ -108,7 +108,7 @@ export default function QuickStartPage() {
 
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-lg px-4 py-2">
               <Zap size={16} className="text-primary" />
               <span className="text-sm font-medium text-primary">PREMIUM SERVICE</span>
             </div>

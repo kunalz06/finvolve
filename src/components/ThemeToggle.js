@@ -37,7 +37,7 @@ export default function ThemeToggle({ compact = false }) {
       onClick={toggleTheme}
       variant="secondary"
       size="small"
-      className={`theme-toggle rounded-full ${compact ? "h-11 w-11 justify-center px-0" : "px-3 py-2 text-xs font-bold uppercase"}`}
+      className={`theme-toggle rounded-lg ${compact ? "h-11 w-11 justify-center px-0" : "px-3 py-2 text-xs font-semibold"}`}
       aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
       title={`Switch to ${isDark ? "light" : "dark"} mode`}
     >

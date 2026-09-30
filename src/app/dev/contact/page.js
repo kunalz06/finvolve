@@ -74,7 +74,7 @@ export default function Contact() {
         <div className="mx-auto max-w-5xl">
           {/* Contact Info Side */}
           <div className="mb-12 sm:mb-16 text-center">
-            <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
+            <div className="glass-chip-strong mb-4 sm:mb-6 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">CONTACT US</span>
             </div>
             <h1 className="mb-4 text-3xl font-black tracking-[-0.04em] text-[var(--heading)] sm:text-4xl md:text-5xl">Let&apos;s Start a Conversation</h1>
