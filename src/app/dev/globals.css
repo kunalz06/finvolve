@@ -705,3 +705,187 @@ select:focus {
   background: var(--primary);
   border: 2px solid var(--surface-muted);
 }
+
+/* ============================================
+   2026 UI refresh
+   A calmer product-studio visual system shared
+   by every public /dev route.
+   ============================================ */
+:root {
+  --primary: #3157f6;
+  --primary-hover: #2446d8;
+  --primary-soft: #eef2ff;
+  --accent: #f97316;
+  --accent-cool: #0f9f9a;
+  --accent-mint: #16a34a;
+  --accent-amber: #d97706;
+  --accent-rose: #db2777;
+  --background: #f7f8fc;
+  --surface: rgba(255, 255, 255, 0.86);
+  --surface-strong: #ffffff;
+  --surface-muted: #f2f4f8;
+  --foreground: #344054;
+  --heading: #101828;
+  --muted: #667085;
+  --border: #cfd5df;
+  --border-soft: #e4e7ec;
+  --shadow: 0 20px 50px rgba(15, 23, 42, 0.12);
+  --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --overlay: rgba(15, 23, 42, 0.48);
+  --max-width: 1240px;
+}
+
+[data-theme="dark"] {
+  --primary: #8aa6ff;
+  --primary-hover: #a9bbff;
+  --primary-soft: #17213d;
+  --accent: #fb923c;
+  --accent-cool: #5eead4;
+  --accent-mint: #86efac;
+  --accent-amber: #fbbf24;
+  --accent-rose: #f9a8d4;
+  --background: #0b0f17;
+  --surface: rgba(17, 24, 39, 0.86);
+  --surface-strong: #111827;
+  --surface-muted: #172033;
+  --foreground: #d0d5dd;
+  --heading: #f8fafc;
+  --muted: #98a2b3;
+  --border: #344054;
+  --border-soft: #263244;
+  --shadow: 0 22px 55px rgba(0, 0, 0, 0.34);
+  --shadow-soft: 0 10px 28px rgba(0, 0, 0, 0.24);
+  --overlay: rgba(0, 0, 0, 0.72);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 28rem),
+    radial-gradient(circle at 90% 12%, color-mix(in srgb, var(--accent-cool) 7%, transparent), transparent 24rem),
+    var(--background);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--primary) 24%, transparent);
+  color: var(--heading);
+}
+
+.dev-shell {
+  background: transparent;
+}
+
+.dev-shell::before {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border-soft) 55%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border-soft) 55%, transparent) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.3;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 72%);
+}
+
+.dev-shell::after {
+  display: none;
+}
+
+.glass-surface,
+.glass-surface-strong,
+.glass-surface-muted,
+.solid-surface {
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-surface {
+  background: var(--surface);
+}
+
+.glass-surface-strong {
+  background: color-mix(in srgb, var(--surface-strong) 94%, transparent);
+}
+
+.glass-surface-muted {
+  background: var(--surface-muted);
+}
+
+.glass-chip,
+.glass-chip-strong {
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+.glass-chip {
+  background: color-mix(in srgb, var(--surface-muted) 90%, transparent);
+}
+
+.glass-chip-strong {
+  background: var(--surface-strong);
+}
+
+.glass-icon-plate {
+  border: 1px solid color-mix(in srgb, var(--primary) 26%, var(--border-soft));
+  box-shadow: none;
+}
+
+.glass-nav-strip {
+  border: 1px solid var(--border-soft);
+  background: color-mix(in srgb, var(--surface-muted) 86%, transparent);
+  box-shadow: none;
+}
+
+.theme-toggle {
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-soft);
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent);
+  outline-offset: 3px;
+}
+
+.page-section {
+  overflow: visible;
+}
+
+@media (max-width: 767px) {
+  .dev-shell > nav {
+    background: linear-gradient(to bottom, var(--background) 72%, transparent);
+  }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .glass-surface,
+  .glass-surface-strong,
+  .glass-surface-muted {
+    box-shadow: var(--shadow-soft);
+  }
+}
+

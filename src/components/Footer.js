@@ -48,12 +48,12 @@ export default function Footer() {
           <div className="grid grid-cols-1 gap-8 sm:gap-10 md:grid-cols-2 lg:grid-cols-4">
             <div className="lg:col-span-1">
               <Link href="/" className="mb-4 flex items-center justify-center gap-3 md:justify-start">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[var(--red-primary)] bg-[var(--primary)] shadow-[var(--shadow-soft)] hover:border-[var(--red-secondary)] transition-colors">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--primary)] text-white shadow-[var(--shadow-soft)] transition-transform hover:-translate-y-0.5">
                   <Zap className="text-white" size={20} />
                 </div>
-                <span className="font-code-brand text-xl sm:text-2xl font-black text-slate-900">DEV Infinity</span>
+                <span className="font-code-brand text-xl sm:text-2xl font-black text-[var(--heading)]">DEV Infinity</span>
               </Link>
-              <p className="mb-6 text-center text-sm leading-relaxed text-slate-600 md:text-left">
+              <p className="mb-6 text-center text-sm leading-relaxed text-[var(--muted)] md:text-left">
                 Product engineering, dashboards, automation, and sharp delivery for ambitious teams.
               </p>
               <div className="flex items-center justify-center gap-3 md:justify-start">
@@ -63,7 +63,7 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-slate-900">Services</h4>
+              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Services</h4>
               <ul className="space-y-3">
                 <FooterLink href="/dev/services">Web Development</FooterLink>
                 <FooterLink href="/dev/services">Mobile Apps</FooterLink>
@@ -74,7 +74,7 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-slate-900">Company</h4>
+              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Company</h4>
               <ul className="space-y-3">
                 <FooterLink href="/dev/about">About Us</FooterLink>
                 <FooterLink href="/dev/contact">Contact</FooterLink>
@@ -82,8 +82,8 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-slate-900">Newsletter</h4>
-              <p className="mb-4 text-sm text-slate-600">Short, useful notes from the build floor.</p>
+              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Newsletter</h4>
+              <p className="mb-4 text-sm text-[var(--muted)]">Short, useful notes from the build floor.</p>
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3">
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
@@ -92,7 +92,7 @@ export default function Footer() {
                     placeholder="Enter your email"
                     value={newsletterEmail}
                     onChange={(event) => setNewsletterEmail(event.target.value)}
-                    className="w-full rounded-xl py-2.5 sm:py-3 pl-10 pr-4 text-sm text-slate-900 placeholder-slate-400"
+                    className="w-full rounded-xl py-2.5 sm:py-3 pl-10 pr-4 text-sm text-[var(--heading)] placeholder-slate-400"
                     required
                   />
                 </div>
@@ -122,7 +122,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-[var(--border-soft)] pt-6 text-center text-sm text-slate-500 md:flex-row md:text-left">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-[var(--border-soft)] pt-6 text-center text-sm text-[var(--muted)] md:flex-row md:text-left">
             <p>&copy; {currentYear} DEV Infinity Software Studio. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end md:gap-6">
               <Link href="/dev/privacy-policy" className="transition-colors hover:text-primary">
@@ -142,7 +142,7 @@ export default function Footer() {
 function FooterLink({ href, children }) {
   return (
     <li>
-      <Link href={href} className="text-sm font-semibold text-slate-600 transition-colors hover:text-slate-900">
+      <Link href={href} className="text-sm font-semibold text-[var(--muted)] transition-colors hover:text-[var(--heading)]">
         {children}
       </Link>
     </li>
@@ -153,7 +153,7 @@ function SocialLink({ icon: Icon, href }) {
   return (
     <a
       href={href}
-      className="glass-surface flex h-11 w-11 items-center justify-center rounded-xl text-slate-500 transition-all duration-200 hover:-translate-y-0.5 hover:text-primary"
+      className="glass-surface flex h-11 w-11 items-center justify-center rounded-xl text-[var(--muted)] transition-all duration-200 hover:-translate-y-0.5 hover:text-primary"
     >
       <Icon size={18} />
     </a>
