@@ -802,7 +802,7 @@ export default function CloudPage() {
                       <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
                         <Timer size={14} /> Usage Rate
                       </div>
-                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR} / {RENTAL_CONFIG.computeHoursPerUnit}hrs</span>
+                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR} / {RENTAL_CONFIG.computeHoursPerUnit}hrs · ₹{RENTAL_CONFIG.hourlyRateINR}/hr prorated</span>
                     </div>
                   </div>
                 </div>
@@ -810,7 +810,7 @@ export default function CloudPage() {
                 {/* Info Box */}
                 <div className="rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3">
                   <p className="text-xs text-[var(--foreground)] font-medium leading-relaxed">
-                    A confirmation email has been sent. After your rental period ends, your actual compute usage will be calculated and a bill with a Razorpay payment link will be emailed to you.
+                    A confirmation email has been sent. After your rental period ends, your actual compute usage will be billed proportionally at ₹10/hour (₹200 per 20 hours). Your email will contain a secure DEV Infinity payment portal link, and Razorpay SMS remains available as a secondary payment option.
                   </p>
                 </div>
 
