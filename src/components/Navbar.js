@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, Zap } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import ThemeToggle from "@/components/ThemeToggle";
+import BrandMark from "@/components/BrandMark";
 import Button from "@/components/ui/Button";
 
 const navLinks = [
@@ -50,21 +51,11 @@ export default function Navbar() {
         <div className={`container mx-auto transition-all duration-200 ${scrolled ? "max-w-6xl" : ""}`}>
           <div className="glass-surface-strong flex min-h-16 items-center justify-between rounded-2xl px-3 py-2.5 sm:px-4 md:px-5">
             <Link href="/dev" className="group flex min-w-0 items-center gap-3" aria-label="DEV Infinity home">
-              <span className="brand-gradient flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-[var(--shadow-color)] transition-transform duration-200 group-hover:-translate-y-0.5">
-                <Zap size={20} />
-              </span>
-              <span className="min-w-0">
-                <span className="block truncate font-code-brand text-base font-black text-[var(--heading)] sm:text-lg">
-                  DEV Infinity
-                </span>
-                <span className="hidden text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--muted)] sm:block">
-                  Product engineering studio
-                </span>
-              </span>
+              <BrandMark withWordmark className="min-w-0" />
             </Link>
 
             <div className="hidden items-center gap-1 lg:flex">
-              <div className="glass-nav-strip flex items-center gap-1 rounded-xl p-1">
+              <div className="glass-nav-strip flex items-center gap-1 rounded-lg p-1">
                 {navLinks.map((link) => {
                   const active = isLinkActive(pathname, link.href);
                   return (
@@ -72,7 +63,7 @@ export default function Navbar() {
                       key={link.href}
                       href={link.href}
                       aria-current={active ? "page" : undefined}
-                      className={`rounded-lg px-3 py-2 text-sm font-bold transition-colors ${active
+                      className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors ${active
                         ? "bg-[var(--primary-soft)] text-[var(--primary)] shadow-sm"
                         : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--heading)]"
                       }`}
@@ -114,7 +105,7 @@ export default function Navbar() {
 
       <div className={`fixed inset-x-0 top-[76px] z-50 px-3 transition-all duration-200 sm:px-5 lg:hidden ${mobileMenuOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-3 opacity-0"}`}>
         <div className="container mx-auto">
-          <div className="glass-surface-strong rounded-2xl p-3">
+          <div className="glass-surface-strong rounded-xl p-3">
             <div className="grid gap-1">
               {navLinks.map((link) => {
                 const active = isLinkActive(pathname, link.href);
@@ -123,7 +114,7 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     aria-current={active ? "page" : undefined}
-                    className={`rounded-xl px-4 py-3 text-sm font-bold ${active
+                    className={`rounded-lg px-4 py-3 text-sm font-semibold ${active
                       ? "bg-[var(--primary-soft)] text-[var(--primary)]"
                       : "text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
                     }`}
