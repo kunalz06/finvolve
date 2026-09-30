@@ -14,7 +14,7 @@ export default function About() {
         <section className="page-section">
           <div className="gradient-section glass-surface-strong relative grid items-center gap-8 overflow-hidden rounded-[28px] px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-2 lg:gap-12 lg:px-12 lg:py-12">
             <AnimatedDiv initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-lg px-4 py-2">
                 <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">About Us</span>
               </div>
               <h1 className="mb-5 text-4xl font-black leading-[1.02] tracking-[-0.04em] text-[var(--heading)] md:text-5xl lg:text-6xl">
@@ -71,7 +71,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-lg px-4 py-2">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Portfolio</span>
             </div>
             <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">Selected Work</h2>
@@ -90,7 +90,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-lg px-4 py-2">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Tech Stack</span>
             </div>
             <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">Technologies We Use</h2>
@@ -115,7 +115,7 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-lg px-4 py-2">
               <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Values</span>
             </div>
             <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">What Drives Us</h2>
@@ -183,7 +183,7 @@ function PortfolioCard({ title, category, desc, tech }) {
       <p className="mb-4 text-sm leading-7 text-[var(--muted)]">{desc}</p>
       <div className="flex flex-wrap gap-2">
         {tech.map((t) => (
-          <span key={t} className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-[var(--muted)]">
+          <span key={t} className="glass-chip rounded-md px-3 py-1 text-xs font-medium text-[var(--muted)]">
             {t}
           </span>
         ))}
