@@ -195,7 +195,7 @@ export async function POST(request) {
                 amount: billAmount * 100,
                 currency: "INR",
                 accept_partial: false,
-                description: `DEV Infinity Cloud — Rental Bill (${rentalId})`,
+                description: `DEV Infinity Cloud — Rental ${rentalId} · ${hoursUsed} compute hours · INR ${billAmount} due`,
                 customer: {
                     name: rental.name,
                     email: rental.email,
