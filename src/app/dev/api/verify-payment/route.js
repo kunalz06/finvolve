@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
 import {
+    PAYMENT_PURPOSE,
     PAYMENT_SOURCE,
     QUICK_START_AMOUNT_PAISE,
     getRazorpayServerCredentials,
@@ -16,6 +17,7 @@ import {
 } from "@/lib/server/newsletter";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import { fetchSuccessfulCashfreePayment, markCashfreePaymentPaid } from "@/lib/server/cashfree";
+import { settleRentalBillPayment } from "@/lib/server/rental-payment-settlement";
 
 const quickStartDataSchema = z.object({
     name: z.string().trim().min(2).max(120),
@@ -93,7 +95,25 @@ export async function POST(request) {
             }
             const authoritative = await fetchSuccessfulCashfreePayment(data.providerOrderId);
             const result = await markCashfreePaymentPaid({ db, paymentRequestId: data.paymentRequestId, providerOrderId: data.providerOrderId, ...authoritative });
-            return corsJson(request, { success: true, ...result, paymentRequestId: data.paymentRequestId });
+
+            let rentalSettlement = null;
+            if (record.purpose === PAYMENT_PURPOSE.RENTAL_BILL && record.rentalId) {
+                rentalSettlement = await settleRentalBillPayment({
+                    db,
+                    rentalId: record.rentalId,
+                    paymentRequestId: data.paymentRequestId,
+                    paymentId: authoritative.payment?.cf_payment_id ? String(authoritative.payment.cf_payment_id) : null,
+                    provider: "cashfree",
+                    providerOrderId: data.providerOrderId,
+                });
+            }
+
+            return corsJson(request, {
+                success: true,
+                ...result,
+                paymentRequestId: data.paymentRequestId,
+                rentalSettlement,
+            });
         }
 
         const { keyId, keySecret } = getRazorpayServerCredentials();
@@ -229,7 +249,7 @@ export async function POST(request) {
             );
         }
 
-        const expectedAmountPaise = Number(payment.amount) * 100;
+        const expectedAmountPaise = Math.round(Number(payment.amount) * 100);
         if (!Number.isFinite(expectedAmountPaise) || Number(order.amount) !== expectedAmountPaise) {
             return corsJson(
                 request,
@@ -253,10 +273,23 @@ export async function POST(request) {
         }
 
         if (payment.status === "paid") {
+            let rentalSettlement = null;
+            if (payment.purpose === PAYMENT_PURPOSE.RENTAL_BILL && payment.rentalId) {
+                rentalSettlement = await settleRentalBillPayment({
+                    db,
+                    rentalId: payment.rentalId,
+                    paymentRequestId: paymentSnap.id,
+                    paymentId: payment.providerPaymentId || data.razorpay_payment_id,
+                    provider: payment.provider || "razorpay",
+                    providerOrderId: payment.providerOrderId || data.razorpay_order_id,
+                });
+            }
+
             return corsJson(request, {
                 success: true,
                 alreadyProcessed: true,
                 paymentRequestId: paymentSnap.id,
+                rentalSettlement,
             });
         }
 
@@ -272,9 +305,22 @@ export async function POST(request) {
             updatedAt: FieldValue.serverTimestamp(),
         });
 
+        let rentalSettlement = null;
+        if (payment.purpose === PAYMENT_PURPOSE.RENTAL_BILL && payment.rentalId) {
+            rentalSettlement = await settleRentalBillPayment({
+                db,
+                rentalId: payment.rentalId,
+                paymentRequestId: paymentSnap.id,
+                paymentId: data.razorpay_payment_id,
+                provider: "razorpay",
+                providerOrderId: data.razorpay_order_id,
+            });
+        }
+
         return corsJson(request, {
             success: true,
             paymentRequestId: paymentSnap.id,
+            rentalSettlement,
         });
     } catch (error) {
         console.error("Payment verification failed:", error.message);
