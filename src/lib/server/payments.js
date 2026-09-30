@@ -5,6 +5,11 @@ export const PAYMENT_SOURCE = {
     PAYMENT_PORTAL: "payment_portal",
 };
 
+export const PAYMENT_PURPOSE = {
+    CLIENT_PAYMENT: "client_payment",
+    RENTAL_BILL: "rental_bill",
+};
+
 export const QUICK_START_AMOUNT_INR = 99;
 export const QUICK_START_AMOUNT_PAISE = QUICK_START_AMOUNT_INR * 100;
 
