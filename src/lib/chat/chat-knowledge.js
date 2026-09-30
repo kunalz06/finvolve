@@ -659,6 +659,7 @@ export const QUICK_REPLY_ROUTES = {
   "Contact Support": { link: "/dev/contact" },
   "Contact Us": { link: "/dev/contact" },
   "Contact Page": { link: "/dev/contact" },
+  "Contact": { link: "/dev/contact" },
   "Start a Project": { intent: "project_request" },
   "Start Quick Start": { link: "/dev/quick-start" },
   "Get a Quote": { link: "/dev/request" },
