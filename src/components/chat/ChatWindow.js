@@ -272,9 +272,11 @@ export default function ChatWindow({ onClose, onMinimize }) {
       }
 
       if (pendingAction) {
+        const actionType = pendingAction.type;
         setPendingAction(null);
         setActionStatus("idle");
         setActionError("");
+        engine.requestAction?.(actionType);
       }
 
       setActiveReplies([]);
