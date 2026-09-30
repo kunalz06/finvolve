@@ -891,6 +891,7 @@ select:focus-visible {
 
 /* ============================================
    Vibrant colour enrichment
+   Shared across public /dev routes.
    ============================================ */
 :root {
   --primary: #4f46e5;
