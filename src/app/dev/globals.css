@@ -1442,3 +1442,185 @@ select:focus {
   }
 }
 
+/* ============================================
+   Brand consistency pass
+   Flat surfaces, reduced gradients, no pill UI.
+   ============================================ */
+:root {
+  --brand-mark-bg: #111827;
+  --brand-mark-fg: #ffffff;
+  --brand-mark-accent: #5b5cf0;
+  --brand-logo-border: #d8dde8;
+  --brand-logo-shadow: 0 6px 18px rgba(16, 24, 40, 0.10);
+}
+
+[data-theme="dark"] {
+  --brand-mark-bg: #f8fafc;
+  --brand-mark-fg: #10141e;
+  --brand-mark-accent: #7e86ff;
+  --brand-logo-border: #344054;
+  --brand-logo-shadow: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+body {
+  background: var(--background);
+}
+
+.dev-shell::before {
+  opacity: 0.14;
+}
+
+.brand-gradient {
+  background: var(--primary);
+}
+
+.brand-gradient:hover {
+  background: var(--primary-hover);
+}
+
+.brand-gradient-text,
+.glass-text-gradient,
+.gradient-text {
+  background: none;
+  color: var(--primary) !important;
+  -webkit-text-fill-color: currentColor;
+}
+
+.spectrum-line {
+  height: 2px;
+  background: var(--primary);
+  box-shadow: none;
+}
+
+.gradient-section,
+.hero-vibrant-panel {
+  background: var(--surface-strong);
+}
+
+.hero-vibrant-panel::before {
+  display: none;
+}
+
+.color-tile-primary,
+.color-tile-cool,
+.color-tile-warm,
+.color-tile-rose {
+  background: var(--surface-muted);
+}
+
+.glass-chip,
+.glass-chip-strong {
+  border-radius: 9px !important;
+}
+
+.glass-chip-strong {
+  background: var(--surface-muted);
+}
+
+.glass-nav-strip {
+  background: var(--surface-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+}
+
+.brand-mark {
+  --brand-mark-size: 40px;
+  width: var(--brand-mark-size);
+  height: var(--brand-mark-size);
+  flex: 0 0 var(--brand-mark-size);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 11px;
+  border: 1px solid var(--brand-logo-border);
+  background: var(--brand-mark-bg);
+  color: var(--brand-mark-fg);
+  box-shadow: var(--brand-logo-shadow);
+  transition: transform 180ms ease, border-color 180ms ease;
+}
+
+.brand-lockup:hover .brand-mark {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--primary) 38%, var(--brand-logo-border));
+}
+
+.brand-mark svg {
+  width: 27px;
+  height: 27px;
+}
+
+.brand-mark-small {
+  --brand-mark-size: 28px;
+  border-radius: 8px;
+}
+
+.brand-mark-small svg {
+  width: 19px;
+  height: 19px;
+}
+
+.brand-mark-large {
+  --brand-mark-size: 48px;
+  border-radius: 13px;
+}
+
+.brand-mark-large svg {
+  width: 32px;
+  height: 32px;
+}
+
+.brand-wordmark {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  line-height: 1.05;
+}
+
+.brand-wordmark-main {
+  color: var(--heading);
+  font-family: var(--font-sans);
+  font-size: 1.02rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+}
+
+.brand-wordmark-sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.dev-shell h1,
+.dev-shell h2 {
+  text-wrap: balance;
+}
+
+.dev-shell p {
+  text-wrap: pretty;
+}
+
+@media (max-width: 480px) {
+  .brand-wordmark-sub {
+    display: none;
+  }
+
+  .brand-lockup {
+    gap: 9px;
+  }
+}
+
