@@ -13,8 +13,7 @@ const services = [
     description: "Build responsive web products that scale from launch to enterprise usage.",
     features: ["React and Next.js Development", "Progressive Web Apps", "E-commerce Solutions", "Real-time Applications", "API Integration"],
     color: "bg-[var(--primary)]",
-    tint: "color-tile-primary",
-  },
+      },
   {
     id: "mobile-app",
     icon: Smartphone,
@@ -22,8 +21,7 @@ const services = [
     description: "Native and cross-platform experiences that feel polished, fast, and reliable.",
     features: ["iOS and Android Native Apps", "React Native", "Flutter Development", "App Store Optimization", "Analytics and Notifications"],
     color: "bg-[var(--accent-cool)]",
-    tint: "color-tile-cool",
-  },
+      },
   {
     id: "ai",
     icon: Brain,
@@ -31,8 +29,7 @@ const services = [
     description: "Use applied AI to automate workflows, unlock insights, and add intelligence to products.",
     features: ["Machine Learning Models", "Natural Language Processing", "Computer Vision", "Predictive Analytics", "AI Assistants"],
     color: "bg-[var(--accent)]",
-    tint: "color-tile-warm",
-  },
+      },
   {
     id: "saas",
     icon: Cloud,
@@ -40,8 +37,7 @@ const services = [
     description: "Build scalable multi-tenant platforms with durable architecture and security built in.",
     features: ["Multi-tenant Architecture", "Subscription Management", "User Authentication and RBAC", "Cloud Infrastructure", "Automated Scaling"],
     color: "bg-[var(--accent-mint)]",
-    tint: "color-tile-cool",
-  },
+      },
   {
     id: "custom-software",
     icon: Code,
@@ -49,8 +45,7 @@ const services = [
     description: "Tailored systems for internal tools, automation, and high-leverage business workflows.",
     features: ["Process Automation", "Internal Dashboards", "Legacy Modernization", "Third-party Integrations", "Custom CRM and ERP"],
     color: "bg-[var(--primary)]",
-    tint: "color-tile-primary",
-  },
+      },
   {
     id: "database",
     icon: Database,
@@ -58,8 +53,7 @@ const services = [
     description: "Robust backend systems designed for performance, maintainability, and clean data flows.",
     features: ["Database Design", "REST and GraphQL APIs", "Microservices Architecture", "Real-time Data Processing", "Cloud Database Management"],
     color: "bg-[var(--accent-cool)]",
-    tint: "color-tile-cool",
-  },
+      },
   {
     id: "security",
     icon: Shield,
@@ -67,8 +61,7 @@ const services = [
     description: "Security-first delivery for applications that need stronger trust, privacy, and resilience.",
     features: ["Security Audits", "OWASP Alignment", "Data Encryption", "Access Control", "GDPR and HIPAA Readiness"],
     color: "bg-[var(--accent-amber)]",
-    tint: "color-tile-warm",
-  },
+      },
   {
     id: "design",
     icon: Palette,
@@ -76,8 +69,7 @@ const services = [
     description: "Interfaces shaped for clarity, conversion, and a product experience users actually enjoy.",
     features: ["User Research", "Wireframes and Prototypes", "Design Systems", "Responsive Design", "Design to Dev Handoff"],
     color: "bg-[var(--accent-rose)]",
-    tint: "color-tile-rose",
-  },
+      },
 ];
 
 export default function ServicesPage() {
@@ -98,22 +90,22 @@ export default function ServicesPage() {
         <section className="grid gap-6 sm:gap-8 md:grid-cols-2">
           {services.map((service, index) => (
             <AnimatedDiv key={service.id} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: index * 0.05 }}>
-              <Card className={`group h-full ${service.tint}`}>
-                <div className={`mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl border border-white/20 ${service.color} shadow-[var(--shadow-color)] transition-transform duration-200 group-hover:-translate-y-0.5`}>
+              <Card className="group flex h-full flex-col">
+                <div className={`mb-4 sm:mb-6 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl border border-white/10 ${service.color} shadow-[var(--shadow-soft)] transition-transform duration-200 group-hover:-translate-y-0.5`}>
                   <service.icon className="text-white size-6 sm:size-7" />
                 </div>
-                <h3 className="mb-2 sm:mb-3 text-lg sm:text-xl font-bold text-[var(--heading)]">{service.title}</h3>
-                <p className="mb-4 sm:mb-6 leading-relaxed text-sm sm:text-base text-[var(--muted)]">{service.description}</p>
-                <ul className="space-y-2">
+                <h3 className="mb-2 sm:mb-3 text-lg sm:text-xl font-semibold text-[var(--heading)]">{service.title}</h3>
+                <p className="mb-5 text-sm leading-6 text-[var(--muted)] sm:text-base">{service.description}</p>
+                <ul className="flex-1 space-y-2.5">
                   {service.features.map((feature) => (
-                    <li key={feature} className="flex items-center gap-2 text-sm text-[var(--muted)]">
+                    <li key={feature} className="flex items-start gap-2.5 text-sm leading-5 text-[var(--muted-strong)]">
                       <CheckCircle size={14} className="flex-shrink-0 text-primary sm:size-4" />
                       {feature}
                     </li>
                   ))}
                 </ul>
-                <div className="mt-4 sm:mt-6 border-t-2 border-[var(--border-soft)] pt-4 sm:pt-6">
-                  <Button href={`/dev/request?service=${service.id}`} variant="ghost" className="group/btn px-0 hover:bg-transparent touch-target">
+                <div className="mt-6 border-t border-[var(--border-soft)] pt-5">
+                  <Button href={`/dev/request?service=${service.id}`} variant="ghost" className="group/btn px-0 font-semibold text-[var(--primary)] hover:bg-transparent touch-target">
                     Get Started
                     <ArrowRight size={14} className="sm:size-4 transition-transform group-hover/btn:translate-x-1" />
                   </Button>
@@ -126,7 +118,7 @@ export default function ServicesPage() {
         <section className="gradient-section glass-surface-strong relative overflow-hidden rounded-[28px] px-4 py-8 sm:px-6 sm:py-10 md:px-8 lg:px-12 text-center">
           <div className="spectrum-line absolute inset-x-0 top-0" />
           <div className="relative z-10 space-y-4 sm:space-y-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[var(--heading)] md:text-4xl">Not Sure Where to Start?</h2>
+            <h2 className="text-2xl sm:text-3xl font-semibold text-[var(--heading)] md:text-4xl">Not Sure Where to Start?</h2>
             <p className="mx-auto max-w-2xl text-base sm:text-lg text-[var(--muted)]">We can help you shape the right build path, scope the work, and choose the best delivery approach for your product.</p>
             <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               <Button href="/dev/contact" variant="secondary" size="large" className="touch-target">Talk to an Expert</Button>
