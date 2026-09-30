@@ -6,25 +6,28 @@ import { ChatEngine } from "@/lib/chat/chat-engine";
 import {
   getSessionId,
   saveChatSession,
-  saveContactMessage,
   loadPreviousSession,
   setLastChatTime,
   getLastChatTime,
 } from "@/lib/chat/chat-utils";
+import { apiUrl } from "@/lib/api";
 import ChatMessage from "./ChatMessage";
 import QuickReplies from "./QuickReplies";
 import TypingIndicator from "./TypingIndicator";
+import ChatActionCard from "./ChatActionCard";
 import Button from "@/components/ui/Button";
 import BrandMark from "@/components/BrandMark";
 
 const WELCOME = {
   role: "bot",
-  text: "Hi, I’m the DEV Infinity assistant. I can help you compare services, understand cloud plans, find pricing information, or prepare a project request.",
-  quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Contact Us"],
+  text: "Hi, I’m the DEV Infinity assistant. I can answer questions, remember project details during the conversation, open pages for you, send a message to the team, or prepare and submit a project request after you confirm it.",
+  quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Send a Message"],
 };
 
 const SESSION_RESTORE_HOURS = 24;
 const MAX_MESSAGE_LENGTH = 1000;
+const CONFIRM_RE = /^(yes|confirm|confirmed|do it|go ahead|send it|submit it|proceed)$/i;
+const CANCEL_RE = /^(no|cancel|stop|never mind|nevermind|don'?t|do not)$/i;
 
 export default function ChatWindow({ onClose, onMinimize }) {
   const [messages, setMessages] = useState([WELCOME]);
@@ -34,6 +37,10 @@ export default function ChatWindow({ onClose, onMinimize }) {
   const [initialized, setInitialized] = useState(false);
   const [engine, setEngine] = useState(null);
   const [restoring, setRestoring] = useState(true);
+  const [restoredContext, setRestoredContext] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [actionStatus, setActionStatus] = useState("idle");
+  const [actionError, setActionError] = useState("");
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const saveTimerRef = useRef(null);
@@ -73,6 +80,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
             );
             setActiveReplies([]);
           }
+          if (prev?.context) setRestoredContext(prev.context);
         }
       } catch (err) {
         console.warn("Session restore error:", err);
@@ -85,8 +93,14 @@ export default function ChatWindow({ onClose, onMinimize }) {
   }, []);
 
   useEffect(() => {
+    if (!engine || !restoredContext) return;
+    engine.restoreContext(restoredContext);
+    setRestoredContext(null);
+  }, [engine, restoredContext]);
+
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
-  }, [messages, isTyping]);
+  }, [messages, isTyping, pendingAction, actionStatus]);
 
   useEffect(() => {
     if (!restoring) {
@@ -101,19 +115,44 @@ export default function ChatWindow({ onClose, onMinimize }) {
     };
   }, []);
 
-  const scheduleSave = useCallback((msgs) => {
+  const scheduleSave = useCallback((msgs, contextOverride = null) => {
     if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     saveTimerRef.current = setTimeout(() => {
       const sessionId = getSessionId();
-      if (sessionId) saveChatSession(sessionId, msgs);
+      if (sessionId) {
+        const context = contextOverride || engine?.getContextSnapshot?.() || null;
+        saveChatSession(sessionId, msgs, context);
+      }
       setLastChatTime();
-    }, 2500);
+    }, 2000);
+  }, [engine]);
+
+  const appendBotMessage = useCallback((botMsg) => {
+    setMessages((prev) => {
+      const next = [...prev, botMsg];
+      scheduleSave(next, engine?.getContextSnapshot?.());
+      return next;
+    });
+  }, [engine, scheduleSave]);
+
+  const executeNavigation = useCallback((link) => {
+    if (!link) return;
+    const url = new URL(link, window.location.origin);
+    const isSamePage = url.pathname === window.location.pathname;
+
+    if (isSamePage && url.hash) {
+      const element = document.getElementById(url.hash.slice(1));
+      if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
+      return;
+    }
+
+    window.location.href = link;
   }, []);
 
   const addBotResponse = useCallback(
     (response) => {
       setIsTyping(true);
-      const delay = 260 + Math.random() * 260;
+      const delay = 220 + Math.random() * 220;
 
       setTimeout(() => {
         setIsTyping(false);
@@ -123,67 +162,122 @@ export default function ChatWindow({ onClose, onMinimize }) {
           text: response.text,
           timestamp: Date.now(),
           cards: response.cards || undefined,
-          intent: response.confidence > 0 ? null : undefined,
+          intent: response.confidence > 0 ? response.intent || null : undefined,
         };
 
-        setMessages((prev) => {
-          const next = [...prev, botMsg];
-          scheduleSave(next);
-          return next;
-        });
-
+        appendBotMessage(botMsg);
         setActiveReplies(response.quickReplies || []);
 
+        if (response.pendingAction) {
+          setPendingAction(response.pendingAction);
+          setActionStatus("idle");
+          setActionError("");
+        }
+
         if (response.action === "navigate" && response.link) {
-          setTimeout(() => {
-            const url = new URL(response.link, window.location.origin);
-            const isSamePage = url.pathname === window.location.pathname;
-
-            if (isSamePage && url.hash) {
-              const element = document.getElementById(url.hash.slice(1));
-              if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
-            } else {
-              window.location.href = response.link;
-            }
-          }, 650);
-        }
-
-        if (response.action === "message_sent" && response.actionData) {
-          saveContactMessage(response.actionData);
-        }
-
-        if (response.action === "project_brief_complete" && response.actionData) {
-          const data = response.actionData;
-          const params = new URLSearchParams({
-            type: data.projectType || "",
-            timeline: data.timeline || "",
-            budget: data.budget || "",
-          });
-
-          setTimeout(() => {
-            window.location.href = `/dev/request?${params.toString()}`;
-          }, 650);
+          setTimeout(() => executeNavigation(response.link), 450);
         }
       }, delay);
     },
-    [scheduleSave],
+    [appendBotMessage, executeNavigation],
   );
+
+  const executePendingAction = useCallback(async () => {
+    if (!pendingAction || actionStatus === "running") return;
+
+    setActionStatus("running");
+    setActionError("");
+    setActiveReplies([]);
+
+    try {
+      const response = await fetch(apiUrl("/dev/api/chat/action"), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: pendingAction.type,
+          payload: pendingAction.payload,
+        }),
+      });
+
+      const json = await response.json();
+      if (!response.ok) {
+        throw new Error(json.error || "The action could not be completed.");
+      }
+
+      engine?.markActionCompleted?.(pendingAction.type, {
+        recordId: json.recordId || null,
+        emailSent: json.emailSent,
+      });
+
+      const completedAction = pendingAction;
+      setPendingAction(null);
+      setActionStatus("success");
+
+      appendBotMessage({
+        role: "bot",
+        text: json.message || (completedAction.type === "project_request"
+          ? "Your project request was submitted."
+          : "Your message was sent to the team."),
+        timestamp: Date.now(),
+      });
+
+      setActiveReplies(
+        completedAction.type === "project_request"
+          ? ["Our Services", "Cloud Plans", "Contact Us"]
+          : ["Our Services", "Start a Project", "Cloud Plans"],
+      );
+    } catch (err) {
+      setActionStatus("error");
+      setActionError(err.message || "The action could not be completed.");
+    }
+  }, [pendingAction, actionStatus, engine, appendBotMessage]);
+
+  const cancelPendingAction = useCallback(() => {
+    if (!pendingAction || actionStatus === "running") return;
+    engine?.clearRequestedAction?.();
+    setPendingAction(null);
+    setActionStatus("idle");
+    setActionError("");
+    appendBotMessage({
+      role: "bot",
+      text: "Cancelled. I didn’t perform that action.",
+      timestamp: Date.now(),
+    });
+    setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
+  }, [pendingAction, actionStatus, engine, appendBotMessage]);
 
   const handleSend = useCallback(
     async (text) => {
       const trimmed = (text || input).trim();
-      if (!trimmed || !engine || isTyping || restoring) return;
+      if (!trimmed || !engine || isTyping || restoring || actionStatus === "running") return;
 
       setInput("");
-      setActiveReplies([]);
       if (inputRef.current) inputRef.current.style.height = "auto";
 
       const userMsg = { role: "user", text: trimmed, timestamp: Date.now() };
       setMessages((prev) => {
         const next = [...prev, userMsg];
-        scheduleSave(next);
+        scheduleSave(next, engine.getContextSnapshot?.());
         return next;
       });
+
+      if (pendingAction && CONFIRM_RE.test(trimmed)) {
+        await executePendingAction();
+        return;
+      }
+
+      if (pendingAction && CANCEL_RE.test(trimmed)) {
+        cancelPendingAction();
+        return;
+      }
+
+      if (pendingAction) {
+        setPendingAction(null);
+        setActionStatus("idle");
+        setActionError("");
+      }
+
+      setActiveReplies([]);
 
       try {
         const response = await engine.processMessage(trimmed);
@@ -191,39 +285,49 @@ export default function ChatWindow({ onClose, onMinimize }) {
       } catch (err) {
         console.warn("Message processing error:", err);
         addBotResponse({
-          text: "I couldn’t process that message. You can try again or contact the team directly.",
+          text: "I couldn’t process that reliably. Try rephrasing your instruction, or contact the team directly.",
           quickReplies: ["Our Services", "Contact Us"],
         });
       }
     },
-    [engine, input, isTyping, restoring, addBotResponse, scheduleSave],
+    [
+      engine,
+      input,
+      isTyping,
+      restoring,
+      actionStatus,
+      pendingAction,
+      scheduleSave,
+      executePendingAction,
+      cancelPendingAction,
+      addBotResponse,
+    ],
   );
 
   const handleQuickReply = useCallback(
     (label) => {
-      if (!engine || !initialized || restoring || isTyping) return;
+      if (!engine || !initialized || restoring || isTyping || actionStatus === "running") return;
+
+      const userMsg = { role: "user", text: label, timestamp: Date.now() };
+      setMessages((prev) => {
+        const next = [...prev, userMsg];
+        scheduleSave(next, engine.getContextSnapshot?.());
+        return next;
+      });
+      setActiveReplies([]);
 
       try {
-        setActiveReplies([]);
-
-        const userMsg = { role: "user", text: label, timestamp: Date.now() };
-        setMessages((prev) => {
-          const next = [...prev, userMsg];
-          scheduleSave(next);
-          return next;
-        });
-
         const response = engine.handleQuickReply(label);
         addBotResponse(response);
       } catch (err) {
         console.warn("Quick reply error:", err);
         addBotResponse({
-          text: "I couldn’t open that option. Try another suggestion or type your question below.",
+          text: "I couldn’t open that option. Try another suggestion or type your request below.",
           quickReplies: ["Our Services", "Contact Us"],
         });
       }
     },
-    [engine, initialized, restoring, isTyping, addBotResponse, scheduleSave],
+    [engine, initialized, restoring, isTyping, actionStatus, scheduleSave, addBotResponse],
   );
 
   const handleInputChange = (event) => {
@@ -241,10 +345,14 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
   const handleReset = () => {
     engine?.cancelFlow?.();
+    engine?.clearRequestedAction?.();
     localStorage.removeItem("dev_chat_session_id");
     localStorage.removeItem("dev_chat_last_time");
     setMessages([WELCOME]);
     setActiveReplies(WELCOME.quickReplies);
+    setPendingAction(null);
+    setActionStatus("idle");
+    setActionError("");
     setInput("");
     if (inputRef.current) {
       inputRef.current.style.height = "auto";
@@ -255,14 +363,11 @@ export default function ChatWindow({ onClose, onMinimize }) {
   const cancelFlow = () => {
     engine?.cancelFlow?.();
     setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "bot",
-        text: "No problem. I’ve stopped that flow. What would you like help with instead?",
-        timestamp: Date.now(),
-      },
-    ]);
+    appendBotMessage({
+      role: "bot",
+      text: "No problem. I stopped that guided flow. I’ll keep the useful details you already shared in this conversation.",
+      timestamp: Date.now(),
+    });
   };
 
   const isInFlow = engine?.isInFlow;
@@ -276,7 +381,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
             <div className="chat-header-name">DEV Infinity Assistant</div>
             <div className="chat-header-status">
               <span className="chat-status-dot" aria-hidden="true" />
-              {initialized ? "Ready to help" : "Starting assistant…"}
+              {initialized ? "Context-aware · actions enabled" : "Starting assistant…"}
             </div>
           </div>
         </div>
@@ -318,7 +423,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
         </div>
       </header>
 
-      <div className="chat-messages" aria-live="polite" aria-busy={isTyping || restoring}>
+      <div className="chat-messages" aria-live="polite" aria-busy={isTyping || restoring || actionStatus === "running"}>
         {restoring && <TypingIndicator label="Restoring conversation" />}
         {!restoring &&
           messages.map((message, index) => (
@@ -328,18 +433,28 @@ export default function ChatWindow({ onClose, onMinimize }) {
         <div ref={messagesEndRef} />
       </div>
 
-      {!restoring && activeReplies.length > 0 && (
+      {pendingAction && (
+        <ChatActionCard
+          action={pendingAction}
+          status={actionStatus}
+          error={actionError}
+          onConfirm={executePendingAction}
+          onCancel={cancelPendingAction}
+        />
+      )}
+
+      {!restoring && !pendingAction && activeReplies.length > 0 && (
         <QuickReplies
           replies={activeReplies}
           onSelect={handleQuickReply}
-          disabled={!initialized || isTyping}
+          disabled={!initialized || isTyping || actionStatus === "running"}
         />
       )}
 
       <div className="chat-input-area">
-        {isInFlow && (
+        {isInFlow && !pendingAction && (
           <div className="chat-flow-bar">
-            <span>You’re answering a guided question.</span>
+            <span>Guided input is active. You can answer naturally.</span>
             <Button
               className="chat-cancel-flow"
               onClick={cancelFlow}
@@ -359,8 +474,14 @@ export default function ChatWindow({ onClose, onMinimize }) {
             value={input}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder={isInFlow ? "Type your response…" : "Ask about services, cloud, pricing, or a project…"}
-            disabled={isTyping || restoring}
+            placeholder={
+              pendingAction
+                ? "Type confirm, cancel, or revise the details…"
+                : isInFlow
+                  ? "Type your response…"
+                  : "Ask a question or give an instruction…"
+            }
+            disabled={isTyping || restoring || actionStatus === "running"}
             autoComplete="off"
             rows={1}
             maxLength={MAX_MESSAGE_LENGTH}
@@ -369,7 +490,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
           <Button
             className="chat-send-btn"
             onClick={() => handleSend()}
-            disabled={!input.trim() || isTyping || restoring || !engine}
+            disabled={!input.trim() || isTyping || restoring || !engine || actionStatus === "running"}
             type="button"
             aria-label="Send message"
             variant="primary"
