@@ -9,18 +9,18 @@ import Button from "@/components/ui/Button";
 
 export default function About() {
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="container space-y-10">
+    <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
+      <div className="container space-y-12 md:space-y-16">
         <section className="page-section">
-          <div className="glass-surface-strong grid items-center gap-12 rounded-2xl px-8 py-10 lg:grid-cols-2 lg:px-12">
+          <div className="gradient-section glass-surface-strong relative grid items-center gap-8 overflow-hidden rounded-[28px] px-5 py-8 sm:px-8 sm:py-10 lg:grid-cols-2 lg:gap-12 lg:px-12 lg:py-12">
             <AnimatedDiv initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
-                <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">About Us</span>
+              <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+                <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">About Us</span>
               </div>
-              <h1 className="mb-6 text-4xl font-bold leading-tight text-slate-950 md:text-5xl lg:text-6xl">
+              <h1 className="mb-5 text-4xl font-black leading-[1.02] tracking-[-0.04em] text-[var(--heading)] md:text-5xl lg:text-6xl">
                 We build <span className="glass-text-gradient">digital products</span> that scale with confidence.
               </h1>
-              <p className="mb-8 max-w-xl text-lg leading-relaxed text-slate-600">
+              <p className="mb-8 max-w-xl text-base leading-7 text-[var(--muted)] sm:text-lg sm:leading-8">
                 DEV♾️ is a modern engineering agency obsessed with speed, precision, and reliability. We help businesses ship high-quality products quickly without sacrificing craft.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -32,7 +32,7 @@ export default function About() {
             <AnimatedDiv initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.2 }}>
               <div className="relative mx-auto aspect-square max-w-md">
                 <div className="glass-chip absolute inset-0 rotate-3 rounded-2xl" />
-                <div className="relative flex h-full items-center justify-center rounded-2xl border-2 border-[var(--border)] bg-[var(--primary)] p-8 text-center text-white shadow-[var(--shadow)]">
+                <div className="brand-gradient relative flex h-full items-center justify-center rounded-[26px] border border-white/15 p-8 text-center text-white shadow-[var(--shadow-color)]">
                   <div>
                     <div className="mb-2 text-7xl font-bold">50+</div>
                     <div className="text-lg text-white/80">Projects Delivered</div>
@@ -49,12 +49,12 @@ export default function About() {
               <div className="glass-icon-plate flex h-12 w-12 items-center justify-center rounded-[18px]">
                 <Target className="text-primary" size={24} />
               </div>
-              <h2 className="text-3xl font-bold text-slate-950">Our Mission</h2>
+              <h2 className="text-3xl font-black text-[var(--heading)]">Our Mission</h2>
             </div>
-            <p className="text-lg leading-relaxed text-slate-600">
+            <p className="text-lg leading-8 text-[var(--muted)]">
               At DEV♾️, our mission is to fuel businesses with high-performance technology. We do not just follow best practices, we push for sharper execution and better product clarity.
             </p>
-            <p className="leading-relaxed text-slate-600">
+            <p className="leading-7 text-[var(--muted)]">
               Whether it is a mobile app that keeps teams connected or a robust platform that runs operations, we bring the engineering depth to deliver reliable outcomes.
             </p>
           </div>
@@ -71,11 +71,11 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
-              <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Portfolio</span>
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Portfolio</span>
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">Selected Work</h2>
-            <p className="mx-auto max-w-2xl text-slate-600">A snapshot of the kinds of platforms, products, and systems we love building.</p>
+            <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">Selected Work</h2>
+            <p className="mx-auto max-w-2xl text-[var(--muted)]">A snapshot of the kinds of platforms, products, and systems we love building.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
@@ -90,16 +90,16 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
-              <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Tech Stack</span>
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Tech Stack</span>
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">Technologies We Use</h2>
-            <p className="mx-auto max-w-2xl text-slate-600">A modern stack chosen for maintainability, speed, and product momentum.</p>
+            <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">Technologies We Use</h2>
+            <p className="mx-auto max-w-2xl text-[var(--muted)]">A modern stack chosen for maintainability, speed, and product momentum.</p>
           </div>
 
           <AnimatedDiv className="grid grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
             <TechLogo icon={FaReact} name="React" color="text-cyan-500" />
-            <TechLogo icon={SiNextdotjs} name="Next.js" color="text-slate-950" />
+            <TechLogo icon={SiNextdotjs} name="Next.js" color="text-[var(--heading)]" />
             <TechLogo icon={SiTailwindcss} name="Tailwind" color="text-teal-500" />
             <TechLogo icon={FaNodeJs} name="Node.js" color="text-green-600" />
             <TechLogo icon={SiFirebase} name="Firebase" color="text-yellow-500" />
@@ -115,11 +115,11 @@ export default function About() {
 
         <section>
           <div className="mb-12 text-center">
-            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-xl px-4 py-2">
-              <span className="text-sm font-medium uppercase tracking-[0.2em] text-primary">Values</span>
+            <div className="glass-chip-strong mb-6 inline-flex items-center gap-2 rounded-full px-4 py-2">
+              <span className="text-xs font-semibold uppercase tracking-[0.16em] text-primary">Values</span>
             </div>
-            <h2 className="mb-4 text-3xl font-bold text-slate-950 md:text-4xl">What Drives Us</h2>
-            <p className="mx-auto max-w-2xl text-slate-600">The principles shaping our pace, collaboration, and product decisions.</p>
+            <h2 className="mb-4 text-3xl font-black text-[var(--heading)] md:text-4xl">What Drives Us</h2>
+            <p className="mx-auto max-w-2xl text-[var(--muted)]">The principles shaping our pace, collaboration, and product decisions.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-3">
@@ -129,9 +129,9 @@ export default function About() {
           </div>
         </section>
 
-        <section className="glass-surface-strong rounded-2xl px-8 py-12 text-center">
-          <h2 className="mb-4 text-2xl font-bold text-slate-950 md:text-3xl">Ready to build something ambitious?</h2>
-          <p className="mx-auto mb-8 max-w-xl text-slate-600">Let&apos;s discuss your goals and shape the right product path together.</p>
+        <section className="gradient-section glass-surface-strong rounded-[28px] px-5 py-10 text-center sm:px-8 md:py-12">
+          <h2 className="mb-4 text-2xl font-semibold text-[var(--heading)] md:text-3xl">Ready to build something ambitious?</h2>
+          <p className="mx-auto mb-8 max-w-xl text-[var(--muted)]">Let&apos;s discuss your goals and shape the right product path together.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Button href="/dev/request" variant="primary" size="large">Start a Project</Button>
             <Button href="/dev/contact" variant="secondary" size="large">Contact Us</Button>
@@ -144,9 +144,9 @@ export default function About() {
 
 function Stat({ number, label }) {
   return (
-    <div className="glass-chip-strong rounded-[24px] p-5 text-center">
-      <div className="mb-1 text-3xl font-bold text-slate-950">{number}</div>
-      <div className="text-sm text-slate-500">{label}</div>
+    <div className="rounded-2xl border border-[var(--border-soft)] bg-[var(--surface-muted)] p-5 text-center">
+      <div className="mb-1 text-3xl font-black text-[var(--heading)]">{number}</div>
+      <div className="text-sm text-[var(--muted)]">{label}</div>
     </div>
   );
 }
@@ -157,17 +157,17 @@ function ValueItem({ icon: Icon, title, desc }) {
       <div className="glass-icon-plate mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-[20px]">
         <Icon className="text-primary" size={28} />
       </div>
-      <h3 className="mb-3 text-xl font-bold text-slate-950">{title}</h3>
-      <p className="leading-relaxed text-slate-600">{desc}</p>
+      <h3 className="mb-3 text-xl font-semibold text-[var(--heading)]">{title}</h3>
+      <p className="leading-7 text-[var(--muted)]">{desc}</p>
     </Card>
   );
 }
 
 function TechLogo({ icon: Icon, name, color }) {
   return (
-    <div className="glass-surface flex cursor-pointer flex-col items-center gap-2 rounded-[24px] p-4 transition-all duration-300 hover:-translate-y-1 hover:border-white/80">
+    <div className="card-shell flex flex-col items-center gap-2 rounded-2xl p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow)]">
       <Icon className={`text-3xl ${color}`} />
-      <span className="text-center text-xs font-medium text-slate-500">{name}</span>
+      <span className="text-center text-xs font-medium text-[var(--muted)]">{name}</span>
     </div>
   );
 }
@@ -177,13 +177,13 @@ function PortfolioCard({ title, category, desc, tech }) {
     <Card className="group cursor-pointer">
       <div className="mb-4 flex items-center justify-between">
         <span className="text-xs font-medium uppercase tracking-[0.2em] text-primary">{category}</span>
-        <ExternalLink size={16} className="text-slate-400 transition-colors group-hover:text-primary" />
+        <ExternalLink size={16} className="text-[var(--muted)] transition-colors group-hover:text-primary" />
       </div>
-      <h3 className="mb-3 text-xl font-bold text-slate-950 transition-colors group-hover:text-primary">{title}</h3>
-      <p className="mb-4 text-sm leading-relaxed text-slate-600">{desc}</p>
+      <h3 className="mb-3 text-xl font-semibold text-[var(--heading)] transition-colors group-hover:text-primary">{title}</h3>
+      <p className="mb-4 text-sm leading-7 text-[var(--muted)]">{desc}</p>
       <div className="flex flex-wrap gap-2">
         {tech.map((t) => (
-          <span key={t} className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-slate-600">
+          <span key={t} className="glass-chip rounded-full px-3 py-1 text-xs font-medium text-[var(--muted)]">
             {t}
           </span>
         ))}
