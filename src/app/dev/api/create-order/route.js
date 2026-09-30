@@ -15,7 +15,7 @@ import { createCashfreeOrder, getCashfreeServerConfig } from "@/lib/server/cashf
 
 const payloadSchema = z.object({
     source: z.enum([PAYMENT_SOURCE.QUICK_START, PAYMENT_SOURCE.PAYMENT_PORTAL]),
-    amount: z.number().int().positive().optional(),
+    amount: z.number().positive().max(5_00_000).optional(),
     paymentRequestId: z.string().min(6).optional(),
     token: z.string().min(16).optional(),
     provider: z.enum(["razorpay", "cashfree"]).optional(),
@@ -139,7 +139,7 @@ export async function POST(request) {
             );
         }
 
-        const amountInPaisa = amountInInr * 100;
+        const amountInPaisa = Math.round(amountInInr * 100);
         if (provider === "cashfree") {
             const paymentRef = getAdminDb().collection("payment_requests").doc(paymentRequestId);
             const payment = (await paymentRef.get()).data();
