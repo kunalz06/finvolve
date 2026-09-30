@@ -795,7 +795,7 @@ export default function AdminPage() {
                                                         type="number"
                                                         min="0"
                                                         step="0.5"
-                                                        placeholder="Hours used"
+                                                        placeholder="Hours used (₹10/hr)"
                                                         value={billHoursInput}
                                                         onChange={(e) => setBillHoursInput(e.target.value)}
                                                         className="flex-1 rounded-[16px] border-2 border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-slate-900"
@@ -839,7 +839,7 @@ export default function AdminPage() {
                                         <div className="mt-3 space-y-2 rounded-xl border border-amber-200 bg-amber-50/75 p-3 text-xs text-amber-800">
                                             {r.billPaymentLink && (
                                                 <div>
-                                                    Razorpay payment link requested by <strong>SMS + email</strong> to {r.email}.
+                                                    DEV Infinity payment portal link emailed to <strong>{r.email}</strong>. Razorpay SMS: <strong>{r.billSmsNotificationStatus === "requested" ? "Requested" : r.billSmsNotificationStatus === "failed" ? "Failed" : r.billSmsNotificationStatus === "cancelled_after_portal_payment" ? "Cancelled after portal payment" : "Not requested"}</strong>.
                                                 </div>
                                             )}
                                             <div>
