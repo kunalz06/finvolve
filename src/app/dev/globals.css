@@ -1101,3 +1101,344 @@ select:focus {
   }
 }
 
+/* ============================================
+   Theme + typography foundation cleanup
+   Final semantic layer for public /dev routes.
+   ============================================ */
+:root {
+  --primary: #5b5cf0;
+  --primary-hover: #4a46d6;
+  --primary-soft: #f0f0ff;
+  --violet: #7c5ce7;
+  --cyan: #0891b2;
+  --sky: #0284c7;
+  --accent: #ea6a12;
+  --accent-cool: #0f9f8f;
+  --accent-mint: #16a34a;
+  --accent-amber: #d97706;
+  --accent-rose: #db3f86;
+  --accent-coral: #ef5b5b;
+  --background: #f7f8fc;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: #ffffff;
+  --surface-muted: #f3f5f9;
+  --surface-subtle: #fafbfc;
+  --heading: #101828;
+  --foreground: #344054;
+  --muted: #667085;
+  --muted-strong: #475467;
+  --border: #d0d5dd;
+  --border-soft: #e4e7ec;
+  --shadow: 0 18px 48px rgba(16, 24, 40, 0.11);
+  --shadow-soft: 0 6px 20px rgba(16, 24, 40, 0.07);
+  --shadow-color: 0 16px 36px rgba(91, 92, 240, 0.18);
+  --gradient-brand: linear-gradient(135deg, #5b5cf0 0%, #7657df 52%, #c64288 100%);
+  --gradient-cool: linear-gradient(135deg, #0e90bf 0%, #119d8e 100%);
+  --gradient-warm: linear-gradient(135deg, #ea6a12 0%, #ef5b5b 58%, #d94686 100%);
+  --gradient-spectrum: linear-gradient(90deg, #5b5cf0 0%, #7657df 26%, #d94686 50%, #ea6a12 74%, #119d8e 100%);
+}
+
+[data-theme="dark"] {
+  --primary: #9ea5ff;
+  --primary-hover: #b4b9ff;
+  --primary-soft: #20243f;
+  --violet: #b8a5ff;
+  --cyan: #67d6ee;
+  --sky: #75c9f2;
+  --accent: #ff9a55;
+  --accent-cool: #57d5c7;
+  --accent-mint: #75d99b;
+  --accent-amber: #f4c66b;
+  --accent-rose: #f395c3;
+  --accent-coral: #ff9c9c;
+  --background: #0b0e14;
+  --surface: rgba(18, 23, 34, 0.92);
+  --surface-strong: #121722;
+  --surface-muted: #181e2b;
+  --surface-subtle: #10141e;
+  --heading: #f8fafc;
+  --foreground: #d5dae3;
+  --muted: #98a2b3;
+  --muted-strong: #b6beca;
+  --border: #3a4353;
+  --border-soft: #283142;
+  --shadow: 0 22px 54px rgba(0, 0, 0, 0.35);
+  --shadow-soft: 0 8px 24px rgba(0, 0, 0, 0.24);
+  --shadow-color: 0 18px 42px rgba(116, 96, 238, 0.22);
+  --gradient-brand: linear-gradient(135deg, #7e86ff 0%, #9b78ff 52%, #ee78b4 100%);
+  --gradient-cool: linear-gradient(135deg, #52bce7 0%, #55d2c3 100%);
+  --gradient-warm: linear-gradient(135deg, #ff9a55 0%, #ff858d 58%, #ef8fc1 100%);
+}
+
+body {
+  color: var(--foreground);
+  font-size: 16px;
+  line-height: 1.6;
+  background:
+    radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--primary) 9%, transparent), transparent 31rem),
+    radial-gradient(circle at 92% 8%, color-mix(in srgb, var(--accent-cool) 7%, transparent), transparent 29rem),
+    var(--background);
+}
+
+.dev-shell {
+  color: var(--foreground);
+}
+
+.dev-shell::before {
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--border-soft) 52%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--border-soft) 52%, transparent) 1px, transparent 1px);
+  opacity: 0.24;
+}
+
+.dev-shell h1,
+.dev-shell h2,
+.dev-shell h3,
+.dev-shell h4,
+.dev-shell h5,
+.dev-shell h6 {
+  color: var(--heading);
+  font-family: var(--font-sans);
+  text-wrap: balance;
+}
+
+.dev-shell h1 {
+  letter-spacing: -0.045em;
+}
+
+.dev-shell h2 {
+  letter-spacing: -0.035em;
+}
+
+.dev-shell h3,
+.dev-shell h4 {
+  letter-spacing: -0.02em;
+}
+
+.dev-shell p {
+  color: var(--muted);
+  text-wrap: pretty;
+}
+
+.dev-shell button,
+.dev-shell input,
+.dev-shell textarea,
+.dev-shell select {
+  font-family: var(--font-sans);
+}
+
+.dev-shell label {
+  color: var(--foreground);
+}
+
+.font-code-brand {
+  font-family: var(--font-code) !important;
+}
+
+.glass-surface,
+.glass-surface-strong,
+.glass-surface-muted,
+.solid-surface,
+.card-shell {
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.glass-surface {
+  background: var(--surface);
+}
+
+.glass-surface-strong,
+.solid-surface,
+.card-shell {
+  background: var(--surface-strong);
+}
+
+.glass-surface-muted {
+  background: var(--surface-muted);
+}
+
+.card-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.card-shell:hover {
+  border-color: color-mix(in srgb, var(--primary) 24%, var(--border-soft));
+}
+
+.vibrant-card::before,
+.vibrant-card::after {
+  display: none;
+}
+
+.gradient-section {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 38%, var(--surface-strong)), var(--surface-strong) 48%, color-mix(in srgb, var(--accent-cool) 5%, var(--surface-strong)));
+}
+
+.hero-vibrant-panel {
+  background:
+    linear-gradient(145deg, color-mix(in srgb, var(--primary-soft) 54%, var(--surface-strong)), var(--surface-strong) 58%, color-mix(in srgb, var(--accent-cool) 7%, var(--surface-strong)));
+  border-color: color-mix(in srgb, var(--primary) 18%, var(--border-soft));
+  box-shadow: var(--shadow);
+}
+
+.hero-vibrant-panel::before {
+  opacity: 0.65;
+}
+
+.spectrum-line {
+  height: 3px;
+  box-shadow: none;
+}
+
+.color-tile-primary,
+.color-tile-cool,
+.color-tile-warm,
+.color-tile-rose {
+  border-color: var(--border-soft);
+}
+
+.color-tile-primary {
+  background: color-mix(in srgb, var(--primary-soft) 58%, var(--surface-strong));
+}
+
+.color-tile-cool {
+  background: color-mix(in srgb, var(--accent-cool) 8%, var(--surface-strong));
+}
+
+.color-tile-warm {
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-strong));
+}
+
+.color-tile-rose {
+  background: color-mix(in srgb, var(--accent-rose) 7%, var(--surface-strong));
+}
+
+.glass-chip,
+.glass-chip-strong {
+  color: var(--foreground);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+.glass-chip {
+  background: var(--surface-muted);
+}
+
+.glass-chip-strong {
+  background: color-mix(in srgb, var(--primary-soft) 48%, var(--surface-strong));
+  border-color: color-mix(in srgb, var(--primary) 16%, var(--border-soft));
+}
+
+.glass-icon-plate {
+  background: color-mix(in srgb, var(--primary-soft) 72%, var(--surface-strong));
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border-soft));
+  box-shadow: none;
+}
+
+.glass-nav-strip {
+  background: var(--surface-muted);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+.theme-toggle {
+  background: var(--surface-strong);
+  color: var(--foreground);
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+
+input,
+textarea,
+select {
+  background: var(--surface-strong);
+  color: var(--heading);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 13%, transparent);
+}
+
+.brand-gradient {
+  background: var(--gradient-brand);
+}
+
+.brand-gradient-text,
+.glass-text-gradient,
+.gradient-text {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent !important;
+}
+
+.dev-shell .text-slate-950,
+.dev-shell .text-slate-900,
+.dev-shell .text-gray-900 {
+  color: var(--heading);
+}
+
+.dev-shell .text-slate-800,
+.dev-shell .text-slate-700,
+.dev-shell .text-gray-700 {
+  color: var(--foreground);
+}
+
+.dev-shell .text-slate-600,
+.dev-shell .text-slate-500,
+.dev-shell .text-gray-600,
+.dev-shell .text-gray-500,
+.dev-shell .text-slate-400 {
+  color: var(--muted);
+}
+
+[data-theme="dark"] .dev-shell .bg-emerald-50,
+[data-theme="dark"] .dev-shell .bg-emerald-100,
+[data-theme="dark"] .dev-shell .bg-emerald-100\/90 {
+  background-color: rgba(6, 78, 59, 0.34);
+}
+
+[data-theme="dark"] .dev-shell .bg-red-50,
+[data-theme="dark"] .dev-shell .bg-red-50\/85 {
+  background-color: rgba(69, 10, 10, 0.42);
+}
+
+[data-theme="dark"] .dev-shell .bg-orange-50 {
+  background-color: rgba(124, 45, 18, 0.28);
+}
+
+[data-theme="dark"] .dev-shell .bg-teal-50 {
+  background-color: rgba(19, 78, 74, 0.3);
+}
+
+[data-theme="dark"] .dev-shell .border-emerald-200,
+[data-theme="dark"] .dev-shell .border-red-200 {
+  border-color: var(--border);
+}
+
+@media (max-width: 767px) {
+  .dev-shell > nav {
+    background: linear-gradient(to bottom, color-mix(in srgb, var(--background) 96%, transparent) 72%, transparent);
+  }
+
+  .card-shell {
+    border-radius: 18px;
+  }
+}
+
