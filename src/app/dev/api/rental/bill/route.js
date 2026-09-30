@@ -1,12 +1,19 @@
 import Razorpay from "razorpay";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
-import { getRazorpayServerCredentials } from "@/lib/server/payments";
+import {
+    PAYMENT_PURPOSE,
+    PAYMENT_SOURCE,
+    createPaymentToken,
+    getRazorpayServerCredentials,
+    hashToken,
+} from "@/lib/server/payments";
 import { calculateRentalBill, getBillBreakdown } from "@/lib/server/rental-plans";
 import { sendRentalBillEmail } from "@/lib/server/rental-emails";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
+import { getCanonicalSiteUrl } from "@/lib/server/site-url";
 
 const payloadSchema = z
     .object({
@@ -79,12 +86,99 @@ async function sendAndTrackBillEmail({
     }
 }
 
+async function createRentalPortalPayment({
+    request,
+    db,
+    rental,
+    rentalId,
+    amount,
+    hoursUsed,
+}) {
+    const siteUrl = getCanonicalSiteUrl(request);
+    if (!siteUrl) {
+        throw new Error("Site URL is not configured on the server.");
+    }
+
+    const token = createPaymentToken();
+    const tokenHash = hashToken(token);
+    const expiresAt = new Date(Date.now() + 72 * 60 * 60 * 1000);
+    const paymentRef = db.collection("payment_requests").doc();
+
+    await paymentRef.set({
+        amount,
+        currency: "INR",
+        source: PAYMENT_SOURCE.PAYMENT_PORTAL,
+        purpose: PAYMENT_PURPOSE.RENTAL_BILL,
+        rentalId,
+        status: "pending",
+        clientName: rental.name,
+        clientEmail: rental.email,
+        notes: `DEV Infinity Cloud rental usage bill · ${hoursUsed} compute hours`,
+        tokenHash,
+        tokenExpiresAt: Timestamp.fromDate(expiresAt),
+        createdAt: FieldValue.serverTimestamp(),
+        updatedAt: FieldValue.serverTimestamp(),
+        createdByUid: "rental_billing",
+        createdByEmail: "",
+        paymentLinkEmailSent: false,
+    });
+
+    return {
+        paymentRef,
+        paymentRequestId: paymentRef.id,
+        paymentUrl: `${siteUrl.replace(/\/$/, "")}/dev/payments?token=${token}`,
+        expiresAt,
+    };
+}
+
+async function createRentalSmsLink({
+    rental,
+    rentalId,
+    paymentRequestId,
+    billAmount,
+    hoursUsed,
+    expiresAt,
+    siteUrl,
+}) {
+    const { keyId, keySecret } = getRazorpayServerCredentials();
+    const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
+    const amountPaise = Math.round(billAmount * 100);
+
+    return razorpay.paymentLink.create({
+        amount: amountPaise,
+        currency: "INR",
+        accept_partial: false,
+        reference_id: paymentRequestId,
+        description: `DEV Infinity Cloud — Rental ${rentalId} · ${hoursUsed} compute hours · INR ${billAmount} due`,
+        customer: {
+            name: rental.name,
+            email: rental.email,
+            contact: rental.phone,
+        },
+        // Keep the requested Razorpay SMS channel, but do not email the
+        // Razorpay short URL. Email uses the DEV Infinity payment portal.
+        notify: { sms: true, email: false },
+        reminder_enable: true,
+        expire_by: Math.floor(expiresAt.getTime() / 1000),
+        notes: {
+            rentalId,
+            paymentRequestId,
+            type: "rental_bill_sms",
+            hoursUsed: String(hoursUsed),
+        },
+        callback_url: `${siteUrl.replace(/\/$/, "")}/dev/cloud?rental=bill_payment_returned`,
+        callback_method: "get",
+    });
+}
+
 /**
  * POST
- * - action=generate: calculate a rental bill, create one Razorpay payment link,
- *   request both Razorpay SMS + email notifications, and send the detailed bill email.
- * - action=resend_email: resend only the detailed bill email using the existing
- *   payment link. This never creates a second Razorpay link or duplicate SMS.
+ * - action=generate: calculate a prorated rental bill, create the same
+ *   tokenized DEV Infinity payment portal link used for project payments,
+ *   keep Razorpay SMS as a secondary notification channel, and email the
+ *   detailed bill using the portal URL.
+ * - action=resend_email: resend only the detailed bill email using the
+ *   existing portal payment URL; this does not create another SMS link.
  */
 export async function POST(request) {
     const ip = getRequestIp(request);
@@ -174,7 +268,7 @@ export async function POST(request) {
         const billBreakdown = getBillBreakdown(hoursUsed);
 
         const updates = {
-            status: "billed",
+            status: billAmount > 0 ? "billed" : "settled",
             hoursUsed,
             billAmountINR: billAmount,
             billBreakdown,
@@ -185,45 +279,49 @@ export async function POST(request) {
         };
 
         let paymentUrl = null;
-        let razorpayNotificationRequested = false;
+        let paymentRequestId = null;
+        let smsRequested = false;
+        let smsError = null;
 
         if (billAmount > 0) {
-            const { keyId, keySecret } = getRazorpayServerCredentials();
-            const razorpay = new Razorpay({ key_id: keyId, key_secret: keySecret });
-
-            const link = await razorpay.paymentLink.create({
-                amount: billAmount * 100,
-                currency: "INR",
-                accept_partial: false,
-                description: `DEV Infinity Cloud — Rental ${rentalId} · ${hoursUsed} compute hours · INR ${billAmount} due`,
-                customer: {
-                    name: rental.name,
-                    email: rental.email,
-                    contact: rental.phone,
-                },
-                // Keep Razorpay SMS and also send the same payment link by email.
-                notify: { sms: true, email: true },
-                reminder_enable: true,
-                notes: {
-                    rentalId,
-                    type: "rental_bill",
-                    hoursUsed: String(hoursUsed),
-                },
-                callback_url: `${process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || "https://devsoftware.vercel.app"}/dev/api/rental/webhook`,
-                callback_method: "get",
+            const portal = await createRentalPortalPayment({
+                request,
+                db,
+                rental,
+                rentalId,
+                amount: billAmount,
+                hoursUsed,
             });
+            paymentUrl = portal.paymentUrl;
+            paymentRequestId = portal.paymentRequestId;
 
-            paymentUrl = link.short_url;
-            razorpayNotificationRequested = true;
             updates.billPaymentLink = paymentUrl;
-            updates.billPaymentLinkId = link.id;
-            updates.billRazorpayNotificationChannels = {
-                sms: true,
-                email: true,
-            };
-            updates.billRazorpayNotificationRequestedAt = FieldValue.serverTimestamp();
-        } else {
-            updates.status = "settled";
+            updates.billPaymentRequestId = paymentRequestId;
+            updates.billPaymentPortalExpiresAt = Timestamp.fromDate(portal.expiresAt);
+
+            try {
+                const siteUrl = getCanonicalSiteUrl(request);
+                const smsLink = await createRentalSmsLink({
+                    rental,
+                    rentalId,
+                    paymentRequestId,
+                    billAmount,
+                    hoursUsed,
+                    expiresAt: portal.expiresAt,
+                    siteUrl,
+                });
+
+                smsRequested = true;
+                updates.billSmsPaymentLinkId = smsLink.id;
+                updates.billSmsPaymentLink = smsLink.short_url;
+                updates.billSmsNotificationRequestedAt = FieldValue.serverTimestamp();
+                updates.billSmsNotificationStatus = "requested";
+            } catch (smsLinkError) {
+                smsError = String(smsLinkError?.message || "Razorpay SMS notification failed.").slice(0, 500);
+                console.error("Rental bill SMS link creation failed:", smsError);
+                updates.billSmsNotificationStatus = "failed";
+                updates.billSmsNotificationError = smsError;
+            }
         }
 
         await rentalRef.update(updates);
@@ -244,11 +342,12 @@ export async function POST(request) {
             billAmountINR: billAmount,
             billBreakdown,
             paymentUrl,
+            paymentRequestId,
             status: billAmount > 0 ? "billed" : "settled",
-            razorpayNotifications: {
-                requested: razorpayNotificationRequested,
-                sms: razorpayNotificationRequested,
-                email: razorpayNotificationRequested,
+            notifications: {
+                portalEmail: delivery.emailSent,
+                razorpaySms: smsRequested,
+                razorpaySmsError: smsError,
             },
             emailSent: delivery.emailSent,
             emailError: delivery.emailError || null,

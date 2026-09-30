@@ -41,6 +41,7 @@ function PaymentPortalContent() {
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState("");
   const [provider, setProvider] = useState("razorpay");
+  const isRentalBill = session?.purpose === "rental_bill";
 
   useEffect(() => {
     let cancelled = false;
@@ -110,8 +111,10 @@ function PaymentPortalContent() {
         key: order.checkoutKey,
         amount: order.amount,
         currency: order.currency,
-        name: "DEV Infinity Services",
-        description: "Client payment",
+        name: isRentalBill ? "DEV Infinity Cloud" : "DEV Infinity Services",
+        description: isRentalBill
+          ? `Rental usage bill${session.rentalId ? ` · ${session.rentalId}` : ""}`
+          : "Client payment",
         order_id: order.id,
         handler: async (response) => {
           try {
@@ -169,8 +172,19 @@ function PaymentPortalContent() {
               </div>
             </div>
 
-            <h2 className="mb-2 text-2xl font-bold text-slate-950">Secure Payment Portal</h2>
-            {session && <p className="mb-6 text-slate-500">{session.clientName ? `Hello, ${session.clientName}` : "Payment Request"}</p>}
+            <h2 className="mb-2 text-2xl font-bold text-slate-950">
+              {isRentalBill ? "Rental Usage Payment" : "Secure Payment Portal"}
+            </h2>
+            {session && (
+              <div className="mb-6 space-y-1 text-slate-500">
+                <p>{session.clientName ? `Hello, ${session.clientName}` : "Payment Request"}</p>
+                {isRentalBill && session.rentalId && (
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-primary">
+                    Rental {session.rentalId}
+                  </p>
+                )}
+              </div>
+            )}
 
             {error && (
               <div className="mb-6 flex items-center gap-2 rounded-[22px] border border-red-200 bg-red-50/85 p-3 text-sm text-red-700">
@@ -180,9 +194,16 @@ function PaymentPortalContent() {
 
             {session ? (
               <>
-                <div className="glass-chip-strong mb-8 rounded-[24px] p-6">
-                  <p className="mb-1 text-sm uppercase tracking-[0.24em] text-slate-500">Amount Due</p>
-                  <div className="text-4xl font-bold text-slate-950">INR {Number(session.amount).toLocaleString()}</div>
+                <div className="glass-chip-strong mb-6 rounded-[18px] p-6">
+                  <p className="mb-1 text-sm uppercase tracking-[0.18em] text-slate-500">
+                    {isRentalBill ? "Rental Usage Amount" : "Amount Due"}
+                  </p>
+                  <div className="text-4xl font-bold text-slate-950">
+                    INR {Number(session.amount).toLocaleString("en-IN", { maximumFractionDigits: 2 })}
+                  </div>
+                  {isRentalBill && session.notes && (
+                    <p className="mt-3 text-sm leading-6 text-slate-500">{session.notes}</p>
+                  )}
                 </div>
 
                 {session.status === "paid" ? (

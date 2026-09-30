@@ -91,8 +91,8 @@ export default function Terms() {
                   </p>
                   <ul className="list-disc pl-6 mt-3 space-y-2 text-emerald-900">
                     <li><strong>Upfront Fee:</strong> A one-time upfront fee of INR 1 is charged before your rental period begins. This fee is non-refundable once the rental is activated.</li>
-                    <li><strong>Usage Billing:</strong> Compute usage is billed at INR 200 per 20 hours of compute. Usage is measured in slabs of 20 hours, and partial slabs are rounded up. The usage bill is generated after your rental period ends.</li>
-                    <li><strong>Payment Link:</strong> If compute usage is recorded, a detailed bill along with a Razorpay payment link will be sent to your registered email address. You must pay the bill using the provided payment link.</li>
+                    <li><strong>Usage Billing:</strong> Compute usage uses a base rate of INR 200 per 20 hours (INR 10 per hour) and is charged proportionally based on actual usage. For example, 5 hours costs INR 50 and 12.5 hours costs INR 125. The usage bill is generated after your rental period ends.</li>
+                    <li><strong>Payment Link:</strong> If compute usage is recorded, a detailed bill with a secure DEV Infinity payment portal link will be sent to your registered email address. A Razorpay SMS payment link may also be sent as a secondary payment option. You only need to complete the bill once.</li>
                     <li><strong>Rental Duration:</strong> You select a rental duration (1, 3, 7, 15, or 30 days) at the time of signup. The rental expires automatically at the end of the chosen period. Only one active rental is permitted per email address at a time.</li>
                     <li><strong>No Subscription:</strong> Rent Services do not create a recurring subscription. Each rental is a standalone, one-time engagement with separate upfront and usage payments.</li>
                     <li><strong>Usage Tracking:</strong> Compute hours consumed during the rental period are tracked by our system. The final bill is based on actual hours used, not the maximum available during the rental period.</li>

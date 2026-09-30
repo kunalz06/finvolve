@@ -3,6 +3,12 @@ import nodemailer from "nodemailer";
 import { getCanonicalApiUrl, getCanonicalSiteUrl } from "@/lib/server/site-url";
 
 export const NEWSLETTER_COLLECTION = "newsletter_subscribers";
+export const EMAIL_LOGO_URL = "https://devsoftwareai.live/dev-infinity-email-logo.svg";
+
+export function renderEmailBrandLogo({ width = 196, cloud = false } = {}) {
+    const label = cloud ? "DEV Infinity Cloud" : "DEV Infinity";
+    return `<img src="${EMAIL_LOGO_URL}" width="${width}" alt="${label}" style="display:block;width:${width}px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;" />`;
+}
 
 export function normalizeNewsletterEmail(email) {
     return String(email || "").trim().toLowerCase();
@@ -75,7 +81,8 @@ export function renderNewsletterHtml({ title, body, unsubscribeUrl }) {
     return `
         <div style="margin:0;padding:32px;background:#eef3ff;font-family:Segoe UI,Arial,sans-serif;color:#142033;">
             <div style="max-width:640px;margin:0 auto;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.8);border-radius:28px;padding:32px;box-shadow:0 24px 60px rgba(24,34,66,0.14);">
-                <p style="margin:0 0 12px;color:#7c5cff;font-size:12px;letter-spacing:0.22em;text-transform:uppercase;font-weight:700;">DEV♾️ Newsletter</p>
+                <div style="margin:0 0 18px;">${renderEmailBrandLogo()}</div>
+                <p style="margin:0 0 8px;color:#5b5cf0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;">Newsletter</p>
                 <h1 style="margin:0 0 20px;font-size:28px;line-height:1.2;color:#111827;">${safeTitle}</h1>
                 <div style="font-size:16px;line-height:1.75;color:#46556f;">${safeBody}</div>
                 <hr style="border:0;border-top:1px solid #e5e7eb;margin:32px 0 20px;" />
@@ -113,7 +120,7 @@ export function renderProjectRequestAcknowledgementHtml({ name, projectType, tim
     return `
         <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
             <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
-                <p style="margin:0 0 12px;color:#2457ff;font-size:12px;text-transform:uppercase;font-weight:800;">DEV Infinity</p>
+                <div style="margin:0 0 20px;">${renderEmailBrandLogo()}</div>
                 <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">We received your project request</h1>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, thanks for sharing your idea. We have your request and will review it carefully before getting back to you.</p>
                 <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">
@@ -137,7 +144,7 @@ export function renderPaymentLinkHtml({ clientName, amount, currency = "INR", pa
     return `
         <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
             <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
-                <p style="margin:0 0 12px;color:#2457ff;font-size:12px;text-transform:uppercase;font-weight:800;">DEV Infinity</p>
+                <div style="margin:0 0 20px;">${renderEmailBrandLogo()}</div>
                 <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">Your secure payment link is ready</h1>
                 <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, please use the secure link below to complete your payment.</p>
                 <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">

@@ -1,97 +1,97 @@
+import crypto from "crypto";
 import { getAdminDb } from "@/lib/firebase-admin";
 import { corsJson } from "@/lib/server/cors";
-import { FieldValue } from "firebase-admin/firestore";
-import { sendRentalBillPaidEmail } from "@/lib/server/rental-emails";
+import { settleRentalBillPayment } from "@/lib/server/rental-payment-settlement";
 
-/**
- * Razorpay Payment Link callback (GET redirect after user pays).
- * Query params: razorpay_payment_id, razorpay_payment_link_id, razorpay_payment_link_reference_id,
- *               razorpay_payment_link_status, rentalId (from notes).
- *
- * Also handles the `payment_link.paid` webhook event (POST) for server-side confirmation.
- */
-export async function GET(request) {
-    const { searchParams } = new URL(request.url);
-    const paymentId = searchParams.get("razorpay_payment_id");
-    const paymentLinkId = searchParams.get("razorpay_payment_link_id");
-    const status = searchParams.get("razorpay_payment_link_status");
-    const rentalId = searchParams.get("rentalId");
+function verifyWebhookSignature(rawBody, signature, secret) {
+    if (!signature || !secret) return false;
 
-    if (!paymentId || !rentalId) {
-        return corsJson(request, { error: "Missing parameters." }, { status: 400 });
-    }
+    const expected = crypto
+        .createHmac("sha256", secret)
+        .update(rawBody)
+        .digest("hex");
 
-    return handleBillPayment({ paymentId, paymentLinkId, status, rentalId, request });
+    const supplied = Buffer.from(signature);
+    const expectedBuffer = Buffer.from(expected);
+    if (supplied.length !== expectedBuffer.length) return false;
+
+    return crypto.timingSafeEqual(supplied, expectedBuffer);
 }
 
+/**
+ * Razorpay returns the customer to this route after the SMS-only Payment Link
+ * checkout. State is never mutated from GET query parameters; the signed
+ * webhook below is the authoritative settlement path.
+ */
+export async function GET() {
+    return redirectResponse();
+}
+
+/**
+ * Signed Razorpay webhook for the SMS-only rental Payment Link.
+ * The DEV Infinity portal and this SMS link both settle the same
+ * payment_requests record, so either channel is idempotent.
+ */
 export async function POST(request) {
+    const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+    if (!webhookSecret) {
+        console.error("RAZORPAY_WEBHOOK_SECRET is not configured.");
+        return new Response("Webhook not configured", { status: 500 });
+    }
+
+    const signature = request.headers.get("x-razorpay-signature");
+    const rawBody = await request.text();
+
+    if (!verifyWebhookSignature(rawBody, signature, webhookSecret)) {
+        return new Response("Invalid signature", { status: 400 });
+    }
+
     try {
-        const json = await request.json();
+        const event = JSON.parse(rawBody);
 
-        // Handle Razorpay webhook for payment_link.paid
-        const event = json.event;
-        if (event === "payment_link.paid") {
-            const payload = json.payload?.payment_link || json.payload?.payment || {};
-            const paymentEntity = json.payload?.payment || {};
-            const paymentId = paymentEntity.id || payload.payment_id;
-            const notes = payload.notes || paymentEntity.notes || {};
-            const rentalId = notes.rentalId;
-            const type = notes.type;
-
-            if (type === "rental_bill" && rentalId) {
-                return handleBillPayment({ paymentId, paymentLinkId: payload.id, rentalId, request });
-            }
+        if (event.event !== "payment_link.paid") {
+            return corsJson(request, { received: true });
         }
 
-        return corsJson(request, { received: true });
+        const paymentLinkEntity = event.payload?.payment_link?.entity || {};
+        const paymentEntity = event.payload?.payment?.entity || {};
+        const notes = paymentLinkEntity.notes || paymentEntity.notes || {};
+
+        const rentalId = notes.rentalId;
+        const paymentRequestId = notes.paymentRequestId;
+        const paymentId = paymentEntity.id;
+        const paymentLinkId = paymentLinkEntity.id;
+
+        if (
+            notes.type !== "rental_bill_sms" ||
+            !rentalId ||
+            !paymentRequestId ||
+            !paymentId
+        ) {
+            console.warn("Rental Payment Link webhook missing trusted association data.");
+            return corsJson(request, { received: true });
+        }
+
+        const db = getAdminDb();
+        const settlement = await settleRentalBillPayment({
+            db,
+            rentalId,
+            paymentRequestId,
+            paymentId,
+            provider: "razorpay_payment_link",
+            paymentLinkId,
+        });
+
+        return corsJson(request, { received: true, settlement });
     } catch (error) {
         console.error("Rental webhook error:", error.message);
         return corsJson(request, { error: "Webhook processing failed." }, { status: 500 });
     }
 }
 
-async function handleBillPayment({ paymentId, paymentLinkId, rentalId, request }) {
-    const db = getAdminDb();
-    const rentalRef = db.collection("rentals").doc(rentalId);
-    const snap = await rentalRef.get();
-
-    if (!snap.exists) {
-        console.warn(`Rental ${rentalId} not found for bill payment ${paymentId}`);
-        return redirectResponse(request);
-    }
-
-    const rental = snap.data();
-    if (rental.status === "paid" || rental.status === "settled") {
-        return redirectResponse(request);
-    }
-
-    await rentalRef.update({
-        status: "paid",
-        billPaymentId: paymentId,
-        billPaymentLinkId: paymentLinkId || rental.billPaymentLinkId,
-        billPaidAt: FieldValue.serverTimestamp(),
-        updatedAt: FieldValue.serverTimestamp(),
-    });
-
-    // Send payment confirmation email
-    try {
-        await sendRentalBillPaidEmail({
-            to: rental.email,
-            name: rental.name,
-            rentalId,
-            hoursUsed: rental.hoursUsed,
-            totalPaid: rental.billAmountINR,
-        });
-    } catch (mailErr) {
-        console.error("Rental bill paid email failed:", mailErr.message);
-    }
-
-    return redirectResponse(request);
-}
-
-function redirectResponse(request) {
+function redirectResponse() {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://devsoftwareai.live";
     const url = new URL("/dev/cloud", siteUrl);
-    url.searchParams.set("rental", "bill_paid");
+    url.searchParams.set("rental", "bill_payment_returned");
     return Response.redirect(url.toString(), 302);
 }

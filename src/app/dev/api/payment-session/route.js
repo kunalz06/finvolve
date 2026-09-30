@@ -71,6 +71,9 @@ export async function POST(request) {
             status: payment.status || "pending",
             clientName: payment.clientName || "",
             clientEmail: payment.clientEmail || "",
+            purpose: payment.purpose || "client_payment",
+            rentalId: payment.rentalId || null,
+            notes: payment.notes || "",
             expiresAt: payment.tokenExpiresAt?.toDate?.()?.toISOString() || null,
         });
     } catch (error) {

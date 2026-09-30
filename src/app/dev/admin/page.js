@@ -116,6 +116,7 @@ export default function AdminPage() {
     });
     const [creatingPayment, setCreatingPayment] = useState(false);
     const [generatedLink, setGeneratedLink] = useState(null);
+    const [revenueSummary, setRevenueSummary] = useState(null);
     const [newsletterDraft, setNewsletterDraft] = useState({
         subject: "",
         body: "",
@@ -206,6 +207,24 @@ export default function AdminPage() {
             }
         };
         fetchSubscriptions();
+
+        const fetchRevenue = async () => {
+            try {
+                if (!auth?.currentUser) return;
+                const idToken = await auth.currentUser.getIdToken();
+                const res = await fetch(apiUrl("/dev/api/admin/revenue"), {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                    cache: "no-store",
+                });
+                const json = await res.json();
+                if (res.ok) setRevenueSummary(json);
+            } catch (e) {
+                console.warn("Failed to fetch total revenue:", e.message);
+            }
+        };
+        fetchRevenue();
+        const revenueTimer = window.setInterval(fetchRevenue, 60_000);
+        listenersRef.current.revenue = () => window.clearInterval(revenueTimer);
 
         listenersRef.current.rentals = onSnapshot(
             query(collection(db, "rentals"), orderBy("createdAt", "desc")),
@@ -371,12 +390,18 @@ export default function AdminPage() {
     };
 
     const unreadCount = messages.filter((item) => item.status === "unread").length;
-    const paidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const legacyPaidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const paidPaymentsCount = Number.isFinite(revenueSummary?.paymentCount)
+        ? revenueSummary.paymentCount
+        : legacyPaidPaymentsCount;
     const activeSubscriberCount = newsletterSubscribers.filter((item) => item.status === "active").length;
     const activeSubCount = subscriptions.filter((s) => s.status === "active" || s.status === "paused").length;
-    const revenue = payments
+    const legacyRevenue = payments
         .filter((item) => item.status === "paid")
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const revenue = Number.isFinite(revenueSummary?.totalINR)
+        ? revenueSummary.totalINR
+        : legacyRevenue;
     const activeRentalCount = rentals.filter((r) => r.status === "active").length;
     const stats = useMemo(() => ([
         { label: "Requests", value: requests.length, tone: "text-slate-900" },
@@ -770,7 +795,7 @@ export default function AdminPage() {
                                                         type="number"
                                                         min="0"
                                                         step="0.5"
-                                                        placeholder="Hours used"
+                                                        placeholder="Hours used (₹10/hr)"
                                                         value={billHoursInput}
                                                         onChange={(e) => setBillHoursInput(e.target.value)}
                                                         className="flex-1 rounded-[16px] border-2 border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-slate-900"
@@ -795,7 +820,7 @@ export default function AdminPage() {
                                                             setBillingRentalId(null);
                                                             setBillHoursInput("");
                                                             if (json.emailSent === false) {
-                                                                setError("Bill generated successfully. Razorpay is sending the payment link by SMS and email, but the detailed bill email failed. Use Resend Bill Email below.");
+                                                                setError("Bill generated successfully. The secure DEV Infinity payment portal link is saved and Razorpay SMS is handled separately, but the detailed bill email failed. Use Resend Bill Email below.");
                                                             }
                                                             // onSnapshot will auto-refresh
                                                         } catch (e) { setError(e.message); }
@@ -814,7 +839,7 @@ export default function AdminPage() {
                                         <div className="mt-3 space-y-2 rounded-xl border border-amber-200 bg-amber-50/75 p-3 text-xs text-amber-800">
                                             {r.billPaymentLink && (
                                                 <div>
-                                                    Razorpay payment link requested by <strong>SMS + email</strong> to {r.email}.
+                                                    DEV Infinity payment portal link emailed to <strong>{r.email}</strong>. Razorpay SMS: <strong>{r.billSmsNotificationStatus === "requested" ? "Requested" : r.billSmsNotificationStatus === "failed" ? "Failed" : r.billSmsNotificationStatus === "cancelled_after_portal_payment" ? "Cancelled after portal payment" : "Not requested"}</strong>.
                                                 </div>
                                             )}
                                             <div>

@@ -1,4 +1,4 @@
-import { sendNewsletterMail } from "./newsletter";
+import { renderEmailBrandLogo, sendNewsletterMail } from "./newsletter";
 import { getCanonicalSiteUrl } from "./site-url";
 import { SUBSCRIPTION_TIERS } from "./subscription-plans";
 
@@ -344,8 +344,8 @@ function renderSubscriptionHtml({
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                     <tr>
                         <td align="left" style="vertical-align:middle;">
-                            <span style="display:inline-block;padding:4px 10px;background:#2457ff;color:#ffffff;font-size:12px;font-weight:900;letter-spacing:0.08em;border-radius:8px;text-transform:uppercase;border:1.5px solid #101820;box-shadow:2px 2px 0 #101820;">DEV♾️</span>
-                            <span style="margin-left:10px;font-size:18px;font-weight:800;color:#101820;letter-spacing:-0.02em;">Cloud Services</span>
+                            ${renderEmailBrandLogo({ cloud: true, width: 184 })}
+                            <div style="margin-top:7px;font-size:11px;font-weight:700;color:#667085;letter-spacing:0.08em;text-transform:uppercase;">Cloud Services</div>
                         </td>
                         <td align="right" style="vertical-align:middle;">
                             <span style="display:inline-block;padding:5px 12px;background:${config.badgeBg};border:1.5px solid ${config.badgeBorder};color:${config.badgeColor};font-size:11px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;border-radius:999px;">

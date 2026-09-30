@@ -2,7 +2,7 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb, verifyAdminFromRequest } from "@/lib/firebase-admin";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
-import { createPaymentToken, hashToken, PAYMENT_SOURCE } from "@/lib/server/payments";
+import { createPaymentToken, hashToken, PAYMENT_PURPOSE, PAYMENT_SOURCE } from "@/lib/server/payments";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import { renderPaymentLinkHtml, sendNewsletterMail } from "@/lib/server/newsletter";
 import { getCanonicalSiteUrl } from "@/lib/server/site-url";
@@ -71,6 +71,7 @@ export async function POST(request) {
             amount: payload.amount,
             currency: "INR",
             source: PAYMENT_SOURCE.PAYMENT_PORTAL,
+            purpose: PAYMENT_PURPOSE.CLIENT_PAYMENT,
             status: "pending",
             clientName: payload.clientName,
             clientEmail: payload.clientEmail || "",

@@ -203,7 +203,7 @@ export const KNOWLEDGE = {
 
   cloud_pricing: {
     texts: [
-      "Here's a quick pricing overview:\n\n**Subscriptions:**\n• Starter — ₹200/15 days + ₹100 setup\n• Pro — ₹12,900/month + ₹1,000 setup\n• Enterprise — ₹17,900/month + ₹1,200 setup\n\n**Rentals (pay-per-use):**\n• ₹1 upfront (non-refundable)\n• ₹200 per 20 hours of compute\n• Durations: 1, 3, 7, 15, or 30 days\n\n**Quick Start (priority service):**\n• ₹99 one-time — response under 48 hours",
+      "Here's a quick pricing overview:\n\n**Subscriptions:**\n• Starter — ₹200/15 days + ₹100 setup\n• Pro — ₹12,900/month + ₹1,000 setup\n• Enterprise — ₹17,900/month + ₹1,200 setup\n\n**Rentals (pay-per-use):**\n• ₹1 upfront (non-refundable)\n• ₹200 per 20 hours, prorated at ₹10/hour\n• Durations: 1, 3, 7, 15, or 30 days\n\n**Quick Start (priority service):**\n• ₹99 one-time — response under 48 hours",
     ],
     quickReplies: ["View Cloud Plans", "Rent Cloud", "Start a Project"],
   },
@@ -241,7 +241,7 @@ export const KNOWLEDGE = {
 
   cloud_rental: {
     texts: [
-      "**Cloud Rent** — Pay only for what you use\n\n• **₹1 upfront** (non-refundable) to activate\n• **₹200 per 20 hours** of compute time\n• Slab billing: partial slabs rounded up\n• Choose duration: 1, 3, 7, 15, or 30 days\n• Bill + Razorpay payment link emailed after rental ends\n• **One active rental per email** at a time\n\nPerfect for short-term projects, testing, or burst compute needs.",
+      "**Cloud Rent** — Pay only for what you use\n\n• **₹1 upfront** (non-refundable) to activate\n• Base rate: **₹200 per 20 hours** = **₹10/hour**\n• Usage is prorated, so 5 hours costs ₹50 and 12.5 hours costs ₹125\n• Choose duration: 1, 3, 7, 15, or 30 days\n• A DEV Infinity payment portal link is emailed after the rental ends; Razorpay SMS remains available as a secondary payment option\n• **One active rental per email** at a time\n\nPerfect for short-term projects, testing, or burst compute needs.",
     ],
     quickReplies: ["Rent Now", "Cloud Subscriptions", "Contact Us"],
     cards: [
