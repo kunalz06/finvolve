@@ -794,6 +794,9 @@ export default function AdminPage() {
                                                             if (!res.ok) throw new Error(json.error || "Bill failed");
                                                             setBillingRentalId(null);
                                                             setBillHoursInput("");
+                                                            if (json.emailSent === false) {
+                                                                setError("Bill generated successfully. Razorpay is sending the payment link by SMS and email, but the detailed bill email failed. Use Resend Bill Email below.");
+                                                            }
                                                             // onSnapshot will auto-refresh
                                                         } catch (e) { setError(e.message); }
                                                         finally { setSubActionLoading(null); }
@@ -807,9 +810,66 @@ export default function AdminPage() {
                                             )}
                                         </div>
                                     )}
-                                    {r.billPaymentLink && (r.status === "billed") && (
-                                        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50/75 p-2 text-xs text-amber-700 break-all">
-                                            Payment link sent to {r.email}
+                                    {r.billGeneratedAt && ["billed", "paid", "settled"].includes(r.status) && (
+                                        <div className="mt-3 space-y-2 rounded-xl border border-amber-200 bg-amber-50/75 p-3 text-xs text-amber-800">
+                                            {r.billPaymentLink && (
+                                                <div>
+                                                    Razorpay payment link requested by <strong>SMS + email</strong> to {r.email}.
+                                                </div>
+                                            )}
+                                            <div>
+                                                Detailed bill email:{" "}
+                                                <strong>
+                                                    {r.billEmailStatus === "sent"
+                                                        ? "Sent"
+                                                        : r.billEmailStatus === "failed"
+                                                            ? "Failed"
+                                                            : "Pending"}
+                                                </strong>
+                                                {r.billEmailSentAt ? ` · ${formatDate(r.billEmailSentAt)}` : ""}
+                                            </div>
+                                            {r.billEmailLastError && (
+                                                <div className="break-words text-red-700">
+                                                    Last email error: {r.billEmailLastError}
+                                                </div>
+                                            )}
+                                            <Button
+                                                variant="secondary"
+                                                size="small"
+                                                className="w-full"
+                                                disabled={subActionLoading === `email-${r.id}`}
+                                                onClick={async () => {
+                                                    setSubActionLoading(`email-${r.id}`);
+                                                    setError("");
+                                                    try {
+                                                        if (!auth?.currentUser) {
+                                                            throw new Error("Session expired. Please sign in again.");
+                                                        }
+                                                        const idToken = await auth.currentUser.getIdToken(true);
+                                                        const res = await fetch(apiUrl("/dev/api/rental/bill"), {
+                                                            method: "POST",
+                                                            headers: {
+                                                                "Content-Type": "application/json",
+                                                                Authorization: `Bearer ${idToken}`,
+                                                            },
+                                                            body: JSON.stringify({
+                                                                rentalId: r.id,
+                                                                action: "resend_email",
+                                                            }),
+                                                        });
+                                                        const json = await res.json();
+                                                        if (!res.ok) {
+                                                            throw new Error(json.emailError || json.error || "Bill email resend failed");
+                                                        }
+                                                    } catch (e) {
+                                                        setError(e.message);
+                                                    } finally {
+                                                        setSubActionLoading(null);
+                                                    }
+                                                }}
+                                            >
+                                                {subActionLoading === `email-${r.id}` ? "Sending..." : "Resend Bill Email"}
+                                            </Button>
                                         </div>
                                     )}
                                 </Card>
