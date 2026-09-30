@@ -64,7 +64,7 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Services</h4>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-strong)]">Services</h4>
               <ul className="space-y-3">
                 <FooterLink href="/dev/services">Web Development</FooterLink>
                 <FooterLink href="/dev/services">Mobile Apps</FooterLink>
@@ -75,7 +75,7 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Company</h4>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-strong)]">Company</h4>
               <ul className="space-y-3">
                 <FooterLink href="/dev/about">About Us</FooterLink>
                 <FooterLink href="/dev/contact">Contact</FooterLink>
@@ -83,11 +83,11 @@ export default function Footer() {
             </div>
 
             <div className="text-center md:text-left">
-              <h4 className="mb-4 text-sm font-black uppercase text-[var(--heading)]">Newsletter</h4>
+              <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-strong)]">Newsletter</h4>
               <p className="mb-4 text-sm text-[var(--muted)]">Short, useful notes from the build floor.</p>
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3">
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]" size={18} />
                   <input
                     type="email"
                     placeholder="Enter your email"
@@ -111,10 +111,10 @@ export default function Footer() {
                 {newsletterStatus.message && (
                   <p className={`rounded-xl px-3 py-2 text-xs leading-5 ${
                     newsletterStatus.type === "error"
-                      ? "border-2 border-[var(--red-primary)] bg-[var(--red-soft)] text-[var(--red-dark)]"
+                      ? "border border-[var(--red-primary)] bg-[var(--red-soft)] text-[var(--red-dark)]"
                       : newsletterStatus.type === "warning"
-                        ? "border-2 border-[var(--accent-amber)] bg-[var(--accent-amber)]/20 text-[var(--accent-amber)]"
-                        : "border-2 border-[var(--accent-mint)] bg-[var(--accent-mint)]/20 text-[var(--accent-mint)]"
+                        ? "border border-[var(--accent-amber)] bg-[var(--accent-amber)]/20 text-[var(--accent-amber)]"
+                        : "border border-[var(--accent-mint)] bg-[var(--accent-mint)]/20 text-[var(--accent-mint)]"
                   }`}>
                     {newsletterStatus.message}
                   </p>
@@ -123,7 +123,7 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t-2 border-[var(--border-soft)] pt-6 text-center text-sm text-[var(--muted)] md:flex-row md:text-left">
+          <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-[var(--border-soft)] pt-6 text-center text-sm text-[var(--muted)] md:flex-row md:text-left">
             <p>&copy; {currentYear} DEV Infinity Software Studio. All rights reserved.</p>
             <div className="flex flex-wrap items-center justify-center gap-4 md:justify-end md:gap-6">
               <Link href="/dev/privacy-policy" className="transition-colors hover:text-primary">
