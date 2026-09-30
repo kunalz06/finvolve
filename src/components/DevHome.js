@@ -42,8 +42,6 @@ const capabilities = [
     copy: "Fast, maintainable web products and internal tools built around real workflows.",
     points: ["Next.js and React", "APIs and integrations"],
     iconClass: "bg-[var(--primary-soft)] text-[var(--primary)]",
-    accent: "linear-gradient(180deg, var(--primary), var(--violet))",
-    glow: "color-mix(in srgb, var(--primary) 16%, transparent)",
   },
   {
     icon: Workflow,
@@ -51,8 +49,6 @@ const capabilities = [
     copy: "Remove repetitive work with connected processes, dashboards, and operational tooling.",
     points: ["Business workflows", "Admin and reporting"],
     iconClass: "bg-teal-50 text-[var(--accent-cool)] dark:bg-teal-950/40",
-    accent: "linear-gradient(180deg, var(--accent-cool), var(--cyan))",
-    glow: "color-mix(in srgb, var(--accent-cool) 16%, transparent)",
   },
   {
     icon: Cloud,
@@ -60,8 +56,6 @@ const capabilities = [
     copy: "Architecture, payments, data, and deployment foundations designed to scale cleanly.",
     points: ["Cloud infrastructure", "Payments and data"],
     iconClass: "bg-orange-50 text-[var(--accent)] dark:bg-orange-950/40",
-    accent: "linear-gradient(180deg, var(--accent), var(--accent-rose))",
-    glow: "color-mix(in srgb, var(--accent) 15%, transparent)",
   },
 ];
 
@@ -128,7 +122,7 @@ export default function Home() {
                     <p className="font-code-brand text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
                       Delivery board
                     </p>
-                    <h2 className="mt-1 text-xl font-black text-[var(--heading)] sm:text-2xl">
+                    <h2 className="mt-1 text-xl font-semibold text-[var(--heading)] sm:text-2xl">
                       From rough idea to working product
                     </h2>
                   </div>
@@ -141,14 +135,14 @@ export default function Home() {
                   {deliverySteps.map((step, index) => (
                     <div
                       key={step.label}
-                      className={`${step.tone} rounded-2xl border border-[var(--border-soft)] p-4 transition-transform duration-200 hover:translate-x-1`}
+                      className={`${step.tone} rounded-2xl border border-[var(--border-soft)] p-4 `}
                     >
                       <div className="flex items-start gap-3">
                         <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black shadow-sm ${step.badge}`}>
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <div>
-                          <h3 className="text-sm font-black text-[var(--heading)] sm:text-base">{step.label}</h3>
+                          <h3 className="text-sm font-semibold text-[var(--heading)] sm:text-base">{step.label}</h3>
                           <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{step.copy}</p>
                         </div>
                       </div>
@@ -181,20 +175,13 @@ export default function Home() {
 
           <div className="grid gap-5 md:grid-cols-3">
             {capabilities.map((capability) => (
-              <Card
-                key={capability.title}
-                className="h-full"
-                style={{
-                  "--card-accent": capability.accent,
-                  "--card-glow": capability.glow,
-                }}
-              >
+              <Card key={capability.title} className="flex h-full flex-col">
                 <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-xl shadow-sm ${capability.iconClass}`}>
                   <capability.icon size={23} />
                 </div>
-                <h3 className="text-xl font-black text-[var(--heading)]">{capability.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-[var(--muted)] sm:text-base">{capability.copy}</p>
-                <div className="mt-6 space-y-2 border-t border-[var(--border-soft)] pt-5">
+                <h3 className="text-xl font-semibold text-[var(--heading)]">{capability.title}</h3>
+                <p className="mt-3 flex-1 text-sm leading-6 text-[var(--muted)] sm:text-base">{capability.copy}</p>
+                <div className="mt-6 space-y-2.5 border-t border-[var(--border-soft)] pt-5">
                   {capability.points.map((point) => (
                     <div key={point} className="flex items-center gap-2 text-sm font-semibold text-[var(--foreground)]">
                       <Check size={15} className="text-primary" />
@@ -238,7 +225,7 @@ function MiniMetric({ icon: Icon, label, tone, iconClass }) {
   return (
     <div className={`${tone} rounded-xl border border-[var(--border-soft)] p-3 text-center`}>
       <Icon size={17} className={`mx-auto ${iconClass}`} />
-      <span className="mt-2 block text-[10px] font-black uppercase tracking-[0.08em] text-[var(--muted)] sm:text-[11px]">
+      <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.08em] text-[var(--muted)] sm:text-[11px]">
         {label}
       </span>
     </div>
