@@ -110,7 +110,7 @@ function extractEntities(text) {
   if (contactMessageMatch) entities.contactMessage = contactMessageMatch[1].trim();
 
   const descriptionSignals = /\b(build|need|want|project|platform|app|website|software|system|dashboard|automation|integrat|develop|create)\b/i;
-  if (value.length >= 24 && descriptionSignals.test(value)) {
+  if (value.length >= 24 && descriptionSignals.test(value) && !/\b(submit|send|share|forward|deliver)\b/i.test(value)) {
     entities.projectDescription = value;
   }
 
@@ -308,6 +308,23 @@ export class ChatEngine {
   responseForWriteAction(action) {
     if (!action?.ready) {
       this.requestedAction = action?.type || this.requestedAction;
+
+      const firstMissing = action?.missing?.[0];
+      if (action?.type === "contact_message") {
+        if (firstMissing === "name") this.flowState = FLOW_STATES.COLLECT_MSG_NAME;
+        else if (firstMissing === "email") this.flowState = FLOW_STATES.COLLECT_MSG_EMAIL;
+        else if (firstMissing === "message") this.flowState = FLOW_STATES.COLLECT_MSG_BODY;
+      }
+
+      if (action?.type === "project_request") {
+        if (firstMissing === "project type") this.flowState = FLOW_STATES.COLLECT_PROJECT_TYPE;
+        else if (firstMissing === "timeline") this.flowState = FLOW_STATES.COLLECT_TIMELINE;
+        else if (firstMissing === "budget") this.flowState = FLOW_STATES.COLLECT_BUDGET;
+        else if (firstMissing === "project description") this.flowState = FLOW_STATES.COLLECT_PROJECT_DESCRIPTION;
+        else if (firstMissing === "name") this.flowState = FLOW_STATES.COLLECT_PROJECT_NAME;
+        else if (firstMissing === "email") this.flowState = FLOW_STATES.COLLECT_PROJECT_EMAIL;
+      }
+
       return {
         text: actionMissingPrompt(action) || "I need a little more information before I can do that.",
         quickReplies: [],
@@ -316,6 +333,7 @@ export class ChatEngine {
       };
     }
 
+    this.flowState = FLOW_STATES.IDLE;
     this.requestedAction = null;
     return {
       text: "I have enough information. Review the action below before I do anything.",
