@@ -73,7 +73,7 @@ export default function Navbar() {
                       href={link.href}
                       aria-current={active ? "page" : undefined}
                       className={`rounded-lg px-3 py-2 text-sm font-bold transition-colors ${active
-                        ? "brand-gradient !text-white shadow-sm"
+                        ? "bg-[var(--primary-soft)] text-[var(--primary)] shadow-sm"
                         : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--heading)]"
                       }`}
                     >
@@ -124,7 +124,7 @@ export default function Navbar() {
                     href={link.href}
                     aria-current={active ? "page" : undefined}
                     className={`rounded-xl px-4 py-3 text-sm font-bold ${active
-                      ? "brand-gradient !text-white"
+                      ? "bg-[var(--primary-soft)] text-[var(--primary)]"
                       : "text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
                     }`}
                   >
