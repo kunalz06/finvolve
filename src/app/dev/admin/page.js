@@ -116,6 +116,7 @@ export default function AdminPage() {
     });
     const [creatingPayment, setCreatingPayment] = useState(false);
     const [generatedLink, setGeneratedLink] = useState(null);
+    const [revenueSummary, setRevenueSummary] = useState(null);
     const [newsletterDraft, setNewsletterDraft] = useState({
         subject: "",
         body: "",
@@ -206,6 +207,24 @@ export default function AdminPage() {
             }
         };
         fetchSubscriptions();
+
+        const fetchRevenue = async () => {
+            try {
+                if (!auth?.currentUser) return;
+                const idToken = await auth.currentUser.getIdToken();
+                const res = await fetch(apiUrl("/dev/api/admin/revenue"), {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                    cache: "no-store",
+                });
+                const json = await res.json();
+                if (res.ok) setRevenueSummary(json);
+            } catch (e) {
+                console.warn("Failed to fetch total revenue:", e.message);
+            }
+        };
+        fetchRevenue();
+        const revenueTimer = window.setInterval(fetchRevenue, 60_000);
+        listenersRef.current.revenue = () => window.clearInterval(revenueTimer);
 
         listenersRef.current.rentals = onSnapshot(
             query(collection(db, "rentals"), orderBy("createdAt", "desc")),
@@ -371,12 +390,18 @@ export default function AdminPage() {
     };
 
     const unreadCount = messages.filter((item) => item.status === "unread").length;
-    const paidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const legacyPaidPaymentsCount = payments.filter((item) => item.status === "paid").length;
+    const paidPaymentsCount = Number.isFinite(revenueSummary?.paymentCount)
+        ? revenueSummary.paymentCount
+        : legacyPaidPaymentsCount;
     const activeSubscriberCount = newsletterSubscribers.filter((item) => item.status === "active").length;
     const activeSubCount = subscriptions.filter((s) => s.status === "active" || s.status === "paused").length;
-    const revenue = payments
+    const legacyRevenue = payments
         .filter((item) => item.status === "paid")
         .reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+    const revenue = Number.isFinite(revenueSummary?.totalINR)
+        ? revenueSummary.totalINR
+        : legacyRevenue;
     const activeRentalCount = rentals.filter((r) => r.status === "active").length;
     const stats = useMemo(() => ([
         { label: "Requests", value: requests.length, tone: "text-slate-900" },
