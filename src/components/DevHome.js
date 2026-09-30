@@ -111,8 +111,6 @@ export default function Home() {
             </div>
 
             <div className="relative">
-              <div className="absolute -left-12 top-16 hidden h-44 w-44 rounded-full bg-[var(--violet)]/20 blur-3xl lg:block" />
-              <div className="absolute -right-10 bottom-10 hidden h-52 w-52 rounded-full bg-[var(--accent-cool)]/18 blur-3xl lg:block" />
 
               <div className="hero-vibrant-panel glass-surface-strong relative overflow-hidden rounded-[30px] p-4 sm:p-5 md:p-6">
                 <div className="spectrum-line absolute inset-x-0 top-0" />
@@ -199,7 +197,6 @@ export default function Home() {
         <div className="container">
           <div className="gradient-section glass-surface-strong relative overflow-hidden rounded-[30px] p-6 sm:p-8 md:p-10 lg:p-12">
             <div className="spectrum-line absolute inset-x-0 top-0" />
-            <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[var(--accent-rose)]/12 blur-3xl" />
             <div className="relative grid items-center gap-8 lg:grid-cols-[1fr_auto]">
               <div className="max-w-3xl">
                 <p className="font-code-brand text-xs font-bold uppercase tracking-[0.18em] text-primary">Have something to build?</p>
