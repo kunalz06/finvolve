@@ -820,7 +820,7 @@ export default function AdminPage() {
                                                             setBillingRentalId(null);
                                                             setBillHoursInput("");
                                                             if (json.emailSent === false) {
-                                                                setError("Bill generated successfully. Razorpay is sending the payment link by SMS and email, but the detailed bill email failed. Use Resend Bill Email below.");
+                                                                setError("Bill generated successfully. The secure DEV Infinity payment portal link is saved and Razorpay SMS is handled separately, but the detailed bill email failed. Use Resend Bill Email below.");
                                                             }
                                                             // onSnapshot will auto-refresh
                                                         } catch (e) { setError(e.message); }
