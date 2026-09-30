@@ -66,8 +66,8 @@ export default function Home() {
         <div className="container">
           <div className="grid items-center gap-8 lg:min-h-[700px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
             <div className="max-w-3xl">
-              <div className="glass-chip-strong mb-5 inline-flex items-center gap-2 rounded-full px-3 py-1.5 sm:px-4 sm:py-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full brand-gradient text-white shadow-sm">
+              <div className="glass-chip-strong mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
+                <span className="flex h-6 w-6 items-center justify-center rounded-md brand-gradient text-white shadow-sm">
                   <Sparkles size={13} />
                 </span>
                 <span className="font-code-brand text-[11px] font-bold uppercase tracking-[0.16em] text-primary sm:text-xs">
@@ -101,7 +101,7 @@ export default function Home() {
                   ["Launch-ready systems", "bg-orange-50 text-[var(--accent)] dark:bg-orange-950/40"],
                 ].map(([item, tone]) => (
                   <div key={item} className="flex items-center gap-2 text-sm font-semibold text-[var(--muted)]">
-                    <span className={`flex h-7 w-7 items-center justify-center rounded-full ${tone}`}>
+                    <span className={`flex h-7 w-7 items-center justify-center rounded-md ${tone}`}>
                       <Check size={14} strokeWidth={3} />
                     </span>
                     {item}
@@ -138,7 +138,7 @@ export default function Home() {
                       className={`${step.tone} rounded-2xl border border-[var(--border-soft)] p-4 `}
                     >
                       <div className="flex items-start gap-3">
-                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black shadow-sm ${step.badge}`}>
+                        <span className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-xs font-black shadow-sm ${step.badge}`}>
                           {String(index + 1).padStart(2, "0")}
                         </span>
                         <div>
