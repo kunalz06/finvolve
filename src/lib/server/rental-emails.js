@@ -1,4 +1,4 @@
-import { sendNewsletterMail } from "./newsletter";
+import { renderEmailBrandLogo, sendNewsletterMail } from "./newsletter";
 import { RENTAL_CONFIG, getBillBreakdown } from "./rental-plans";
 
 function escapeHtml(value) {
@@ -22,11 +22,11 @@ function emailShell({ badge, badgeBg, badgeBorder, badgeColor, heading, body }) 
       <!-- Brand Header -->
       <tr><td style="padding:0 0 24px;text-align:center;">
         <table cellpadding="0" cellspacing="0" style="margin:0 auto;"><tr>
-          <td style="background:#2457ff;color:#fff;font-size:18px;font-weight:900;letter-spacing:0.04em;padding:10px 20px;border-radius:10px;border:2px solid #101820;box-shadow:3px 3px 0 #101820;">
-            DEV&#8734; Cloud
+          <td align="center">
+            ${renderEmailBrandLogo({ cloud: true, width: 196 })}
           </td>
         </tr></table>
-        <p style="margin:10px 0 0;font-size:11px;font-weight:700;color:#8a8580;text-transform:uppercase;letter-spacing:0.1em;">Cloud Infrastructure &amp; AI Models</p>
+        <p style="margin:10px 0 0;font-size:11px;font-weight:700;color:#667085;text-transform:uppercase;letter-spacing:0.1em;">Cloud Infrastructure &amp; AI Models</p>
       </td></tr>
 
       <!-- Main Card -->
@@ -120,8 +120,8 @@ export function renderRentalActivatedHtml({ name, rentalId, days, expiresAt }) {
             <p style="margin:0 0 8px;font-size:12px;font-weight:800;color:#101820;text-transform:uppercase;letter-spacing:0.06em;">How Billing Works</p>
             <table cellpadding="0" cellspacing="0" style="font-size:13px;line-height:1.8;color:#5e6773;">
               <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">1.</td><td style="padding:2px 0 2px 8px;">After your ${safeDays}-day period ends, your actual compute usage is calculated.</td></tr>
-              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">2.</td><td style="padding:2px 0 2px 8px;">Every ${RENTAL_CONFIG.computeHoursPerUnit} hours of compute costs <strong>&#8377;${RENTAL_CONFIG.computeRateINR}</strong>.</td></tr>
-              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">3.</td><td style="padding:2px 0 2px 8px;">A detailed bill with a secure Razorpay payment link will be emailed to you.</td></tr>
+              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">2.</td><td style="padding:2px 0 2px 8px;">The base rate is <strong>&#8377;${RENTAL_CONFIG.computeRateINR} for ${RENTAL_CONFIG.computeHoursPerUnit} hours</strong>, billed proportionally at <strong>&#8377;${RENTAL_CONFIG.hourlyRateINR}/hour</strong>.</td></tr>
+              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">3.</td><td style="padding:2px 0 2px 8px;">A detailed bill with a secure DEV Infinity payment portal link will be emailed to you.</td></tr>
               <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">4.</td><td style="padding:2px 0 2px 8px;">You only pay for what you use &mdash; nothing more.</td></tr>
             </table>
           </td></tr>
@@ -147,7 +147,7 @@ export function renderRentalActivatedHtml({ name, rentalId, days, expiresAt }) {
 
 /**
  * Email sent when the usage bill is generated after rental period ends.
- * Contains a Razorpay payment link for the bill amount.
+ * Contains a DEV Infinity payment portal link for the bill amount.
  */
 export function renderRentalBillHtml({ name, rentalId, days, hoursUsed, billBreakdown, paymentUrl }) {
     const safeName = escapeHtml(name || "there");
@@ -180,12 +180,12 @@ export function renderRentalBillHtml({ name, rentalId, days, hoursUsed, billBrea
                 <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">${bd.hoursUsed} hours</td>
               </tr>
               <tr style="border-bottom:1px solid #e8e2d6;">
-                <td style="padding:11px 18px;color:#5e6773;font-weight:600;">Billing Units</td>
-                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">${bd.units} unit${bd.units !== 1 ? "s" : ""} &times; ${bd.hoursUsed > 0 ? RENTAL_CONFIG.computeHoursPerUnit : ""} hours</td>
+                <td style="padding:11px 18px;color:#5e6773;font-weight:600;">Base Rate</td>
+                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">&#8377;${bd.baseRateINR ?? RENTAL_CONFIG.computeRateINR} / ${bd.baseHours ?? RENTAL_CONFIG.computeHoursPerUnit} hours</td>
               </tr>
               <tr style="border-bottom:1px solid #e8e2d6;">
-                <td style="padding:11px 18px;color:#5e6773;font-weight:600;">Rate</td>
-                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">&#8377;${bd.ratePerUnit} / ${RENTAL_CONFIG.computeHoursPerUnit} hours</td>
+                <td style="padding:11px 18px;color:#5e6773;font-weight:600;">Prorated Rate</td>
+                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">&#8377;${bd.hourlyRateINR ?? RENTAL_CONFIG.hourlyRateINR} / hour</td>
               </tr>
               <tr>
                 <td style="padding:13px 18px;font-size:14px;font-weight:800;color:#101820;">Total Due</td>
@@ -200,7 +200,7 @@ export function renderRentalBillHtml({ name, rentalId, days, hoursUsed, billBrea
         <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
           <tr><td style="text-align:center;padding:8px 0;">
             <a href="${safePaymentUrl}" style="display:inline-block;background:#2457ff;color:#ffffff;text-decoration:none;border:2px solid #101820;border-radius:12px;padding:14px 36px;font-size:15px;font-weight:800;box-shadow:4px 4px 0 #101820;">Pay &#8377;${bd.totalINR.toLocaleString("en-IN")} Now</a>
-            <p style="margin:10px 0 0;font-size:11px;color:#8a8580;font-weight:600;">Secure payment powered by Razorpay</p>
+            <p style="margin:10px 0 0;font-size:11px;color:#8a8580;font-weight:600;">Secure payment through the DEV Infinity payment portal</p>
           </td></tr>
         </table>
 
@@ -299,20 +299,20 @@ export async function sendRentalActivatedEmail({ to, name, rentalId, days, expir
     return sendNewsletterMail({
         to,
         subject: `Your DEV Infinity Cloud rental is now active (${days} days)`,
-        text: `Hi ${name},\n\nYour ${days}-day cloud compute rental is now active (ID: ${rentalId}).\n\nAccess expires at: ${expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "N/A"}.\n\nUpfront fee: INR ${RENTAL_CONFIG.upfrontFeeINR}\nUsage billing: INR ${RENTAL_CONFIG.computeRateINR} per ${RENTAL_CONFIG.computeHoursPerUnit} hours of compute.\n\nYou will receive a usage bill with a payment link after your rental period ends.`,
+        text: `Hi ${name},\n\nYour ${days}-day cloud compute rental is now active (ID: ${rentalId}).\n\nAccess expires at: ${expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "N/A"}.\n\nUpfront fee: INR ${RENTAL_CONFIG.upfrontFeeINR}\nUsage billing: INR ${RENTAL_CONFIG.computeRateINR} per ${RENTAL_CONFIG.computeHoursPerUnit} hours, prorated at INR ${RENTAL_CONFIG.hourlyRateINR} per hour.\n\nYou will receive a detailed usage bill with a DEV Infinity payment portal link after your rental period ends.`,
         html: renderRentalActivatedHtml({ name, rentalId, days, expiresAt }),
     });
 }
 
 /**
- * Send the usage bill email with Razorpay payment link.
+ * Send the usage bill email with the DEV Infinity payment portal link.
  */
 export async function sendRentalBillEmail({ to, name, rentalId, days, hoursUsed, billBreakdown, paymentUrl }) {
     const bd = billBreakdown || getBillBreakdown(hoursUsed || 0);
     return sendNewsletterMail({
         to,
         subject: `Your DEV Infinity Cloud usage bill \u2014 \u20B9${bd.totalINR.toLocaleString("en-IN")}`,
-        text: `Hi ${name},\n\nYour ${days}-day cloud rental (ID: ${rentalId}) has ended.\n\nCompute hours used: ${bd.hoursUsed}\nBilling units: ${bd.units}\nRate: INR ${bd.ratePerUnit} per ${RENTAL_CONFIG.computeHoursPerUnit} hours\nTotal due: INR ${bd.totalINR.toLocaleString("en-IN")}\n\nPay here: ${paymentUrl}`,
+        text: `Hi ${name},\n\nYour ${days}-day cloud rental (ID: ${rentalId}) has ended.\n\nCompute hours used: ${bd.hoursUsed}\nBase rate: INR ${bd.baseRateINR ?? RENTAL_CONFIG.computeRateINR} per ${bd.baseHours ?? RENTAL_CONFIG.computeHoursPerUnit} hours\nProrated rate: INR ${bd.hourlyRateINR ?? RENTAL_CONFIG.hourlyRateINR} per hour\nTotal due: INR ${bd.totalINR.toLocaleString("en-IN", { maximumFractionDigits: 2 })}\n\nPay securely here: ${paymentUrl}`,
         html: renderRentalBillHtml({ name, rentalId, days, hoursUsed, billBreakdown: bd, paymentUrl }),
     });
 }
