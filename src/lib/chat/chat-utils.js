@@ -50,7 +50,7 @@ export function setLastChatTime() {
 /**
  * Persist a chat session to Firestore
  */
-export async function saveChatSession(sessionId, messages) {
+export async function saveChatSession(sessionId, messages, context = null) {
   if (!isConfigValid || !db) return;
   try {
     const coll = collection(db, "chat_sessions");
@@ -61,6 +61,7 @@ export async function saveChatSession(sessionId, messages) {
         text: m.text,
         timestamp: m.timestamp || Date.now(),
       })),
+      context: context && typeof context === "object" ? context : null,
       createdAt: serverTimestamp(),
       lastActive: serverTimestamp(),
       status: "open",
