@@ -86,13 +86,13 @@ export default function Contact() {
               <Card hover={false} className="bg-[var(--surface-strong)]">
                 <h3 className="mb-4 sm:mb-6 text-base sm:text-lg font-semibold text-[var(--heading)]">Contact Information</h3>
                 <div className="space-y-4 sm:space-y-6">
-                  <a href="mailto:mitraricky06@gmail.com" className="group flex items-start gap-3 sm:gap-4">
+                  <a href="mailto:devsoftwarestudios@gmail.com" className="group flex items-start gap-3 sm:gap-4">
                     <div className="glass-icon-plate flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-xl transition-colors">
                       <Mail className="text-primary size-5 sm:size-[20px]" />
                     </div>
                     <div>
                       <h4 className="mb-1 font-semibold text-[var(--heading)]">Email</h4>
-                      <p className="text-sm text-[var(--muted)]">mitraricky06@gmail.com</p>
+                      <p className="text-sm text-[var(--muted)]">devsoftwarestudios@gmail.com</p>
                     </div>
                   </a>
                   <a href="tel:+919907958859" className="group flex items-start gap-3 sm:gap-4">
