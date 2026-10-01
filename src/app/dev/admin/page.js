@@ -794,8 +794,8 @@ export default function AdminPage() {
                                                     <input
                                                         type="number"
                                                         min="0"
-                                                        step="0.5"
-                                                        placeholder="Hours used (₹10/hr)"
+                                                        step="0.01"
+                                                        placeholder="Actual usage hours (₹10/hr)"
                                                         value={billHoursInput}
                                                         onChange={(e) => setBillHoursInput(e.target.value)}
                                                         className="flex-1 rounded-[16px] border-2 border-[var(--border)] bg-[var(--surface-strong)] px-3 py-2 text-sm text-slate-900"

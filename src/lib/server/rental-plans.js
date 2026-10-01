@@ -8,7 +8,7 @@ export const RENTAL_CONFIG = {
     /** One-time upfront fee before usage begins (INR) */
     upfrontFeeINR: 1,
 
-    /** Reference price for one base block of compute (INR) */
+    /** Reference price equivalent to 20 compute-hours (INR); not a billing slab */
     computeRateINR: 200,
 
     /** Number of compute-hours represented by the reference price */
@@ -67,4 +67,38 @@ export function getBillBreakdown(hoursUsed) {
         ratePerUnit: RENTAL_CONFIG.computeRateINR,
         totalINR,
     };
+}
+
+/**
+ * Decide whether a billed rental needs a fresh emailed portal link.
+ * The link is only relevant when money is due. Missing, malformed, or
+ * expired links are rotated before a bill email is sent again.
+ */
+export function shouldRefreshRentalPaymentLink({
+    billAmountINR,
+    paymentUrl,
+    expiresAt,
+    nowMs = Date.now(),
+}) {
+    const amount = Number(billAmountINR);
+    if (!Number.isFinite(amount) || amount <= 0) return false;
+    if (!paymentUrl) return true;
+
+    let expiresAtMs = Number.NaN;
+    if (typeof expiresAt?.toMillis === "function") {
+        expiresAtMs = Number(expiresAt.toMillis());
+    } else if (typeof expiresAt?.getTime === "function") {
+        expiresAtMs = Number(expiresAt.getTime());
+    } else if (typeof expiresAt === "number") {
+        expiresAtMs = expiresAt;
+    } else if (typeof expiresAt === "string") {
+        expiresAtMs = Date.parse(expiresAt);
+    }
+
+    const comparisonNow = Number(nowMs);
+    return (
+        !Number.isFinite(expiresAtMs) ||
+        !Number.isFinite(comparisonNow) ||
+        expiresAtMs <= comparisonNow
+    );
 }

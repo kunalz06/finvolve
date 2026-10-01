@@ -108,7 +108,7 @@ export function renderRentalActivatedHtml({ name, rentalId, days, expiresAt }) {
               </tr>
               <tr>
                 <td style="padding:11px 18px;color:#5e6773;font-weight:600;">Usage Billing</td>
-                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">&#8377;${RENTAL_CONFIG.computeRateINR} per ${RENTAL_CONFIG.computeHoursPerUnit} hours</td>
+                <td style="padding:11px 18px;text-align:right;font-weight:700;color:#101820;">&#8377;${RENTAL_CONFIG.hourlyRateINR} / hour &middot; actual usage</td>
               </tr>
             </table>
           </td></tr>
@@ -120,7 +120,7 @@ export function renderRentalActivatedHtml({ name, rentalId, days, expiresAt }) {
             <p style="margin:0 0 8px;font-size:12px;font-weight:800;color:#101820;text-transform:uppercase;letter-spacing:0.06em;">How Billing Works</p>
             <table cellpadding="0" cellspacing="0" style="font-size:13px;line-height:1.8;color:#5e6773;">
               <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">1.</td><td style="padding:2px 0 2px 8px;">After your ${safeDays}-day period ends, your actual compute usage is calculated.</td></tr>
-              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">2.</td><td style="padding:2px 0 2px 8px;">The base rate is <strong>&#8377;${RENTAL_CONFIG.computeRateINR} for ${RENTAL_CONFIG.computeHoursPerUnit} hours</strong>, billed proportionally at <strong>&#8377;${RENTAL_CONFIG.hourlyRateINR}/hour</strong>.</td></tr>
+              <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">2.</td><td style="padding:2px 0 2px 8px;">Usage is billed from the <strong>actual recorded compute time</strong> at <strong>&#8377;${RENTAL_CONFIG.hourlyRateINR}/hour</strong>. The &#8377;${RENTAL_CONFIG.computeRateINR}/${RENTAL_CONFIG.computeHoursPerUnit}-hour figure is a reference rate, not a minimum or billing slab.</td></tr>
               <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">3.</td><td style="padding:2px 0 2px 8px;">A detailed bill with a secure DEV Infinity payment portal link will be emailed to you.</td></tr>
               <tr><td style="padding:2px 0 2px 4px;vertical-align:top;">4.</td><td style="padding:2px 0 2px 8px;">You only pay for what you use &mdash; nothing more.</td></tr>
             </table>
@@ -299,7 +299,7 @@ export async function sendRentalActivatedEmail({ to, name, rentalId, days, expir
     return sendNewsletterMail({
         to,
         subject: `Your DEV Infinity Cloud rental is now active (${days} days)`,
-        text: `Hi ${name},\n\nYour ${days}-day cloud compute rental is now active (ID: ${rentalId}).\n\nAccess expires at: ${expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "N/A"}.\n\nUpfront fee: INR ${RENTAL_CONFIG.upfrontFeeINR}\nUsage billing: INR ${RENTAL_CONFIG.computeRateINR} per ${RENTAL_CONFIG.computeHoursPerUnit} hours, prorated at INR ${RENTAL_CONFIG.hourlyRateINR} per hour.\n\nYou will receive a detailed usage bill with a DEV Infinity payment portal link after your rental period ends.`,
+        text: `Hi ${name},\n\nYour ${days}-day cloud compute rental is now active (ID: ${rentalId}).\n\nAccess expires at: ${expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "N/A"}.\n\nUpfront fee: INR ${RENTAL_CONFIG.upfrontFeeINR}\nUsage billing: INR ${RENTAL_CONFIG.hourlyRateINR} per actual compute hour. INR ${RENTAL_CONFIG.computeRateINR} per ${RENTAL_CONFIG.computeHoursPerUnit} hours is a reference rate only; usage is not rounded up to a 20-hour block.\n\nYou will receive a detailed usage bill with a DEV Infinity payment portal link after your rental period ends.`,
         html: renderRentalActivatedHtml({ name, rentalId, days, expiresAt }),
     });
 }
@@ -312,7 +312,7 @@ export async function sendRentalBillEmail({ to, name, rentalId, days, hoursUsed,
     return sendNewsletterMail({
         to,
         subject: `Your DEV Infinity Cloud usage bill \u2014 \u20B9${bd.totalINR.toLocaleString("en-IN")}`,
-        text: `Hi ${name},\n\nYour ${days}-day cloud rental (ID: ${rentalId}) has ended.\n\nCompute hours used: ${bd.hoursUsed}\nBase rate: INR ${bd.baseRateINR ?? RENTAL_CONFIG.computeRateINR} per ${bd.baseHours ?? RENTAL_CONFIG.computeHoursPerUnit} hours\nProrated rate: INR ${bd.hourlyRateINR ?? RENTAL_CONFIG.hourlyRateINR} per hour\nTotal due: INR ${bd.totalINR.toLocaleString("en-IN", { maximumFractionDigits: 2 })}\n\nPay securely here: ${paymentUrl}`,
+        text: `Hi ${name},\n\nYour ${days}-day cloud rental (ID: ${rentalId}) has ended.\n\nCompute hours used: ${bd.hoursUsed}\nReference rate: INR ${bd.baseRateINR ?? RENTAL_CONFIG.computeRateINR} per ${bd.baseHours ?? RENTAL_CONFIG.computeHoursPerUnit} hours (not a billing slab)\nActual usage rate: INR ${bd.hourlyRateINR ?? RENTAL_CONFIG.hourlyRateINR} per hour\nTotal due: INR ${bd.totalINR.toLocaleString("en-IN", { maximumFractionDigits: 2 })}\n\nPay securely here: ${paymentUrl}`,
         html: renderRentalBillHtml({ name, rentalId, days, hoursUsed, billBreakdown: bd, paymentUrl }),
     });
 }

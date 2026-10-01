@@ -10,7 +10,11 @@ import {
     getRazorpayServerCredentials,
     hashToken,
 } from "@/lib/server/payments";
-import { calculateRentalBill, getBillBreakdown } from "@/lib/server/rental-plans";
+import {
+    calculateRentalBill,
+    getBillBreakdown,
+    shouldRefreshRentalPaymentLink,
+} from "@/lib/server/rental-plans";
 import { sendRentalBillEmail } from "@/lib/server/rental-emails";
 import { checkRateLimit, getRequestIp } from "@/lib/server/rate-limit";
 import { getCanonicalSiteUrl } from "@/lib/server/site-url";
@@ -225,13 +229,42 @@ export async function POST(request) {
 
             const storedHours = Number(rental.hoursUsed || 0);
             const billBreakdown = rental.billBreakdown || getBillBreakdown(storedHours);
+            const billAmount = Number(rental.billAmountINR ?? billBreakdown.totalINR ?? 0);
+            let paymentUrl = rental.billPaymentLink || null;
+
+            if (
+                rental.status === "billed" &&
+                shouldRefreshRentalPaymentLink({
+                    billAmountINR: billAmount,
+                    paymentUrl,
+                    expiresAt: rental.billPaymentPortalExpiresAt,
+                })
+            ) {
+                const portal = await createRentalPortalPayment({
+                    request,
+                    db,
+                    rental,
+                    rentalId,
+                    amount: billAmount,
+                    hoursUsed: storedHours,
+                });
+
+                paymentUrl = portal.paymentUrl;
+                await rentalRef.update({
+                    billPaymentLink: paymentUrl,
+                    billPaymentRequestId: portal.paymentRequestId,
+                    billPaymentPortalExpiresAt: Timestamp.fromDate(portal.expiresAt),
+                    updatedAt: FieldValue.serverTimestamp(),
+                });
+            }
+
             const delivery = await sendAndTrackBillEmail({
                 rentalRef,
                 rental,
                 rentalId,
                 hoursUsed: storedHours,
                 billBreakdown,
-                paymentUrl: rental.billPaymentLink || null,
+                paymentUrl,
             });
 
             if (!delivery.emailSent) {
@@ -252,6 +285,7 @@ export async function POST(request) {
                 action,
                 emailSent: true,
                 emailMessageId: delivery.emailMessageId,
+                paymentUrl,
             });
         }
 
