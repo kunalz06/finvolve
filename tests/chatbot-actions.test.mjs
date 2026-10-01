@@ -53,6 +53,10 @@ test("navigation prefers the most specific matching destination", () => {
 test("cloud subscription requests route to the exact dashboard help area", () => {
   const { detectSubscriptionHelpCommand } = loadChatActions();
 
+  const manage = detectSubscriptionHelpCommand("manage my subscription");
+  assert.equal(manage.mode, "manage");
+  assert.equal(manage.href, "/dev/cloud/dashboard#manage-subscription");
+
   const pause = detectSubscriptionHelpCommand("pause my subscription");
   assert.equal(pause.mode, "pause");
   assert.equal(pause.href, "/dev/cloud/dashboard#manage-subscription");
