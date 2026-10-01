@@ -1,135 +1,306 @@
-"use client";
+import {
+  ChevronLeft,
+  Cloud,
+  CreditCard,
+  FileText,
+  Mail,
+  Scale,
+  ShieldCheck,
+} from "lucide-react";
+import Link from "next/link";
+import { SUPPORT_EMAIL, SUPPORT_EMAIL_HREF } from "@/lib/site-contact";
 
-import { AnimatedDiv } from "@/components/ui/Animated";
-import { FileText, ChevronLeft } from 'lucide-react';
-import Link from 'next/link';
-import Card from '@/components/ui/Card';
+const sections = [
+  { id: "introduction", label: "Introduction" },
+  { id: "services", label: "Services" },
+  { id: "payments", label: "Quick Start & Payments" },
+  { id: "subscriptions", label: "Cloud Subscriptions" },
+  { id: "rent-services", label: "Cloud Rent Services" },
+  { id: "intellectual-property", label: "Intellectual Property" },
+  { id: "liability", label: "Liability" },
+  { id: "contact", label: "Contact" },
+];
 
-export default function Terms() {
+function TermsSection({ id, title, icon: Icon, children }) {
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="container max-w-4xl">
-        <Link 
-          href="/dev"
-          className="inline-flex items-center text-slate-500 hover:text-primary mb-8 transition-colors text-sm font-medium"
-        >
-          <ChevronLeft size={16} className="mr-1" />
-          Back to Home
-        </Link>
-
-        <AnimatedDiv
-          initial={false}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          <Card hover={false} className="p-8 md:p-12">
-            <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-200">
-              <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center">
-                <FileText className="text-primary" size={28} />
-              </div>
-              <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-slate-950">Terms of Service</h1>
-                <p className="text-slate-500 text-sm mt-1">Last updated: {new Date().toLocaleDateString()}</p>
-              </div>
-            </div>
-
-            <div className="space-y-10 text-slate-600 leading-relaxed">
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">1. Introduction</h2>
-                <p>
-                  Welcome to DEV♾️. By accessing our website and using our services, you agree to be bound by these Terms and Conditions.
-                  These terms apply to all visitors, users, and others who access or use the Service.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">2. Services</h2>
-                <p className="mb-4">
-                  DEV♾️ provides software development services, including but not limited to web development, mobile app development,
-                  and custom software solutions. We are dedicated to delivering high-quality, scalable, and secure digital products.
-                </p>
-                <p className="mb-4">
-                  DEV♾️ also operates DEV Infinity Cloud, a platform that provides access to compute engine resources and AI model APIs (including ChatGPT, Google Gemini, and Claude models). Cloud services are available through both subscription plans and pay-per-use rentals, subject to plan-specific usage limits, availability, and the additional terms in Sections 3A and 3B below.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">3. Quick Start & Payments</h2>
-                <div className="bg-amber-50 border border-amber-200 p-6 mb-4 rounded-xl">
-                  <p className="text-amber-800 mb-2">
-                    The &quot;Quick Start&quot; option is a paid service for expedited project initiation.
-                    Payments made for this service are non-refundable once the consultation or development process has commenced.
-                  </p>
-                  <p className="font-semibold text-amber-700 text-sm">
-                    Refund Policy: No refunds after payment.
-                  </p>
-                </div>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">3A. Cloud Subscription Terms</h2>
-                <div className="bg-blue-50 border border-blue-200 p-6 mb-4 rounded-xl">
-                  <p className="text-blue-800 mb-2">
-                    DEV Infinity Cloud subscriptions are billed via Razorpay and run for a 12-month cycle. The Starter plan is billed every 15 days, while Pro and Enterprise plans are billed monthly. By subscribing, you agree to the following terms:
-                  </p>
-                  <ul className="list-disc pl-6 mt-3 space-y-2 text-blue-900">
-                    <li><strong>Usage Limits:</strong> Each plan has defined limits for compute engine hours and AI model API access. Usage resets at the start of each billing cycle. Exceeding limits may result in restricted access until the next cycle.</li>
-                    <li><strong>Billing:</strong> Subscription fees (every 15 days for Starter, monthly for Pro and Enterprise) and the one-time setup fee are non-refundable. Your payment method will be charged automatically at each billing cycle until the subscription is cancelled or completed (12 cycles).</li>
-                    <li><strong>Plan Changes:</strong> Tier upgrades or downgrades take effect at the start of the next billing cycle. Your current plan benefits continue until then. The new monthly rate applies from the next charge date.</li>
-                    <li><strong>Pause & Resume:</strong> You may pause your subscription, which freezes billing and usage. Resuming reactivates your subscription. Paused time counts toward the 12-cycle subscription duration.</li>
-                    <li><strong>Cancellation:</strong> You may cancel at any time. Your access continues until the end of the current billing period (15-day period for Starter, monthly for Pro and Enterprise). No partial-period refunds are provided.</li>
-                    <li><strong>Acceptable Use:</strong> Cloud resources must not be used for any illegal activity, cryptocurrency mining, or resale of API access. We reserve the right to suspend or terminate access for violations.</li>
-                  </ul>
-                </div>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">3B. Cloud Rent Services Terms</h2>
-                <div className="bg-emerald-50 border border-emerald-200 p-6 mb-4 rounded-xl">
-                  <p className="text-emerald-800 mb-2">
-                    DEV Infinity Cloud Rent Services allow you to rent cloud compute resources on a pay-per-use basis without committing to a subscription plan. By initiating a rental, you agree to the following terms:
-                  </p>
-                  <ul className="list-disc pl-6 mt-3 space-y-2 text-emerald-900">
-                    <li><strong>Upfront Fee:</strong> A one-time upfront fee of INR 1 is charged before your rental period begins. This fee is non-refundable once the rental is activated.</li>
-                    <li><strong>Usage Billing:</strong> Compute usage uses a base rate of INR 200 per 20 hours (INR 10 per hour) and is charged proportionally based on actual usage. For example, 5 hours costs INR 50 and 12.5 hours costs INR 125. The usage bill is generated after your rental period ends.</li>
-                    <li><strong>Payment Link:</strong> If compute usage is recorded, a detailed bill with a secure DEV Infinity payment portal link will be sent to your registered email address. A Razorpay SMS payment link may also be sent as a secondary payment option. You only need to complete the bill once.</li>
-                    <li><strong>Rental Duration:</strong> You select a rental duration (1, 3, 7, 15, or 30 days) at the time of signup. The rental expires automatically at the end of the chosen period. Only one active rental is permitted per email address at a time.</li>
-                    <li><strong>No Subscription:</strong> Rent Services do not create a recurring subscription. Each rental is a standalone, one-time engagement with separate upfront and usage payments.</li>
-                    <li><strong>Usage Tracking:</strong> Compute hours consumed during the rental period are tracked by our system. The final bill is based on actual hours used, not the maximum available during the rental period.</li>
-                    <li><strong>Acceptable Use:</strong> The same acceptable use restrictions that apply to subscriptions (Section 3A) also apply to rentals. Cloud resources must not be used for any illegal activity, cryptocurrency mining, or resale of API access.</li>
-                  </ul>
-                </div>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">4. Intellectual Property</h2>
-                <p>
-                  Unless otherwise agreed upon in writing, all intellectual property rights for the software developed will be
-                  transferred to the client upon full payment. DEV♾️ retains the right to showcase the work in our portfolio
-                  unless a non-disclosure agreement (NDA) is signed.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">5. Limitation of Liability</h2>
-                <p>
-                  DEV♾️ shall not be liable for any indirect, incidental, special, consequential, or punitive damages,
-                  including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from
-                  your use of our services.
-                </p>
-              </section>
-
-              <section>
-                <h2 className="text-lg font-bold text-slate-950 mb-4">6. Contact Us</h2>
-                <p>
-                  If you have any questions about these Terms, please contact us at <a href="mailto:mitraricky06@gmail.com" className="text-primary hover:underline">mitraricky06@gmail.com</a>.
-                </p>
-              </section>
-            </div>
-          </Card>
-        </AnimatedDiv>
+    <section id={id} className="scroll-mt-28 border-t border-[var(--border-soft)] pt-8 first:border-0 first:pt-0">
+      <div className="mb-4 flex items-start gap-3">
+        <span className="glass-icon-plate flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+          <Icon size={19} className="text-primary" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="font-code-brand text-xs font-bold uppercase tracking-[0.14em] text-[var(--muted)]">
+            Terms
+          </p>
+          <h2 className="mt-1 text-xl font-black tracking-[-0.025em] text-[var(--heading)] sm:text-2xl">
+            {title}
+          </h2>
+        </div>
       </div>
+      <div className="space-y-4 text-[var(--foreground)]">{children}</div>
+    </section>
+  );
+}
+
+function PolicyPanel({ children }) {
+  return (
+    <div className="rounded-2xl border border-[var(--border)] bg-[var(--surface-muted)] p-5 sm:p-6">
+      {children}
     </div>
   );
 }
 
+export default function Terms() {
+  return (
+    <div className="min-h-screen px-4 py-8 sm:px-6 sm:py-12">
+      <div className="container mx-auto max-w-6xl">
+        <Link
+          href="/dev"
+          className="mb-6 inline-flex min-h-11 items-center gap-1.5 rounded-lg px-2 text-sm font-semibold text-[var(--muted)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--heading)] sm:mb-8"
+        >
+          <ChevronLeft size={17} aria-hidden="true" />
+          Back to Home
+        </Link>
+
+        <div className="grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)] lg:items-start">
+          <aside className="lg:sticky lg:top-28">
+            <nav
+              aria-label="Terms sections"
+              className="glass-surface-strong rounded-2xl border border-[var(--border-soft)] p-3 shadow-[var(--shadow-soft)]"
+            >
+              <p className="px-3 pb-2 pt-1 text-xs font-black uppercase tracking-[0.14em] text-[var(--muted)]">
+                On this page
+              </p>
+              <div className="grid grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-1">
+                {sections.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    className="rounded-lg px-3 py-2.5 text-sm font-semibold leading-5 text-[var(--foreground)] transition-colors hover:bg-[var(--surface-muted)] hover:text-[var(--heading)] focus-visible:bg-[var(--surface-muted)]"
+                  >
+                    {section.label}
+                  </a>
+                ))}
+              </div>
+            </nav>
+          </aside>
+
+          <main className="glass-surface-strong overflow-hidden rounded-[24px] border border-[var(--border-soft)] shadow-[var(--shadow-soft)]">
+            <header className="border-b border-[var(--border-soft)] bg-[var(--surface-muted)] px-5 py-7 sm:px-8 sm:py-9 lg:px-10">
+              <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                <div className="glass-icon-plate flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl">
+                  <FileText className="text-primary" size={27} aria-hidden="true" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-code-brand text-xs font-black uppercase tracking-[0.16em] text-primary">
+                    Legal
+                  </p>
+                  <h1 className="mt-1 text-3xl font-black tracking-[-0.04em] text-[var(--heading)] sm:text-4xl">
+                    Terms of Service
+                  </h1>
+                  <p className="mt-2 text-sm text-[var(--muted)]">
+                    Last updated: October 1, 2026
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-4 text-sm leading-6 text-[var(--foreground)]">
+                <strong className="text-[var(--heading)]">Rental billing at a glance:</strong>{" "}
+                Cloud Rent is billed from actual recorded compute usage at ₹10 per hour. The
+                ₹200 / 20-hour figure is a reference rate only, not a minimum charge or billing
+                block.
+              </div>
+            </header>
+
+            <div className="space-y-10 px-5 py-8 sm:px-8 sm:py-10 lg:px-10">
+              <TermsSection id="introduction" title="1. Introduction" icon={Scale}>
+                <p className="leading-7">
+                  Welcome to DEV Infinity. By accessing our website or using our services, you
+                  agree to these Terms and Conditions. These terms apply to visitors, users,
+                  customers, and others who access or use the Service.
+                </p>
+              </TermsSection>
+
+              <TermsSection id="services" title="2. Services" icon={ShieldCheck}>
+                <p className="leading-7">
+                  DEV Infinity provides software development services, including web development,
+                  mobile application development, and custom software solutions.
+                </p>
+                <p className="leading-7">
+                  DEV Infinity Cloud provides compute resources and AI model APIs. Cloud services
+                  are available through subscription plans and pay-per-use rentals, subject to
+                  availability, plan-specific limits, and the additional terms below.
+                </p>
+              </TermsSection>
+
+              <TermsSection id="payments" title="3. Quick Start & Payments" icon={CreditCard}>
+                <PolicyPanel>
+                  <p className="leading-7">
+                    The <strong className="text-[var(--heading)]">Quick Start</strong> option is a
+                    paid service for expedited project initiation. Payments are non-refundable
+                    once the consultation or development process has commenced.
+                  </p>
+                  <p className="mt-3 text-sm font-bold text-[var(--heading)]">
+                    Refund policy: no refund after the paid service has commenced.
+                  </p>
+                </PolicyPanel>
+              </TermsSection>
+
+              <TermsSection id="subscriptions" title="3A. Cloud Subscription Terms" icon={Cloud}>
+                <PolicyPanel>
+                  <p className="leading-7">
+                    DEV Infinity Cloud subscriptions are billed through the supported payment
+                    provider and run for the stated plan cycle. Starter is billed every 15 days;
+                    Pro and Enterprise are billed monthly.
+                  </p>
+                  <ul className="mt-4 list-disc space-y-3 pl-5 leading-7 marker:text-primary">
+                    <li>
+                      <strong className="text-[var(--heading)]">Usage limits:</strong> Each plan
+                      has defined compute-hour and AI model API limits. Usage resets according to
+                      the plan billing cycle.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Billing:</strong> Recurring plan
+                      fees and applicable one-time setup fees are non-refundable after the service
+                      is activated.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Plan changes:</strong> Upgrades or
+                      downgrades take effect at the next billing cycle unless stated otherwise.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Pause & resume:</strong> Pausing
+                      freezes eligible billing and usage until the subscription is resumed, subject
+                      to the subscription duration rules.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Cancellation:</strong> You may
+                      cancel according to the plan controls. Access continues through the paid
+                      billing period; partial-period refunds are not provided.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Acceptable use:</strong> Cloud
+                      resources may not be used for illegal activity, cryptocurrency mining, or
+                      resale of API access.
+                    </li>
+                  </ul>
+                </PolicyPanel>
+              </TermsSection>
+
+              <TermsSection id="rent-services" title="3B. Cloud Rent Services Terms" icon={Cloud}>
+                <PolicyPanel>
+                  <p className="leading-7">
+                    Cloud Rent provides short-term compute on a pay-per-use basis without creating
+                    a recurring subscription.
+                  </p>
+
+                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                        Actual rate
+                      </p>
+                      <p className="mt-2 text-lg font-black text-[var(--heading)]">₹10 / hour</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">Based on recorded usage</p>
+                    </div>
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                        Reference rate
+                      </p>
+                      <p className="mt-2 text-lg font-black text-[var(--heading)]">₹200 / 20 hours</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">Not a minimum or billing block</p>
+                    </div>
+                    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-4">
+                      <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                        Currency precision
+                      </p>
+                      <p className="mt-2 text-lg font-black text-[var(--heading)]">Nearest paisa</p>
+                      <p className="mt-1 text-sm text-[var(--muted)]">Only the final amount is rounded</p>
+                    </div>
+                  </div>
+
+                  <ul className="mt-5 list-disc space-y-3 pl-5 leading-7 marker:text-primary">
+                    <li>
+                      <strong className="text-[var(--heading)]">Upfront fee:</strong> A one-time
+                      ₹1 fee is charged before the rental begins and is non-refundable after
+                      activation.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Actual-usage billing:</strong>{" "}
+                      Your bill equals actual recorded compute hours × ₹10/hour. The 20-hour
+                      reference is not a minimum and is not a billing block. Usage is not rounded
+                      up to 20 hours, a full hour, or a half-hour increment. Only the resulting INR
+                      total is rounded to the nearest paisa.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Examples:</strong> 1.25 hours costs
+                      ₹12.50, 5 hours costs ₹50, and 12.5 hours costs ₹125.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Usage bill:</strong> The usage bill
+                      is generated after the rental period based on the recorded compute time.
+                      Zero recorded usage produces no additional usage charge.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Payment link:</strong> When an
+                      amount is due, a detailed bill with a secure DEV Infinity payment portal link
+                      is sent to your registered email. The portal link normally expires after 72
+                      hours. If an unpaid link is missing or has expired, a fresh link may be issued
+                      for the same outstanding bill. A Razorpay SMS link may also be sent as a
+                      secondary payment option; the bill only needs to be paid once.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Rental duration:</strong> Available
+                      rental periods are 1, 3, 7, 15, or 30 days. A rental expires automatically at
+                      the end of the selected duration, and only one active rental is permitted per
+                      email address at a time.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">No subscription:</strong> Each
+                      rental is a standalone engagement with separate activation and usage billing.
+                    </li>
+                    <li>
+                      <strong className="text-[var(--heading)]">Acceptable use:</strong> The same
+                      acceptable-use restrictions that apply to Cloud subscriptions also apply to
+                      rentals.
+                    </li>
+                  </ul>
+                </PolicyPanel>
+              </TermsSection>
+
+              <TermsSection id="intellectual-property" title="4. Intellectual Property" icon={FileText}>
+                <p className="leading-7">
+                  Unless otherwise agreed in writing, intellectual property rights for custom
+                  software developed for a client are transferred upon full payment. DEV Infinity
+                  may showcase completed work in its portfolio unless a non-disclosure agreement or
+                  other written restriction applies.
+                </p>
+              </TermsSection>
+
+              <TermsSection id="liability" title="5. Limitation of Liability" icon={ShieldCheck}>
+                <p className="leading-7">
+                  To the extent permitted by applicable law, DEV Infinity is not liable for
+                  indirect, incidental, special, consequential, or punitive damages, including
+                  loss of profits, data, use, goodwill, or other intangible losses arising from
+                  use of the services.
+                </p>
+              </TermsSection>
+
+              <TermsSection id="contact" title="6. Contact Us" icon={Mail}>
+                <p className="leading-7">
+                  Questions about these Terms can be sent to{" "}
+                  <a
+                    href={SUPPORT_EMAIL_HREF}
+                    className="font-bold text-primary underline decoration-current/40 underline-offset-4 hover:decoration-current"
+                  >
+                    {SUPPORT_EMAIL}
+                  </a>
+                  .
+                </p>
+              </TermsSection>
+            </div>
+          </main>
+        </div>
+      </div>
+    </div>
+  );
+}
