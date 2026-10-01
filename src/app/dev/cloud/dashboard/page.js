@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     AlertCircle,
@@ -47,6 +47,16 @@ export default function DashboardPage() {
     const [actionLoading, setActionLoading] = useState(null);
     const [actionMessage, setActionMessage] = useState(null);
     const [showTierModal, setShowTierModal] = useState(false);
+
+    useEffect(() => {
+        if (!subscription) return;
+
+        const targetId = window.location.hash.slice(1);
+        if (!["usage", "manage-subscription"].includes(targetId)) return;
+
+        const target = document.getElementById(targetId);
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [subscription]);
 
     const handleLookup = async (e) => {
         e.preventDefault();
@@ -269,7 +279,7 @@ export default function DashboardPage() {
                                 </Card>
 
                                 {/* Compute Usage */}
-                                <Card hover={false} className="glass-surface-strong">
+                                <Card id="usage" hover={false} className="scroll-mt-24 glass-surface-strong">
                                     <h3 className="mb-6 flex items-center gap-2 text-lg font-bold text-slate-950">
                                         <Cpu size={20} className="text-primary" /> Compute Usage
                                     </h3>
@@ -343,7 +353,7 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Actions */}
-                            <Card hover={false} className="glass-surface-strong">
+                            <Card id="manage-subscription" hover={false} className="scroll-mt-24 glass-surface-strong">
                                 <h3 className="mb-6 text-lg font-bold text-slate-950">Manage Subscription</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {(isActive || isPaused) && (

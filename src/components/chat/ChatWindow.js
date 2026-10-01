@@ -20,8 +20,8 @@ import BrandMark from "@/components/BrandMark";
 
 const WELCOME = {
   role: "bot",
-  text: "Hi, I’m the DEV Infinity assistant. I can answer questions, remember project details during the conversation, open pages for you, send a message to the team, or prepare and submit a project request after you confirm it.",
-  quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Send a Message"],
+  text: "What do you want to do? I can jump to the right section, submit a project brief or team message after your confirmation, and guide Cloud plan, usage, pause, resume, cancellation, or plan-change tasks.",
+  quickReplies: ["Manage my subscription", "Compare Cloud plans", "Submit a project brief", "Message the team"],
 };
 
 const SESSION_RESTORE_HOURS = 24;
@@ -142,11 +142,19 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
     if (isSamePage && url.hash) {
       const element = document.getElementById(url.hash.slice(1));
-      if (element) element.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (element) {
+        window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
+        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+    }
+
+    if (isSamePage && !url.hash) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
 
-    window.location.href = link;
+    window.location.assign(`${url.pathname}${url.search}${url.hash}`);
   }, []);
 
   const addBotResponse = useCallback(
@@ -223,8 +231,8 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
       setActiveReplies(
         completedAction.type === "project_request"
-          ? ["Our Services", "Cloud Plans", "Contact Us"]
-          : ["Our Services", "Start a Project", "Cloud Plans"],
+          ? ["Manage my subscription", "Compare Cloud plans", "Message the team"]
+          : ["Submit a project brief", "Compare Cloud plans", "Manage my subscription"],
       );
     } catch (err) {
       setActionStatus("error");
@@ -243,7 +251,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
       text: "Cancelled. I didn’t perform that action.",
       timestamp: Date.now(),
     });
-    setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
+    setActiveReplies(["Manage my subscription", "Compare Cloud plans", "Message the team"]);
   }, [pendingAction, actionStatus, engine, appendBotMessage]);
 
   const handleSend = useCallback(
@@ -287,8 +295,8 @@ export default function ChatWindow({ onClose, onMinimize }) {
       } catch (err) {
         console.warn("Message processing error:", err);
         addBotResponse({
-          text: "I couldn’t process that reliably. Try rephrasing your instruction, or contact the team directly.",
-          quickReplies: ["Our Services", "Contact Us"],
+          text: "I couldn’t map that request to a safe action. Try a direct instruction such as “open Cloud plans”, “pause my subscription”, “submit a project brief”, or “message the team”.",
+          quickReplies: ["Manage my subscription", "Submit a project brief", "Message the team"],
         });
       }
     },
@@ -307,7 +315,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
   );
 
   const handleQuickReply = useCallback(
-    (label) => {
+    async (label) => {
       if (!engine || !initialized || restoring || isTyping || actionStatus === "running") return;
 
       const userMsg = { role: "user", text: label, timestamp: Date.now() };
@@ -319,13 +327,13 @@ export default function ChatWindow({ onClose, onMinimize }) {
       setActiveReplies([]);
 
       try {
-        const response = engine.handleQuickReply(label);
+        const response = await engine.handleQuickReply(label);
         addBotResponse(response);
       } catch (err) {
         console.warn("Quick reply error:", err);
         addBotResponse({
-          text: "I couldn’t open that option. Try another suggestion or type your request below.",
-          quickReplies: ["Our Services", "Contact Us"],
+          text: "That shortcut didn’t resolve. Type the destination or action you want, such as “Cloud usage” or “submit a project brief”.",
+          quickReplies: ["Check my usage", "Submit a project brief", "Message the team"],
         });
       }
     },
@@ -364,10 +372,10 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
   const cancelFlow = () => {
     engine?.cancelFlow?.();
-    setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
+    setActiveReplies(["Manage my subscription", "Submit a project brief", "Message the team"]);
     appendBotMessage({
       role: "bot",
-      text: "No problem. I stopped that guided flow. I’ll keep the useful details you already shared in this conversation.",
+      text: "Stopped this request flow. The details you already provided stay available in this conversation if you continue later.",
       timestamp: Date.now(),
     });
   };
@@ -380,10 +388,10 @@ export default function ChatWindow({ onClose, onMinimize }) {
         <div className="chat-header-left">
           <BrandMark size="small" />
           <div>
-            <div className="chat-header-name">DEV Infinity Assistant</div>
+            <div className="chat-header-name">DEV∞ Assistant</div>
             <div className="chat-header-status">
               <span className="chat-status-dot" aria-hidden="true" />
-              {initialized ? "Context-aware · actions enabled" : "Starting assistant…"}
+              {initialized ? "Navigate · submit · Cloud account help" : "Loading actions…"}
             </div>
           </div>
         </div>
@@ -426,12 +434,12 @@ export default function ChatWindow({ onClose, onMinimize }) {
       </header>
 
       <div className="chat-messages" aria-live="polite" aria-busy={isTyping || restoring || actionStatus === "running"}>
-        {restoring && <TypingIndicator label="Restoring conversation" />}
+        {restoring && <TypingIndicator label="Restoring your previous request context" />}
         {!restoring &&
           messages.map((message, index) => (
             <ChatMessage key={message.timestamp || index} message={message} />
           ))}
-        {isTyping && <TypingIndicator label="DEV Infinity is replying" />}
+        {isTyping && <TypingIndicator label="Preparing the next step" />}
         <div ref={messagesEndRef} />
       </div>
 
@@ -456,7 +464,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
       <div className="chat-input-area">
         {isInFlow && !pendingAction && (
           <div className="chat-flow-bar">
-            <span>Guided input is active. You can answer naturally.</span>
+            <span>Collecting the next detail for this action.</span>
             <Button
               className="chat-cancel-flow"
               onClick={cancelFlow}
@@ -464,7 +472,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
               variant="ghost"
               size="xsmall"
             >
-              Exit flow
+              Stop
             </Button>
           </div>
         )}
@@ -478,10 +486,10 @@ export default function ChatWindow({ onClose, onMinimize }) {
             onKeyDown={handleKeyDown}
             placeholder={
               pendingAction
-                ? "Type confirm, cancel, or revise the details…"
+                ? "Confirm, cancel, or type a correction…"
                 : isInFlow
-                  ? "Type your response…"
-                  : "Ask a question or give an instruction…"
+                  ? "Add the requested detail…"
+                  : "Try “pause my subscription” or “submit a project brief”…"
             }
             disabled={isTyping || restoring || actionStatus === "running"}
             autoComplete="off"

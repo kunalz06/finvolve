@@ -127,7 +127,7 @@ export default function Contact() {
             <div className="lg:col-span-3">
               <Card hover={false} className="bg-[var(--surface-strong)]">
                 <h3 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-[var(--heading)]">Send us a message</h3>
-                <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                <form id="contact-form" onSubmit={handleSubmit} className="scroll-mt-24 space-y-4 sm:space-y-6">
                   <div className="grid gap-4 sm:gap-6 md:grid-cols-2">
                     <div>
                       <label htmlFor="name" className="mb-2 block text-sm font-medium text-[var(--foreground)]">Your Name</label>

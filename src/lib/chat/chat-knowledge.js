@@ -21,29 +21,23 @@ export const KNOWLEDGE = {
 
   greeting: {
     texts: [
-      "Hey there! I'm DEV∞, your assistant at DEV Infinity. I can help you with:\n\n• Our services & capabilities\n• Cloud plans, pricing & rentals\n• Starting a new project\n• Getting in touch with the team\n\nWhat would you like to know?",
-      "Hi! Welcome to DEV Infinity. I'm here to help you explore our services, cloud platform, or kick off a project. What interests you?",
-      "Hello! I'm DEV∞ — your guide to everything DEV Infinity. Ask me about our services, pricing, or let's get your project started!",
+      "Tell me the outcome you want. I can jump to exact sections, guide Cloud plans and account management, collect a project brief, or send a team message after you confirm the action.",
     ],
-    quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Contact Us"],
+    quickReplies: ["Manage my subscription", "Compare Cloud plans", "Submit a project brief", "Message the team"],
   },
 
   farewell: {
     texts: [
-      "Glad I could help! If you need anything else later, I'll be right here. Have a great day!",
-      "See you around! Feel free to come back anytime you have questions. Good luck with your project!",
-      "Take care! I'm always here if you need help with anything. Have an amazing day!",
+      "All set. Your current conversation context is saved for this session.",
     ],
     quickReplies: [],
   },
 
   thanks: {
     texts: [
-      "You're welcome! Anything else you'd like to know about our services or cloud platform?",
-      "Happy to help! Let me know if you have any other questions.",
-      "No problem at all! What else can I help you with?",
+      "You can continue with a concrete action whenever you're ready — manage Cloud, submit a project brief, or message the team.",
     ],
-    quickReplies: ["Cloud Plans", "Our Services", "That's all"],
+    quickReplies: ["Manage my subscription", "Submit a project brief", "Message the team"],
   },
 
   // ── Services ───────────────────────────────────────────────────
@@ -654,17 +648,20 @@ export const QUICK_REPLY_ROUTES = {
   "View Plans": { intent: "cloud_plans" },
   "Compare All Plans": { intent: "cloud_compare" },
   "Compare Plans": { intent: "cloud_compare" },
-  "Subscribe Now": { link: "/dev/cloud" },
-  "Contact Sales": { link: "/dev/contact" },
-  "Contact Support": { link: "/dev/contact" },
-  "Contact Us": { link: "/dev/contact" },
-  "Contact Page": { link: "/dev/contact" },
-  "Contact": { link: "/dev/contact" },
+  "Subscribe Now": { link: "/dev/cloud#plans" },
+  "Contact Sales": { link: "/dev/contact#contact-form" },
+  "Contact Support": { link: "/dev/contact#contact-form" },
+  "Contact Us": { link: "/dev/contact#contact-form" },
+  "Contact Page": { link: "/dev/contact#contact-form" },
+  "Contact": { link: "/dev/contact#contact-form" },
   "Start a Project": { intent: "project_request" },
   "Start Quick Start": { link: "/dev/quick-start" },
-  "Get a Quote": { link: "/dev/request" },
+  "Get a Quote": { link: "/dev/request#project-wizard" },
   "Send a Message": { action: "start_message_flow" },
-  "Cloud Dashboard": { link: "/dev/cloud/dashboard" },
+  "Message the team": { action: "start_message_flow" },
+  "Submit a project brief": { action: "start_project_flow" },
+  "Cloud Rent": { intent: "cloud_rental" },
+  "Cloud Dashboard": { link: "/dev/cloud/dashboard#manage-subscription" },
   "Read Full Terms": { link: "/dev/terms" },
   "Privacy Policy": { link: "/dev/privacy-policy" },
   "Read Privacy Policy": { link: "/dev/privacy-policy" },
@@ -718,16 +715,16 @@ export const QUICK_REPLY_ROUTES = {
 
 export const FALLBACK_RESPONSES = [
   {
-    texts: ["I'm not sure I understood that. Here are some things I can help with:"],
-    quickReplies: ["Our Services", "Cloud Plans", "Start a Project", "Contact Us"],
+    texts: ["I couldn’t map that to a page or safe action. Tell me the result you want — for example, **check Cloud usage**, **change my plan**, **submit a project brief**, or **message the team**."],
+    quickReplies: ["Check my usage", "Manage my subscription", "Submit a project brief", "Message the team"],
   },
   {
-    texts: ["I didn't quite catch that. Could you rephrase it? Or pick a topic:"],
-    quickReplies: ["Cloud Pricing", "Our Portfolio", "Send a Message"],
+    texts: ["I still don’t have enough context to act. Name the destination or task directly and I’ll route it without guessing."],
+    quickReplies: ["Compare Cloud plans", "Cloud Rent", "Message the team"],
   },
   {
-    texts: ["Hmm, that's outside my current knowledge. But I can connect you with the team!"],
-    quickReplies: ["Talk to Human", "Contact Us", "Cloud Plans"],
+    texts: ["For account-specific or unusual requests, I can take you to the Cloud dashboard or send a message to the DEV Infinity team."],
+    quickReplies: ["Manage my subscription", "Message the team"],
   },
 ];
 
