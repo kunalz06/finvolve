@@ -150,8 +150,8 @@ export default function Terms() {
                 <PolicyPanel>
                   <p className="leading-7">
                     DEV Infinity Cloud subscriptions are billed through the supported payment
-                    provider and run for the stated plan cycle. Starter is billed every 15 days;
-                    Pro and Enterprise are billed monthly.
+                    provider for up to 12 billing cycles. Starter is billed every 15 days; Pro and
+                    Enterprise are billed monthly.
                   </p>
                   <ul className="mt-4 list-disc space-y-3 pl-5 leading-7 marker:text-primary">
                     <li>
@@ -162,7 +162,8 @@ export default function Terms() {
                     <li>
                       <strong className="text-[var(--heading)]">Billing:</strong> Recurring plan
                       fees and applicable one-time setup fees are non-refundable after the service
-                      is activated.
+                      is activated. Billing continues each cycle until cancellation or completion
+                      of the 12 billing cycles.
                     </li>
                     <li>
                       <strong className="text-[var(--heading)]">Plan changes:</strong> Upgrades or
