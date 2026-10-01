@@ -14,6 +14,7 @@ import {
 } from "./chat-knowledge";
 import {
   detectNavigationCommand,
+  detectSubscriptionHelpCommand,
   detectWriteActionCommand,
   buildContactAction,
   buildProjectAction,
@@ -110,9 +111,15 @@ function extractEntities(text) {
   const contactMessageMatch = value.match(/(?:message|note|tell (?:the )?team|send (?:this|a message)|change (?:the )?message to)\s*(?:is|:|-)?\s+(.{8,})$/i);
   if (contactMessageMatch) entities.contactMessage = contactMessageMatch[1].trim();
 
-  const descriptionSignals = /\b(build|need|want|project|platform|app|website|software|system|dashboard|automation|integrat|develop|create|description|brief)\b/i;
-  if (value.length >= 24 && descriptionSignals.test(value) && !/\b(submit|send|share|forward|deliver)\b/i.test(value)) {
-    entities.projectDescription = value;
+  const explicitDescription = value.match(/(?:project description|description|project brief|brief)\s*(?:is|:|-)?\s+(.{10,})$/i);
+  if (explicitDescription) {
+    entities.projectDescription = explicitDescription[1].trim();
+  } else {
+    const descriptionSignals = /\b(build|need|want|project|platform|app|website|software|system|dashboard|automation|integrat|develop|create)\b/i;
+    const isClearlyContactOnly = /\b(send|message|email|note)\b.*\b(team|support|sales)\b/i.test(value);
+    if (value.length >= 24 && descriptionSignals.test(value) && !isClearlyContactOnly) {
+      entities.projectDescription = value;
+    }
   }
 
   return entities;
@@ -237,12 +244,29 @@ export class ChatEngine {
       return this.handleFlowInput(trimmed);
     }
 
+    const subscriptionHelp = detectSubscriptionHelpCommand(trimmed);
+    if (subscriptionHelp) {
+      this.lastTopic = "cloud_subscription_help";
+      this.memory.lastTopic = "cloud_subscription_help";
+      this.memory.lastAction = { type: "navigate", mode: subscriptionHelp.mode, href: subscriptionHelp.href };
+      this.history.push({ role: "user", text: trimmed, intent: `cloud_subscription_${subscriptionHelp.mode}` });
+      return {
+        text: subscriptionHelp.text,
+        quickReplies: subscriptionHelp.mode === "plans"
+          ? ["Manage my subscription", "Cloud Rent"]
+          : ["Check my usage", "Compare Cloud plans"],
+        link: subscriptionHelp.href,
+        action: "navigate",
+        confidence: 1,
+      };
+    }
+
     const navigation = detectNavigationCommand(trimmed);
     if (navigation) {
       this.memory.lastAction = { type: "navigate", href: navigation.href };
       this.history.push({ role: "user", text: trimmed, intent: "navigation" });
       return {
-        text: `Opening **${navigation.label}**.`,
+        text: `Taking you to **${navigation.label}**.`,
         quickReplies: [],
         link: navigation.href,
         action: "navigate",
@@ -343,7 +367,9 @@ export class ChatEngine {
     this.flowState = FLOW_STATES.IDLE;
     this.requestedAction = null;
     return {
-      text: "I have enough information. Review the action below before I do anything.",
+      text: action.type === "project_request"
+        ? "Your project brief is ready. Check the details below, then submit it."
+        : "Your message is ready. Check the details below, then send it.",
       quickReplies: [],
       confidence: 1,
       action: "confirm_action",
@@ -401,13 +427,13 @@ export class ChatEngine {
     return this.continueProjectSubmissionFlow();
   }
 
-  handleQuickReply(label) {
+  async handleQuickReply(label) {
     const route = QUICK_REPLY_ROUTES[label];
     if (!route) return this.processMessage(label);
 
     if (route.link) {
       return {
-        text: `Opening **${label}**.`,
+        text: `Taking you to **${label}**.`,
         quickReplies: [],
         link: route.link,
         action: "navigate",
@@ -473,7 +499,7 @@ export class ChatEngine {
         return {
           text: "Opening the project request form with the details we have.",
           quickReplies: [],
-          link: "/dev/request",
+          link: "/dev/request#project-wizard",
           action: "navigate",
         };
 
