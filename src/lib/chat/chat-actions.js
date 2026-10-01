@@ -65,7 +65,7 @@ const NAV_TARGETS = [
 ];
 
 const NAV_VERBS = /\b(open|go to|take me to|navigate to|show me|visit|bring me to|view|jump to|scroll to)\b/i;
-const SEND_VERBS = /\b(send|submit|share|forward|deliver|file|create)\b/i;
+const SEND_VERBS = /\b(send|submit|share|forward|deliver|file|create|message|email)\b/i;
 const TEAM_TERMS = /\b(team|support|sales|dev infinity|developer|developers)\b/i;
 const PROJECT_TERMS = /\b(project request|project brief|project details|proposal|quote request|project inquiry)\b/i;
 
