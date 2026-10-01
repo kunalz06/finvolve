@@ -113,4 +113,8 @@ test("chat UI uses action-oriented copy instead of generic assistant filler", ()
   assert.doesNotMatch(repliesSource, />Suggested</);
   assert.match(repliesSource, /Popular actions/);
   assert.match(actionCardSource, /confirmLabel/);
+
+  const knowledgeSource = read("src/lib/chat/chat-knowledge.js");
+  assert.doesNotMatch(knowledgeSource, /What else can I help you with|Anything else you'd like to know/i);
+  assert.doesNotMatch(windowSource, /setActiveReplies\(\["Our Services", "Cloud Plans", "Contact Us"\]\)/);
 });
