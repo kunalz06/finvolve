@@ -28,20 +28,16 @@ export const KNOWLEDGE = {
 
   farewell: {
     texts: [
-      "Glad I could help! If you need anything else later, I'll be right here. Have a great day!",
-      "See you around! Feel free to come back anytime you have questions. Good luck with your project!",
-      "Take care! I'm always here if you need help with anything. Have an amazing day!",
+      "All set. Your current conversation context is saved for this session.",
     ],
     quickReplies: [],
   },
 
   thanks: {
     texts: [
-      "You're welcome! Anything else you'd like to know about our services or cloud platform?",
-      "Happy to help! Let me know if you have any other questions.",
-      "No problem at all! What else can I help you with?",
+      "You can continue with a concrete action whenever you're ready — manage Cloud, submit a project brief, or message the team.",
     ],
-    quickReplies: ["Cloud Plans", "Our Services", "That's all"],
+    quickReplies: ["Manage my subscription", "Submit a project brief", "Message the team"],
   },
 
   // ── Services ───────────────────────────────────────────────────
