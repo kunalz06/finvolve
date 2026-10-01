@@ -1,6 +1,7 @@
 import { renderEmailBrandLogo, sendNewsletterMail } from "./newsletter";
 import { getCanonicalSiteUrl } from "./site-url";
 import { SUBSCRIPTION_TIERS } from "./subscription-plans";
+import { SUPPORT_EMAIL } from "../site-contact";
 
 function escapeHtml(value) {
     return String(value || "")
@@ -102,7 +103,7 @@ function renderSubscriptionHtml({
     const siteUrl = getCanonicalSiteUrl() || "https://devsoftware.vercel.app";
     const dashboardUrl = `${siteUrl.replace(/\/$/, "")}/dev/cloud/dashboard`;
     const cloudPageUrl = `${siteUrl.replace(/\/$/, "")}/dev/cloud`;
-    const supportEmail = "mitraricky06@gmail.com";
+    const supportEmail = SUPPORT_EMAIL;
 
     const config = statusConfigByAction[action] || statusConfigByAction.activated;
     const planInfo = getPlanDetails(planName);
@@ -432,7 +433,7 @@ export async function sendSubscriptionEmail({
 
     const textBody = `Hi ${name || "Subscriber"},\n\n${
         actionTextMap[action] || `Your subscription has been updated (${action}).`
-    }\n\nPlan: ${planName}\nSubscription ID: ${subscriptionId || "N/A"}\n\nAccess your Cloud Dashboard anytime: ${dashboardUrl}\n\nSupport: mitraricky06@gmail.com\nDEV Infinity Cloud`;
+    }\n\nPlan: ${planName}\nSubscription ID: ${subscriptionId || "N/A"}\n\nAccess your Cloud Dashboard anytime: ${dashboardUrl}\n\nSupport: ${SUPPORT_EMAIL}\nDEV Infinity Cloud`;
 
     return sendNewsletterMail({
         to,
