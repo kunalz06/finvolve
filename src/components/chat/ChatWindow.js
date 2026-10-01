@@ -372,7 +372,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
 
   const cancelFlow = () => {
     engine?.cancelFlow?.();
-    setActiveReplies(["Our Services", "Cloud Plans", "Contact Us"]);
+    setActiveReplies(["Manage my subscription", "Submit a project brief", "Message the team"]);
     appendBotMessage({
       role: "bot",
       text: "Stopped this request flow. The details you already provided stay available in this conversation if you continue later.",
