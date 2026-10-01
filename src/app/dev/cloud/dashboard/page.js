@@ -269,7 +269,7 @@ export default function DashboardPage() {
                                 </Card>
 
                                 {/* Compute Usage */}
-                                <Card hover={false} className="glass-surface-strong">
+                                <Card id="usage" hover={false} className="scroll-mt-24 glass-surface-strong">
                                     <h3 className="mb-6 flex items-center gap-2 text-lg font-bold text-slate-950">
                                         <Cpu size={20} className="text-primary" /> Compute Usage
                                     </h3>
@@ -343,7 +343,7 @@ export default function DashboardPage() {
                             </div>
 
                             {/* Actions */}
-                            <Card hover={false} className="glass-surface-strong">
+                            <Card id="manage-subscription" hover={false} className="scroll-mt-24 glass-surface-strong">
                                 <h3 className="mb-6 text-lg font-bold text-slate-950">Manage Subscription</h3>
                                 <div className="flex flex-wrap gap-3">
                                     {(isActive || isPaused) && (
