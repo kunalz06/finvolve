@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { getCanonicalApiUrl, getCanonicalSiteUrl } from "@/lib/server/site-url";
+import { SUPPORT_EMAIL } from "@/lib/site-contact";
 
 export const NEWSLETTER_COLLECTION = "newsletter_subscribers";
 export const EMAIL_LOGO_URL = "https://devsoftwareai.live/dev-infinity-email-logo.svg";
@@ -8,6 +9,25 @@ export const EMAIL_LOGO_URL = "https://devsoftwareai.live/dev-infinity-email-log
 export function renderEmailBrandLogo({ width = 196, cloud = false } = {}) {
     const label = cloud ? "DEV Infinity Cloud" : "DEV Infinity";
     return `<img src="${EMAIL_LOGO_URL}" width="${width}" alt="${label}" style="display:block;width:${width}px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;" />`;
+}
+
+export function ensureEmailBrandLogo(html) {
+    if (!html) return html;
+
+    const source = String(html);
+    if (
+        source.includes(EMAIL_LOGO_URL) ||
+        source.includes("dev-infinity-email-logo.svg")
+    ) {
+        return source;
+    }
+
+    const brand = `<div style="padding:20px 24px 0;text-align:center;">${renderEmailBrandLogo()}</div>`;
+    const bodyTag = source.match(/<body\b[^>]*>/i)?.[0];
+
+    return bodyTag
+        ? source.replace(bodyTag, `${bodyTag}${brand}`)
+        : `${brand}${source}`;
 }
 
 export function normalizeNewsletterEmail(email) {
@@ -103,10 +123,10 @@ export async function sendNewsletterMail({ to, subject, text, html, unsubscribeU
     return transporter.sendMail({
         from,
         to,
-        replyTo: process.env.NEWSLETTER_REPLY_TO || process.env.NEWSLETTER_SMTP_USER,
+        replyTo: process.env.NEWSLETTER_REPLY_TO || SUPPORT_EMAIL,
         subject,
         text: textBody,
-        html,
+        html: ensureEmailBrandLogo(html),
     });
 }
 
