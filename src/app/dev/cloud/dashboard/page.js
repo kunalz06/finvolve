@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
     AlertCircle,
@@ -47,6 +47,16 @@ export default function DashboardPage() {
     const [actionLoading, setActionLoading] = useState(null);
     const [actionMessage, setActionMessage] = useState(null);
     const [showTierModal, setShowTierModal] = useState(false);
+
+    useEffect(() => {
+        if (!subscription) return;
+
+        const targetId = window.location.hash.slice(1);
+        if (!["usage", "manage-subscription"].includes(targetId)) return;
+
+        const target = document.getElementById(targetId);
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, [subscription]);
 
     const handleLookup = async (e) => {
         e.preventDefault();
