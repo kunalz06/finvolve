@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm test && next build",
     "build:netlify": "node scripts/build-netlify-frontend.mjs",
     "start": "next start",
     "lint": "eslint",
     "migrate:payments": "node scripts/scrub-payment-credentials.mjs",
-    "set-admin": "node scripts/set-admin-claim.mjs"
+    "set-admin": "node scripts/set-admin-claim.mjs",
+    "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
     "animejs": "^4.5.0",
@@ -35,4 +36,4 @@
     "postcss": "8.5.6",
     "tailwindcss": "3.4.19"
   }
-}
+}\n
