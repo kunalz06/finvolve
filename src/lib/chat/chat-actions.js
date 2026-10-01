@@ -110,6 +110,13 @@ export function detectSubscriptionHelpCommand(text) {
 
   const cases = [
     {
+      mode: "manage",
+      pattern: /\b(manage|open|view)\b.*\b(subscription|cloud account|cloud dashboard)\b|\b(subscription|cloud account)\b.*\b(manage|settings)\b/,
+      href: "/dev/cloud/dashboard#manage-subscription",
+      label: "Manage subscription",
+      text: "I’ll take you to **Manage Subscription**. Load your Cloud account there to see the actions available for its current state.",
+    },
+    {
       mode: "cancel",
       pattern: /\b(cancel|end|stop)\b.*\b(subscription|plan|cloud)\b|\b(subscription|plan)\b.*\bcancel\b/,
       href: "/dev/cloud/dashboard#manage-subscription",
