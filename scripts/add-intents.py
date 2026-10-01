@@ -80,13 +80,13 @@ NEW_INTENTS = [
     ], ["Start a Project", "Get a Quote", "Quick Start"]),
 
     ("internship", [
-        "We are always open to hearing from talented people. Here is how to connect:\n\n• **Email your resume** to mitraricky06@gmail.com\n• **Share your work** — GitHub, portfolio, or any projects you have built\n• **Mention what excites you** — Web, mobile, AI, cloud, or all of the above\n• **We look for:** Strong fundamentals, curiosity, and willingness to learn\n\nWe offer hands-on experience with real client projects, not just tutorials.",
-        "Interested in joining DEV Infinity? Here is what you should know:\n\n• We are a small, focused team that works on real products\n• You will get hands-on experience with modern tech stacks\n• Remote-friendly with flexible hours\n• Send your resume and portfolio to mitraricky06@gmail.com\n\nWe value skills and curiosity over degrees.",
+        "We are always open to hearing from talented people. Here is how to connect:\n\n• **Email your resume** to devsoftwarestudios@gmail.com\n• **Share your work** — GitHub, portfolio, or any projects you have built\n• **Mention what excites you** — Web, mobile, AI, cloud, or all of the above\n• **We look for:** Strong fundamentals, curiosity, and willingness to learn\n\nWe offer hands-on experience with real client projects, not just tutorials.",
+        "Interested in joining DEV Infinity? Here is what you should know:\n\n• We are a small, focused team that works on real products\n• You will get hands-on experience with modern tech stacks\n• Remote-friendly with flexible hours\n• Send your resume and portfolio to devsoftwarestudios@gmail.com\n\nWe value skills and curiosity over degrees.",
     ], ["Contact Us", "Start a Project", "About Us"]),
 
     ("partnerships", [
-        "We are open to partnerships and collaborations. Here is how we work with partners:\n\n• **Agency partnerships** — White-label development for design agencies\n• **Tech partnerships** — Joint solutions with complementary tech providers\n• **Referral partnerships** — Earn commissions for referring clients\n• **Open source collaboration** — Co-building tools and libraries\n\nIf you have a partnership idea, email us at mitraricky06@gmail.com.",
-        "Looking to partner with us? Here is what that could look like:\n\n• White-label development: We build, you brand and deliver\n• Referral program: Earn a commission for every referred client\n• Co-development: Joint projects where we handle the tech\n\nReach out at mitraricky06@gmail.com to discuss.",
+        "We are open to partnerships and collaborations. Here is how we work with partners:\n\n• **Agency partnerships** — White-label development for design agencies\n• **Tech partnerships** — Joint solutions with complementary tech providers\n• **Referral partnerships** — Earn commissions for referring clients\n• **Open source collaboration** — Co-building tools and libraries\n\nIf you have a partnership idea, email us at devsoftwarestudios@gmail.com.",
+        "Looking to partner with us? Here is what that could look like:\n\n• White-label development: We build, you brand and deliver\n• Referral program: Earn a commission for every referred client\n• Co-development: Joint projects where we handle the tech\n\nReach out at devsoftwarestudios@gmail.com to discuss.",
     ], ["Contact Us", "Start a Project", "About Us"]),
 
     ("open_source", [
@@ -109,7 +109,7 @@ NEW_INTENTS = [
 
     ("nda", [
         "We take confidentiality seriously:\n\n• **NDA available** — We can sign an NDA before project discussions begin\n• **Secure communication** — All project details shared via secure channels\n• **No portfolio sharing** — We do not share your project details publicly without permission\n• **Data protection** — All project files and credentials are handled securely\n\nJust ask and we will send over our standard NDA for review.",
-        "NDA and IP protection is standard practice for us:\n\n• We sign NDAs before diving into project details\n• Your intellectual property remains yours throughout and after the project\n• We do not share or publish your project without explicit permission\n• All communications and files are kept confidential\n\nRequest an NDA via email at mitraricky06@gmail.com.",
+        "NDA and IP protection is standard practice for us:\n\n• We sign NDAs before diving into project details\n• Your intellectual property remains yours throughout and after the project\n• We do not share or publish your project without explicit permission\n• All communications and files are kept confidential\n\nRequest an NDA via email at devsoftwarestudios@gmail.com.",
     ], ["Start a Project", "Contact Us", "Our Process"]),
 
     ("gdpr_compliance", [
