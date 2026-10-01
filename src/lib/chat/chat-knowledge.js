@@ -168,7 +168,7 @@ export const KNOWLEDGE = {
 
   location_office: {
     texts: [
-      "DEV Infinity operates as a distributed team, which keeps our costs low and our talent global.\n\n• **Reach us anytime** via email or phone\n• **Email:** mitraricky06@gmail.com\n• **Phone:** +91 99079 58859\n• **Response time:** within 24 hours\n\nWe serve clients across India and internationally.",
+      "DEV Infinity operates as a distributed team, which keeps our costs low and our talent global.\n\n• **Reach us anytime** via email or phone\n• **Email:** devsoftwarestudios@gmail.com\n• **Phone:** +91 99079 58859\n• **Response time:** within 24 hours\n\nWe serve clients across India and internationally.",
     ],
     quickReplies: ["Contact Us", "Start a Project", "Our Services"],
   },
@@ -325,7 +325,7 @@ export const KNOWLEDGE = {
 
   contact: {
     texts: [
-      "I can help you reach the team right here! I can collect your message and make sure it gets to the right person.\n\n**Or reach out directly:**\n• Email: mitraricky06@gmail.com\n• Phone: +91 99079 58859\n• Response time: within 24 hours\n\nWant me to take a message for you?",
+      "I can help you reach the team right here! I can collect your message and make sure it gets to the right person.\n\n**Or reach out directly:**\n• Email: devsoftwarestudios@gmail.com\n• Phone: +91 99079 58859\n• Response time: within 24 hours\n\nWant me to take a message for you?",
     ],
     quickReplies: ["Send a Message", "Start a Project", "Cloud Plans"],
   },
@@ -350,7 +350,7 @@ export const KNOWLEDGE = {
 
   support_help: {
     texts: [
-      "If you're experiencing an issue or need technical support:\n\n• **Email us** at mitraricky06@gmail.com with details\n• **Cloud Dashboard issues** — mention your registered email\n• **Payment issues** — include your order ID if you have one\n\nWe typically resolve support requests within 24 hours. For urgent cloud issues, Pro and Enterprise subscribers get priority support.",
+      "If you're experiencing an issue or need technical support:\n\n• **Email us** at devsoftwarestudios@gmail.com with details\n• **Cloud Dashboard issues** — mention your registered email\n• **Payment issues** — include your order ID if you have one\n\nWe typically resolve support requests within 24 hours. For urgent cloud issues, Pro and Enterprise subscribers get priority support.",
     ],
     quickReplies: ["Cloud Dashboard", "Contact Us", "WhatsApp"],
   },
@@ -386,7 +386,7 @@ export const KNOWLEDGE = {
 
   human_handoff: {
     texts: [
-      "I'd like to connect you with our team for a more personal conversation.\n\nYou can:\n• **Email** us at mitraricky06@gmail.com\n• **WhatsApp** us at +91 99079 58859\n• **Fill the contact form** on our website\n\nWe typically respond within a few hours during business time.",
+      "I'd like to connect you with our team for a more personal conversation.\n\nYou can:\n• **Email** us at devsoftwarestudios@gmail.com\n• **WhatsApp** us at +91 99079 58859\n• **Fill the contact form** on our website\n\nWe typically respond within a few hours during business time.",
     ],
     quickReplies: ["Send a Message", "WhatsApp", "Contact Page"],
     cards: [
@@ -520,16 +520,16 @@ export const KNOWLEDGE = {
 
   internship: {
     texts: [
-      "We are always open to hearing from talented people. Here is how to connect:\n\n• **Email your resume** to mitraricky06@gmail.com\n• **Share your work** — GitHub, portfolio, or any projects you have built\n• **Mention what excites you** — Web, mobile, AI, cloud, or all of the above\n• **We look for:** Strong fundamentals, curiosity, and willingness to learn\n\nWe offer hands-on experience with real client projects, not just tutorials.",
-      "Interested in joining DEV Infinity? Here is what you should know:\n\n• We are a small, focused team that works on real products\n• You will get hands-on experience with modern tech stacks\n• Remote-friendly with flexible hours\n• Send your resume and portfolio to mitraricky06@gmail.com\n\nWe value skills and curiosity over degrees.",
+      "We are always open to hearing from talented people. Here is how to connect:\n\n• **Email your resume** to devsoftwarestudios@gmail.com\n• **Share your work** — GitHub, portfolio, or any projects you have built\n• **Mention what excites you** — Web, mobile, AI, cloud, or all of the above\n• **We look for:** Strong fundamentals, curiosity, and willingness to learn\n\nWe offer hands-on experience with real client projects, not just tutorials.",
+      "Interested in joining DEV Infinity? Here is what you should know:\n\n• We are a small, focused team that works on real products\n• You will get hands-on experience with modern tech stacks\n• Remote-friendly with flexible hours\n• Send your resume and portfolio to devsoftwarestudios@gmail.com\n\nWe value skills and curiosity over degrees.",
     ],
     quickReplies: ["Contact Us", "Start a Project", "About Us"],
   },
 
   partnerships: {
     texts: [
-      "We are open to partnerships and collaborations. Here is how we work with partners:\n\n• **Agency partnerships** — White-label development for design agencies\n• **Tech partnerships** — Joint solutions with complementary tech providers\n• **Referral partnerships** — Earn commissions for referring clients\n• **Open source collaboration** — Co-building tools and libraries\n\nIf you have a partnership idea, email us at mitraricky06@gmail.com.",
-      "Looking to partner with us? Here is what that could look like:\n\n• White-label development: We build, you brand and deliver\n• Referral program: Earn a commission for every referred client\n• Co-development: Joint projects where we handle the tech\n\nReach out at mitraricky06@gmail.com to discuss.",
+      "We are open to partnerships and collaborations. Here is how we work with partners:\n\n• **Agency partnerships** — White-label development for design agencies\n• **Tech partnerships** — Joint solutions with complementary tech providers\n• **Referral partnerships** — Earn commissions for referring clients\n• **Open source collaboration** — Co-building tools and libraries\n\nIf you have a partnership idea, email us at devsoftwarestudios@gmail.com.",
+      "Looking to partner with us? Here is what that could look like:\n\n• White-label development: We build, you brand and deliver\n• Referral program: Earn a commission for every referred client\n• Co-development: Joint projects where we handle the tech\n\nReach out at devsoftwarestudios@gmail.com to discuss.",
     ],
     quickReplies: ["Contact Us", "Start a Project", "About Us"],
   },
@@ -565,7 +565,7 @@ export const KNOWLEDGE = {
   nda: {
     texts: [
       "We take confidentiality seriously:\n\n• **NDA available** — We can sign an NDA before project discussions begin\n• **Secure communication** — All project details shared via secure channels\n• **No portfolio sharing** — We do not share your project details publicly without permission\n• **Data protection** — All project files and credentials are handled securely\n\nJust ask and we will send over our standard NDA for review.",
-      "NDA and IP protection is standard practice for us:\n\n• We sign NDAs before diving into project details\n• Your intellectual property remains yours throughout and after the project\n• We do not share or publish your project without explicit permission\n• All communications and files are kept confidential\n\nRequest an NDA via email at mitraricky06@gmail.com.",
+      "NDA and IP protection is standard practice for us:\n\n• We sign NDAs before diving into project details\n• Your intellectual property remains yours throughout and after the project\n• We do not share or publish your project without explicit permission\n• All communications and files are kept confidential\n\nRequest an NDA via email at devsoftwarestudios@gmail.com.",
     ],
     quickReplies: ["Start a Project", "Contact Us", "Our Process"],
   },
