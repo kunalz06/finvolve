@@ -51,7 +51,7 @@ export default function ChatActionCard({
           className="chat-action-confirm"
         >
           {running ? <Loader2 size={15} className="chat-spin" /> : <Check size={15} />}
-          {running ? "Working…" : "Confirm"}
+          {running ? "Working…" : (action.confirmLabel || "Confirm")}
         </Button>
         <Button
           type="button"
@@ -65,7 +65,7 @@ export default function ChatActionCard({
         </Button>
       </div>
 
-      <div className="chat-action-hint">You can also type “confirm” or “cancel”.</div>
+      <div className="chat-action-hint">You can also type “confirm”, “cancel”, or a correction.</div>
     </div>
   );
 }
