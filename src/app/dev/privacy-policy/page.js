@@ -87,7 +87,7 @@ export default function PrivacyPolicy() {
               <section>
                 <h2 className="text-lg font-bold text-slate-950 mb-4">5. Contact Us</h2>
                 <p>
-                  If you have any questions about this Privacy Policy, please contact us at <a href="mailto:mitraricky06@gmail.com" className="text-primary hover:underline">mitraricky06@gmail.com</a>.
+                  If you have any questions about this Privacy Policy, please contact us at <a href="mailto:devsoftwarestudios@gmail.com" className="text-primary hover:underline">devsoftwarestudios@gmail.com</a>.
                 </p>
               </section>
             </div>
