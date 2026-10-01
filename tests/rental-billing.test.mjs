@@ -88,7 +88,7 @@ test("admin rental billing accepts precise decimal usage", () => {
 test("rent terms explicitly reject 20-hour rounding and use theme-safe surfaces", () => {
   const source = read("src/app/dev/terms/page.js");
   assert.match(source, /not a minimum|not a billing block/i);
-  assert.match(source, /not rounded\\s+up/i);
+  assert.match(source, /not rounded\s+up/i);
   assert.match(source, /nearest paisa/i);
   assert.match(source, /var\(--heading\)/);
   assert.match(source, /var\(--surface/);
@@ -120,7 +120,7 @@ test("all email templates use the shared current logo asset", () => {
   assert.match(newsletter, /dev-infinity-email-logo\.svg/);
   assert.match(newsletter, /renderEmailBrandLogo/);
   assert.match(newsletter, /ensureEmailBrandLogo/);
-  assert.match(newsletter, /html:\\s*ensureEmailBrandLogo\\(html\\)/);
+  assert.match(newsletter, /html:\s*ensureEmailBrandLogo\(html\)/);
   assert.match(logo, /DEV Infinity/);
   assert.match(logo, /M22\.3 17\.1/);
 });
