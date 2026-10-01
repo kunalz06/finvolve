@@ -737,8 +737,8 @@ export default function CloudPage() {
                 <Timer size={22} className="text-primary" />
               </div>
               <p className="font-code-brand text-xs font-black uppercase text-[var(--muted)]">Usage Rate</p>
-              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR}</p>
-              <p className="text-xs text-[var(--muted)] font-medium">Per {RENTAL_CONFIG.computeHoursPerUnit} hours of compute</p>
+              <p className="text-2xl font-black text-[var(--heading)]">₹{RENTAL_CONFIG.hourlyRateINR}/hr</p>
+              <p className="text-xs text-[var(--muted)] font-medium">Actual compute time · ₹{RENTAL_CONFIG.computeRateINR}/{RENTAL_CONFIG.computeHoursPerUnit}h reference</p>
             </div>
             <div className="glass-surface rounded-xl p-5 space-y-3 text-center">
               <div className="glass-icon-plate mx-auto flex h-12 w-12 items-center justify-center rounded-xl">
@@ -802,7 +802,7 @@ export default function CloudPage() {
                       <div className="flex items-center gap-2.5 text-sm text-[var(--muted)] font-semibold">
                         <Timer size={14} /> Usage Rate
                       </div>
-                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.computeRateINR} / {RENTAL_CONFIG.computeHoursPerUnit}hrs · ₹{RENTAL_CONFIG.hourlyRateINR}/hr prorated</span>
+                      <span className="text-sm font-bold text-[var(--heading)]">₹{RENTAL_CONFIG.hourlyRateINR}/hr actual usage · ₹{RENTAL_CONFIG.computeRateINR}/{RENTAL_CONFIG.computeHoursPerUnit}h reference</span>
                     </div>
                   </div>
                 </div>
@@ -810,7 +810,7 @@ export default function CloudPage() {
                 {/* Info Box */}
                 <div className="rounded-xl border-2 border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3">
                   <p className="text-xs text-[var(--foreground)] font-medium leading-relaxed">
-                    A confirmation email has been sent. After your rental period ends, your actual compute usage will be billed proportionally at ₹10/hour (₹200 per 20 hours). Your email will contain a secure DEV Infinity payment portal link, and Razorpay SMS remains available as a secondary payment option.
+                    A confirmation email has been sent. After your rental period ends, your recorded compute time is billed at ₹10/hour. The ₹200/20-hour figure is a reference rate only; usage is never rounded up to a 20-hour block. Your email will contain a secure DEV Infinity payment portal link, and Razorpay SMS remains available as a secondary payment option.
                   </p>
                 </div>
 
