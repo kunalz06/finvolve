@@ -95,7 +95,10 @@ test("chat destinations expose stable anchors in the UI", () => {
   assert.match(read("src/app/dev/cloud/page.js"), /id="rent-services"/);
   assert.match(read("src/app/dev/cloud/page.js"), /id="cloud-faq"/);
   assert.match(read("src/app/dev/cloud/dashboard/page.js"), /id="usage"/);
-  assert.match(read("src/app/dev/cloud/dashboard/page.js"), /id="manage-subscription"/);
+  const dashboard = read("src/app/dev/cloud/dashboard/page.js");
+  assert.match(dashboard, /id="manage-subscription"/);
+  assert.match(dashboard, /window\.location\.hash/);
+  assert.match(dashboard, /scrollIntoView/);
 });
 
 test("chat UI uses action-oriented copy instead of generic assistant filler", () => {
