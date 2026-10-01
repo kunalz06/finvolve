@@ -709,7 +709,7 @@ export default function CloudPage() {
         </section>
 
         {/* Rent Services Section */}
-        <section className="glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
+        <section id="rent-services" className="scroll-mt-24 glass-surface-strong rounded-2xl p-6 md:p-10 space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-4 py-1.5 text-xs font-black uppercase text-primary">
               <Server size={14} />
@@ -976,7 +976,7 @@ export default function CloudPage() {
         </section>
 
         {/* Frequently Asked Questions Section */}
-        <section className="glass-surface-strong rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 space-y-6 sm:space-y-8">
+        <section id="cloud-faq" className="scroll-mt-24 glass-surface-strong rounded-2xl p-4 sm:p-6 md:p-8 lg:p-10 space-y-6 sm:space-y-8">
           <div className="text-center max-w-2xl mx-auto space-y-3">
             <div className="glass-chip-strong inline-flex items-center gap-2 rounded-xl px-3 py-1.5 sm:px-4 sm:py-2 text-xs font-black uppercase text-primary">
               <HelpCircle size={14} className="sm:hidden" />
