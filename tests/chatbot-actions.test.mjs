@@ -15,7 +15,7 @@ function loadChatActions() {
     .replace(/\bexport\s+/g, "");
   const context = { globalThis: {} };
   vm.runInNewContext(
-    source + "\n;globalThis.__exports = { detectNavigationCommand, detectSubscriptionHelpCommand, buildContactAction, buildProjectAction, actionMissingPrompt };",
+    source + "\n;globalThis.__exports = { detectNavigationCommand, detectSubscriptionHelpCommand, detectWriteActionCommand, buildContactAction, buildProjectAction, actionMissingPrompt };",
     context,
   );
   return context.globalThis.__exports;
@@ -72,6 +72,18 @@ test("cloud subscription requests route to the exact dashboard help area", () =>
   const pricing = detectSubscriptionHelpCommand("compare cloud subscription pricing");
   assert.equal(pricing.mode, "plans");
   assert.equal(pricing.href, "/dev/cloud#plans");
+});
+
+test("natural message commands enter the confirmed contact action flow", () => {
+  const { detectWriteActionCommand } = loadChatActions();
+
+  const message = detectWriteActionCommand("message the team", {});
+  assert.equal(message.type, "contact_message");
+  assert.equal(message.ready, false);
+
+  const support = detectWriteActionCommand("email support", {});
+  assert.equal(support.type, "contact_message");
+  assert.equal(support.requiresConfirmation, true);
 });
 
 test("action collection prompts one concrete missing field at a time", () => {
