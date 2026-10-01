@@ -88,7 +88,7 @@ test("admin rental billing accepts precise decimal usage", () => {
 test("rent terms explicitly reject 20-hour rounding and use theme-safe surfaces", () => {
   const source = read("src/app/dev/terms/page.js");
   assert.match(source, /not a minimum|not a billing block/i);
-  assert.match(source, /not rounded up/i);
+  assert.match(source, /not rounded\\s+up/i);
   assert.match(source, /nearest paisa/i);
   assert.match(source, /var\(--heading\)/);
   assert.match(source, /var\(--surface/);
