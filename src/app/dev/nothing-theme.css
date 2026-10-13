@@ -263,7 +263,7 @@ body { font-family: var(--font-sans); }
 .dev-shell .text-primary { color: var(--primary) !important; }
 .dev-shell .hover\:text-primary:hover { color: var(--primary) !important; }
 .dev-shell .border-primary { border-color: var(--primary) !important; }
-.dev-shell :is(.border-primary,.border-[var(--primary)]) { border-color: var(--primary); }
+.dev-shell .border-primary { border-color: var(--primary); }
 .dev-shell :is(.bg-purple-100,.bg-indigo-50,.bg-blue-50) { background: var(--primary-soft); }
 .dev-shell .text-purple-600 { color: var(--primary); }
 .dev-shell .bg-white { background: var(--surface-strong); }
