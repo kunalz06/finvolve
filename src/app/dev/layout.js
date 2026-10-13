@@ -1,5 +1,6 @@
 import "./globals.css";
 import "@/components/chat/chat.css";
+import "./nothing-theme.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ChatWidget from "@/components/chat/ChatWidget";
@@ -11,7 +12,7 @@ export const metadata = {
 
 export default function DevLayout({ children }) {
   return (
-    <div className="dev-shell min-h-screen font-sans text-gray-900 antialiased">
+    <div className="dev-shell min-h-screen font-sans text-[var(--foreground)] antialiased">
       <Navbar />
       <main className="min-h-screen pt-[72px] sm:pt-[84px] md:pt-[92px] lg:pt-[104px]">
         {children}

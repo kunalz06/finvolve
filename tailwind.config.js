@@ -12,28 +12,28 @@ module.exports = {
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 primary: {
-                    DEFAULT: "#8B5CF6", // Purple
-                    hover: "#7C3AED",
-                    light: "#A78BFA",
-                    dark: "#6D28D9",
+                    DEFAULT: "var(--primary)",
+                    hover: "var(--primary-hover)",
+                    light: "var(--primary-soft)",
+                    dark: "var(--primary-hover)",
                 },
-                secondary: "#F9FAFB", // Light gray
-                accent: "#3B82F6", // Blue accent
-                muted: "#6B7280", // Gray for body text
+                secondary: "var(--surface-muted)",
+                accent: "var(--accent)",
+                muted: "var(--muted)",
                 card: {
-                    bg: "#FFFFFF",
-                    border: "#E5E7EB",
+                    bg: "var(--surface-strong)",
+                    border: "var(--border-soft)",
                 },
             },
             fontFamily: {
-                sans: ["SF Pro Display", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
-                heading: ["SF Pro Display", "Segoe UI", "Helvetica Neue", "Arial", "sans-serif"],
-                mono: ["Cascadia Code", "Cascadia Mono", "JetBrains Mono", "Consolas", "monospace"],
-                code: ["Cascadia Code", "Cascadia Mono", "Consolas", "Courier New", "monospace"],
+                sans: ["var(--font-sans)"],
+                heading: ["var(--font-sans)"],
+                mono: ["var(--font-code)"],
+                code: ["var(--font-code)"],
             },
             backgroundImage: {
-                "gradient-primary": "linear-gradient(135deg, #8B5CF6 0%, #3B82F6 100%)",
-                "gradient-hero": "linear-gradient(135deg, #8B5CF6 0%, #06B6D4 100%)",
+                "gradient-primary": "linear-gradient(var(--brand-fill), var(--brand-fill))",
+                "gradient-hero": "linear-gradient(var(--surface-strong), var(--surface-strong))",
             },
             animation: {
                 "fade-in": "fadeIn 0.5s ease-out",
@@ -57,7 +57,7 @@ module.exports = {
             boxShadow: {
                 "card": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
                 "card-hover": "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                "button": "0 4px 14px 0 rgba(139, 92, 246, 0.39)",
+                "button": "var(--shadow-soft)",
             },
         },
     },

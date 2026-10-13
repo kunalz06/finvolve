@@ -82,7 +82,7 @@ export default function QuickStartPage() {
           }
         },
         prefill: { name: formData.name, email: formData.email, contact: formData.phone },
-        theme: { color: "#8B5CF6" },
+        theme: { color: "#b21f2a" },
       };
 
       const paymentObject = new window.Razorpay(options);

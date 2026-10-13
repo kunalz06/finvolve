@@ -140,7 +140,7 @@ function PaymentPortalContent() {
           }
         },
         prefill: { name: session.clientName || "", email: session.clientEmail || "" },
-        theme: { color: "#8B5CF6" },
+        theme: { color: "#b21f2a" },
         modal: { ondismiss: () => setProcessing(false) },
       };
 

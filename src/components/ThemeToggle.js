@@ -22,6 +22,14 @@ export default function ThemeToggle({ compact = false }) {
     const initialTheme = getInitialTheme();
     setTheme(initialTheme);
     document.documentElement.dataset.theme = initialTheme;
+    const syncStorage = (event) => {
+      if (event.key !== STORAGE_KEY) return;
+      const next = getInitialTheme();
+      setTheme(next);
+      document.documentElement.dataset.theme = next;
+    };
+    window.addEventListener("storage", syncStorage);
+    return () => window.removeEventListener("storage", syncStorage);
   }, []);
 
   const toggleTheme = () => {
