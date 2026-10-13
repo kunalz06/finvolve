@@ -12,11 +12,11 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex items-center justify-center gap-2 rounded-xl text-center font-semibold transition-all duration-200 focus-visible:outline-none";
+    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-center font-bold tracking-[0.01em] transition-[background-color,border-color,box-shadow,transform] duration-150 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-0";
 
   const variants = {
     primary:
-      "brand-gradient border border-transparent !text-white shadow-[var(--shadow-soft)] hover:-translate-y-0.5 hover:!text-white hover:shadow-[var(--shadow-color)]",
+      "brand-gradient border border-[var(--brand-fill)] !text-white shadow-none hover:-translate-y-0.5 hover:!text-white hover:shadow-[var(--shadow-soft)]",
     secondary:
       "border border-[var(--border)] bg-[var(--surface-strong)] !text-[var(--heading)] shadow-none hover:-translate-y-0.5 hover:border-[var(--primary)]/35 hover:bg-[var(--surface-muted)] hover:!text-[var(--heading)]",
     outline:

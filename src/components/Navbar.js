@@ -38,6 +38,13 @@ export default function Navbar() {
   }, [pathname]);
 
   useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
     const handleEscape = (event) => {
       if (event.key === "Escape") setMobileMenuOpen(false);
     };
@@ -47,11 +54,12 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 md:pt-4">
+      <nav aria-label="Primary navigation" className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-5 md:pt-4">
         <div className={`container mx-auto transition-all duration-200 ${scrolled ? "max-w-6xl" : ""}`}>
           <div className="glass-surface-strong flex min-h-16 items-center justify-between rounded-2xl px-3 py-2.5 sm:px-4 md:px-5">
             <Link href="/dev" className="group flex min-w-0 items-center gap-3" aria-label="DEV Infinity home">
               <BrandMark withWordmark className="min-w-0" />
+              <span className="os-nav-id hidden xl:inline-flex" aria-hidden="true">001 / STUDIO</span>
             </Link>
 
             <div className="hidden items-center gap-1 lg:flex">
@@ -87,6 +95,7 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen((open) => !open)}
                 aria-label={mobileMenuOpen ? "Close navigation" : "Open navigation"}
                 aria-expanded={mobileMenuOpen}
+                aria-controls="dev-mobile-navigation"
                 type="button"
               >
                 {mobileMenuOpen ? <X size={21} /> : <Menu size={21} />}
@@ -103,7 +112,7 @@ export default function Navbar() {
         onClick={() => setMobileMenuOpen(false)}
       />
 
-      <div className={`fixed inset-x-0 top-[76px] z-50 px-3 transition-all duration-200 sm:px-5 lg:hidden ${mobileMenuOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-3 opacity-0"}`}>
+      <div id="dev-mobile-navigation" role="navigation" aria-label="Mobile navigation" className={`fixed inset-x-0 top-[76px] z-50 px-3 transition-all duration-200 sm:px-5 lg:hidden ${mobileMenuOpen ? "visible translate-y-0 opacity-100" : "invisible -translate-y-3 opacity-0"}`}>
         <div className="container mx-auto">
           <div className="glass-surface-strong rounded-xl p-3">
             <div className="grid gap-1">

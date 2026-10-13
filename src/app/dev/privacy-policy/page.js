@@ -24,7 +24,7 @@ export default function PrivacyPolicy() {
         >
           <Card hover={false} className="p-8 md:p-12">
             <div className="flex items-center gap-4 mb-8 pb-8 border-b border-gray-200">
-              <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center">
+              <div className="w-14 h-14 rounded-xl bg-[var(--primary-soft)] flex items-center justify-center">
                 <Shield className="text-primary" size={28} />
               </div>
               <div>

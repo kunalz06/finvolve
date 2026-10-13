@@ -8,7 +8,7 @@ export default function Card({
 }) {
   return (
     <div
-      className={`card-shell p-5 sm:p-6 md:p-7 ${hover ? "hover:-translate-y-1 hover:shadow-[var(--shadow)]" : ""} transition-all duration-200 ${className}`}
+      className={`card-shell p-5 sm:p-6 md:p-7 ${hover ? "hover:-translate-y-0.5 hover:shadow-[var(--shadow-soft)]" : ""} transition-all duration-200 ${className}`}
       {...props}
     >
       {children}
