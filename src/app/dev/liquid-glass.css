@@ -273,7 +273,7 @@ html[data-theme="dark"] .dev-shell::before, html[data-theme="dark"] .dev-shell::
 .dev-shell span.rounded-full:not([aria-hidden]):not([role]) { background: transparent !important; border: 0 !important; box-shadow: none; padding-inline: 0; }
 
 /* Saturated icon/fill utilities must not inherit pale notification surfaces. */
-.dev-shell :is([class*="bg-emerald-4"],[class*="bg-emerald-5"],[class*="bg-emerald-6"],[class*="bg-emerald-7"],[class*="bg-emerald-8"],[class*="bg-blue-5"],[class*="bg-blue-6"],[class*="bg-teal-5"],[class*="bg-teal-6"],[class*="bg-green-5"],[class*="bg-green-6"],[class*="bg-purple-5"],[class*="bg-purple-6"],[class*="bg-indigo-5"],[class*="bg-indigo-6"]) { background-color: #244b94 !important; }
-.dev-shell :is([class*="bg-red-4"],[class*="bg-red-5"],[class*="bg-red-6"],[class*="bg-rose-5"],[class*="bg-rose-6"]) { background-color: var(--danger-fill) !important; }
-.dev-shell :is([class*="bg-amber-4"],[class*="bg-amber-5"],[class*="bg-amber-6"],[class*="bg-yellow-5"],[class*="bg-orange-5"]) { background-color: var(--warning-fill) !important; }
+.dev-shell :is([class*="bg-emerald-400"],[class*="bg-emerald-500"],[class*="bg-emerald-600"],[class*="bg-emerald-700"],[class*="bg-emerald-800"],[class*="bg-blue-500"],[class*="bg-blue-600"],[class*="bg-teal-500"],[class*="bg-teal-600"],[class*="bg-green-500"],[class*="bg-green-600"],[class*="bg-purple-500"],[class*="bg-purple-600"],[class*="bg-indigo-500"],[class*="bg-indigo-600"]) { background-color: #244b94 !important; }
+.dev-shell :is([class*="bg-red-400"],[class*="bg-red-500"],[class*="bg-red-600"],[class*="bg-rose-500"],[class*="bg-rose-600"]) { background-color: var(--danger-fill) !important; }
+.dev-shell :is([class*="bg-amber-400"],[class*="bg-amber-500"],[class*="bg-amber-600"],[class*="bg-yellow-500"],[class*="bg-orange-500"]) { background-color: var(--warning-fill) !important; }
 .dev-shell :is([class*="bg-emerald-950/"],[class*="bg-green-950/"],[class*="bg-teal-950/"]) { background-color: var(--overlay) !important; }
