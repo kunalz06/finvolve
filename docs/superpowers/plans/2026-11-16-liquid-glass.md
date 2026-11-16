@@ -21,8 +21,10 @@
 - Animation cleanup must not leave hidden content or observers after navigation.
 
 ## Tasks
-- [ ] Capture baseline tests; add behavioral motion tests before implementation.
-- [ ] Add local typography and gold jaali asset. Replace theme with semantic glass surfaces, color mappings, controls, scrollbars, responsive and accessibility fallbacks.
-- [ ] Add shared presentation motion without changing business handlers. Improve navigation, admin tab semantics, auth labels and quiet page hierarchy.
-- [ ] Run tests, lint, production build; browser-check light/dark, navigation, forms, chat, mobile and reduced motion; record design QA.
-- [ ] Review diff and prepare feature branch / pull request for deployment, reporting credential-limited verification explicitly.
+- [x] Capture baseline tests; add behavioral motion tests before implementation.
+- [x] Add local typography and gold jaali asset. Replace theme with semantic glass surfaces, color mappings, controls, scrollbars, responsive and accessibility fallbacks.
+- [x] Add shared presentation motion without changing business handlers. Improve navigation, admin tab semantics, auth labels and quiet page hierarchy.
+- [x] Run tests, lint, production build; browser-check light/dark, navigation, forms, chat, mobile and reduced motion; record design QA.
+- [x] Review diff and prepare feature branch / pull request for deployment, reporting credential-limited verification explicitly.
+
+Authenticated visual comparison and physical mobile verification remain pending as recorded in design-qa.md; PR remains draft.
