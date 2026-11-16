@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "node scripts/dev.mjs",
     "build": "npm test && npm run lint && next build",
     "build:netlify": "node scripts/build-netlify-frontend.mjs",
     "start": "next start",

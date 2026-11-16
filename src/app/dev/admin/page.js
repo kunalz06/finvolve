@@ -427,11 +427,13 @@ export default function AdminPage() {
                                 Admin Access
                             </p>
                             <h1 className="text-3xl font-bold text-slate-950">Sign in to Mission Control</h1>
-                            <p className="mt-3 text-sm text-slate-600">Use a Firebase account that already has the admin custom claim.</p>
+                            <p className="mt-3 text-sm text-slate-600">Sign in with your authorized administrator account.</p>
                         </div>
                         <form onSubmit={handleLogin} className="space-y-4 px-8 py-8">
-                            <input className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="email" placeholder="Admin email" value={email} onChange={(event) => setEmail(event.target.value)} required />
-                            <input className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
+                            <label className="block text-sm font-semibold" htmlFor="admin-email">Email address</label>
+                            <input id="admin-email" autoComplete="username" className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="email" placeholder="Admin email" value={email} onChange={(event) => setEmail(event.target.value)} required />
+                            <label className="block text-sm font-semibold" htmlFor="admin-password">Password</label>
+                            <input id="admin-password" autoComplete="current-password" className="w-full rounded-[20px] px-4 py-3 text-slate-900" type="password" placeholder="Password" value={password} onChange={(event) => setPassword(event.target.value)} required />
                             {error && <div className="flex items-center gap-2 rounded-[20px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700"><AlertCircle size={16} />{error}</div>}
                             <Button type="submit" variant="primary" className="w-full">Sign In</Button>
                         </form>
@@ -447,14 +449,14 @@ export default function AdminPage() {
                 {!isConfigValid && <div className="mb-6 rounded-[22px] border border-amber-200 bg-amber-50/85 px-4 py-3 text-sm text-amber-700">Firebase public config appears incomplete.</div>}
                 {error && <div className="mb-6 rounded-[22px] border border-red-200 bg-red-50/85 px-4 py-3 text-sm text-red-700">{error}</div>}
 
-                <section className="glass-surface-strong page-section rounded-2xl px-6 py-8 md:px-8 md:py-10">
+                <section className="page-section px-0 py-6 md:py-8">
                     <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
                         <div className="max-w-2xl">
                             <p className="glass-chip-strong mb-4 inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                                 <Sparkles size={14} />
                                 Admin Dashboard
                             </p>
-                            <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">Mission control for requests, messages, and payments.</h1>
+                            <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">Workspace</h1>
                             <p className="mt-4 max-w-xl text-base text-slate-600">Review incoming project requests, open complete request details in-place, and keep payment links moving without leaving the dashboard.</p>
                         </div>
                         <Button onClick={handleLogout} variant="secondary" className="w-full sm:w-auto">
@@ -466,14 +468,14 @@ export default function AdminPage() {
 
                 <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
                     {stats.map((stat) => (
-                        <Card key={stat.label} hover={false} className="admin-grid-card flex min-h-[148px] flex-col justify-between p-5">
+                        <Card key={stat.label} hover={false} className="admin-grid-card stat-summary flex min-h-[108px] flex-col justify-between p-5">
                             <div className="text-sm font-medium text-slate-500">{stat.label}</div>
                             <div className={`text-3xl font-bold ${stat.tone}`}>{stat.value}</div>
                         </Card>
                     ))}
                 </div>
 
-                <div className="glass-chip-strong mt-8 inline-flex flex-wrap gap-2 rounded-xl p-2">
+                <div className="workspace-tabs" role="group" aria-label="Workspace sections">
                     {[
                         { id: "projects", label: "Projects", icon: LayoutDashboard },
                         { id: "messages", label: "Messages", icon: MessageSquare },
@@ -486,7 +488,7 @@ export default function AdminPage() {
                         const Icon = tab.icon;
                         const active = activeTab === tab.id;
                         return (
-                            <Button key={tab.id} variant={active ? "primary" : "ghost"} size="default" onClick={() => setActiveTab(tab.id)} className={`rounded-lg ${!active ? "!border-transparent !bg-transparent text-slate-600 hover:!bg-[var(--surface-muted)] hover:!text-slate-900" : ""}`}>
+                            <Button key={tab.id} aria-pressed={active} variant="ghost" size="default" onClick={() => setActiveTab(tab.id)} className={`workspace-tab rounded-lg ${!active ? "!border-transparent !bg-transparent text-slate-600 hover:!bg-[var(--surface-muted)] hover:!text-slate-900" : ""}`}>
                                 <Icon size={16} />
                                 {tab.label}
                             </Button>
@@ -495,44 +497,37 @@ export default function AdminPage() {
                 </div>
 
                 {activeTab === "projects" && (
-                    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                        {requests.length === 0 && (
-                            <EmptyState title="No project requests yet" copy="New inquiries will show up here as soon as clients submit the DEV♾️ request flow." />
+                    <section className="workspace-panel mt-8" aria-label="Project requests">
+                        <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                            <h2 className="text-3xl">Projects</h2>
+                            <Button type="button" onClick={() => setActiveTab("payments")}>Create payment link<CreditCard size={17} /></Button>
+                        </div>
+                        {requests.length === 0 ? (
+                            <EmptyState title="No project requests yet" copy="New inquiries will show up here as soon as clients submit the project request form." />
+                        ) : (
+                            <div className="glass-surface-strong project-ledger overflow-x-auto rounded-3xl" tabIndex={0} role="region" aria-label="Project requests table, scroll horizontally for more columns">
+                                <table className="w-full min-w-[720px] text-left">
+                                    <thead><tr><th>Project</th><th>Service</th><th>Request</th><th>Received</th><th><span className="sr-only">Actions</span></th></tr></thead>
+                                    <tbody>{requests.map((item) => (
+                                        <tr key={item.id}>
+                                            <td><div className="font-semibold text-[var(--heading)]">{item.name || "Unnamed lead"}</div><div className="text-sm text-[var(--muted)]">{item.email || "No email"}</div></td>
+                                            <td>{item.service || item.projectType || "Project request"}</td>
+                                            <td>{item.quickStart ? "Quick Start" : "Standard"}</td>
+                                            <td className="whitespace-nowrap">{formatDate(item.createdAt)}</td>
+                                            <td><div className="flex justify-end gap-2">
+                                                <Button type="button" variant="secondary" size="small" onClick={() => setSelectedRequest(item)}>View<Eye size={16} /></Button>
+                                                <Button type="button" variant="ghost" size="icon" aria-label={`Delete project request from ${item.name || "unnamed lead"}`} onClick={() => handleDeleteRequest(item.id)} disabled={deletingRequestId === item.id}><Trash2 size={16} /></Button>
+                                            </div></td>
+                                        </tr>
+                                    ))}</tbody>
+                                </table>
+                            </div>
                         )}
-                        {requests.map((item) => (
-                            <Card key={item.id} className="admin-grid-card flex flex-col justify-between p-6">
-                                <div>
-                                    <div className="mb-4 flex items-start justify-between gap-3">
-                                        <div>
-                                            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{item.projectType || "Project request"}</p>
-                                            <h3 className="mt-2 text-xl font-bold text-slate-950">{item.name || "Unnamed lead"}</h3>
-                                        </div>
-                                        {item.quickStart && <span className="glass-chip-strong rounded-full px-3 py-1 text-xs font-semibold text-primary">Quick Start</span>}
-                                    </div>
-                                    <div className="space-y-2 text-sm text-slate-600">
-                                        <div className="flex items-center gap-2"><Mail size={14} className="text-slate-400" />{item.email || "No email"}</div>
-                                        <div className="flex items-center gap-2"><Phone size={14} className="text-slate-400" />{item.phone || "No phone"}</div>
-                                    </div>
-                                    <p className="mt-5 line-clamp-4 text-sm leading-6 text-slate-600">{item.description || "No description provided."}</p>
-                                </div>
-                                <div className="mt-6">
-                                    <div className="mb-4 flex flex-wrap gap-2 text-xs text-slate-500">
-                                        {item.timeline && <span className="glass-chip rounded-full px-3 py-1">{item.timeline} weeks</span>}
-                                        {item.budget && <span className="glass-chip rounded-full px-3 py-1">{item.budget}</span>}
-                                        <span className="glass-chip rounded-full px-3 py-1">{formatDate(item.createdAt)}</span>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <Button type="button" variant="secondary" className="flex-1" onClick={() => setSelectedRequest(item)}>View<Eye size={18} /></Button>
-                                        <Button type="button" variant="danger" className="flex-1" onClick={() => handleDeleteRequest(item.id)} disabled={deletingRequestId === item.id}><Trash2 size={16} />{deletingRequestId === item.id ? "Deleting..." : "Delete"}</Button>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
+                    </section>
                 )}
 
                 {activeTab === "messages" && (
-                    <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div className="workspace-panel mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                         {messages.length === 0 && (
                             <EmptyState title="No contact messages" copy="Your contact inbox is empty right now. New messages will appear here automatically." />
                         )}

@@ -8,7 +8,6 @@ import {
   Gauge,
   Layers3,
   ShieldCheck,
-  Sparkles,
   Workflow,
 } from "lucide-react";
 import Button from "@/components/ui/Button";
@@ -64,18 +63,9 @@ export default function Home() {
     <div className="pb-10 md:pb-16">
       <section className="page-section px-4 pb-8 pt-5 sm:px-6 sm:pt-8 md:px-0 md:pb-14">
         <div className="container">
-          <div className="grid items-center gap-8 lg:min-h-[700px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
+          <div className="grid items-center gap-8 lg:min-h-[640px] lg:grid-cols-[1.02fr_0.98fr] lg:gap-12">
             <div className="max-w-3xl">
-              <div className="glass-chip-strong mb-5 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 sm:px-4 sm:py-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-md brand-gradient text-white shadow-sm">
-                  <Sparkles size={13} />
-                </span>
-                <span className="font-code-brand text-[11px] font-bold uppercase tracking-[0.16em] text-primary sm:text-xs">
-                  Product engineering for teams that need momentum
-                </span>
-              </div>
-
-              <h1 className="max-w-3xl text-[clamp(2.8rem,7vw,5.9rem)] font-black leading-[0.96] tracking-[-0.05em] text-[var(--heading)]">
+              <h1 className="max-w-3xl text-[clamp(2.8rem,5.6vw,4.8rem)] font-black leading-[1.12] tracking-[-0.025em] text-[var(--heading)]">
                 Build the product.
                 <span className="brand-gradient-text mt-2 block pb-2">Keep the momentum.</span>
               </h1>

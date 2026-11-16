@@ -75,7 +75,7 @@ export default function ChatWidget() {
           size="default"
         >
           <MessageCircle size={18} />
-          <span>{isMinimized ? "Continue request" : "DEV∞ Actions"}</span>
+          <span className="chat-launcher-label">{isMinimized ? "Continue request" : "DEV∞ Actions"}</span>
           {isMinimized && <span className="chat-launcher-dot" aria-hidden="true" />}
         </Button>
       )}

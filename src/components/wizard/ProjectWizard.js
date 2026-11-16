@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
-import { animate as _aa } from "animejs";const runAnim=(p)=>{const{targets,...r}=p;return _aa(targets,r);};
+import { animateSurface } from "@/lib/ui/liquid-motion.mjs";
 import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -45,36 +45,18 @@ export default function ProjectWizard() {
   });
   const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
-  const [showSuccessBurst, setShowSuccessBurst] = useState(false);
-  
-  // Refs for animejs animations
-  const burstOverlayRef = useRef(null);
-  const burstCircleRef = useRef(null);
   const successIconRef = useRef(null);
   const stepContainerRef = useRef(null);
 
   useEffect(() => {
-    if (status !== 'success') return undefined;
-    setShowSuccessBurst(true);
-    const timeout = window.setTimeout(() => setShowSuccessBurst(false), 1400);
-    return () => window.clearTimeout(timeout);
-  }, [status]);
-
-  // Animate step transitions
-  useEffect(() => {
-    if (stepContainerRef.current) {
-      const startX = direction > 0 ? -100 : 100;
-      const endX = 0;
-      
-      runAnim({
-        targets: stepContainerRef.current,
-        translateX: [startX, endX],
-        opacity: [0, 1],
-        duration: 300,
-        easing: "easeOutCubic",
-        autoplay: true
-      });
-    }
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const animation = animateSurface(stepContainerRef.current, [
+      { transform: `translateX(${direction > 0 ? 12 : -12}px)`, opacity: .65 },
+      { transform: "translateX(0)", opacity: 1 },
+    ], { duration: 300 }, preference.matches);
+    const stop = () => { if (preference.matches) animation?.cancel(); };
+    preference.addEventListener("change", stop);
+    return () => { animation?.cancel(); preference.removeEventListener("change", stop); };
   }, [currentStep, direction]);
 
   const handleNext = () => {
@@ -144,99 +126,22 @@ export default function ProjectWizard() {
     }
   };
 
-  const variants = {
-    enter: (direction) => ({
-      x: direction > 0 ? 100 : -100,
-      opacity: 1,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction) => ({
-      x: direction < 0 ? 100 : -100,
-      opacity: 1,
-    }),
-  };
-
-  // Animejs animations for success state
   useEffect(() => {
-    if (status === 'success' && showSuccessBurst && burstOverlayRef.current) {
-      runAnim({
-        targets: burstOverlayRef.current,
-        opacity: [0, 1],
-        duration: 180,
-        easing: "easeInOutQuad",
-        complete: () => {
-          runAnim({
-            targets: burstOverlayRef.current,
-            opacity: [1, 0],
-            duration: 180,
-            delay: 550,
-            easing: "easeInOutQuad"
-          });
-        }
-      });
-    }
-  }, [status, showSuccessBurst]);
-
-  useEffect(() => {
-    if (status === 'success' && showSuccessBurst && burstCircleRef.current) {
-      runAnim({
-        targets: burstCircleRef.current,
-        scale: [0.35, 1.12, 1],
-        rotate: [-10, 0],
-        duration: 550,
-        easing: "easeOutBack",
-        complete: () => {
-          runAnim({
-            targets: burstCircleRef.current,
-            scale: [1, 0.82],
-            opacity: [1, 0],
-            duration: 180,
-            easing: "easeOutQuad"
-          });
-        }
-      });
-    }
-  }, [status, showSuccessBurst]);
-
-  useEffect(() => {
-    if (status === 'success' && successIconRef.current) {
-      runAnim({
-        targets: successIconRef.current,
-        scale: [0, 1],
-        duration: 400,
-        easing: "easeOutBack",
-        delay: 200
-      });
-    }
+    if (status !== "success") return;
+    const animation = animateSurface(successIconRef.current, [
+      { opacity: .65, transform: "scale(.92)" },
+      { opacity: 1, transform: "scale(1)" },
+    ], {}, window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    return () => animation?.cancel();
   }, [status]);
 
   if (status === 'success') {
     return (
       <>
-        {showSuccessBurst && (
-          <div
-            ref={burstOverlayRef}
-            className="fixed inset-0 z-[80] flex items-center justify-center bg-emerald-950/35 backdrop-blur-sm"
-            style={{ opacity: 0 }}
-            aria-hidden="true"
-          >
-            <div
-              ref={burstCircleRef}
-              className="flex h-36 w-36 items-center justify-center rounded-full border-[10px] border-emerald-400 bg-[var(--surface-strong)] shadow-[0_0_0_18px_rgba(16,185,129,0.18)] md:h-44 md:w-44"
-              style={{ scale: 0.35, rotate: -10 }}
-            >
-              <CheckCircle className="h-20 w-20 text-emerald-600 md:h-24 md:w-24" />
-            </div>
-          </div>
-        )}
         <div className="glass-surface-strong mx-auto max-w-2xl rounded-2xl px-8 py-16 text-center">
           <div
             ref={successIconRef}
             className="mx-auto mb-8 flex h-24 w-24 items-center justify-center rounded-full border-4 border-emerald-500 bg-emerald-500/15"
-            style={{ scale: 0 }}
           >
             <CheckCircle className="h-12 w-12 text-emerald-600" />
           </div>
@@ -286,9 +191,9 @@ export default function ProjectWizard() {
       </div>
 
       <div className="relative mb-12 flex items-center justify-between px-4">
-        <div className="glass-track absolute left-0 top-4 -z-10 h-1 w-full rounded-full" />
+        <div className="glass-track absolute left-0 right-0 top-4 -z-10 h-1 w-full rounded-full" />
         <AnimatedDiv
-          className="absolute left-0 top-4 -z-10 h-1 origin-left rounded-full bg-[var(--primary)]"
+          className="absolute left-0 right-0 top-4 -z-10 h-1 origin-left rounded-full bg-[var(--primary)]"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: currentStep / (STEPS.length - 1) }}
           transition={{ duration: 0.5 }}
@@ -312,7 +217,6 @@ export default function ProjectWizard() {
           ref={stepContainerRef}
           key={currentStep}
           className="w-full"
-          style={{ transform: `translateX(${direction > 0 ? -100 : 100}px)`, opacity: 0 }}
         >
             <h2 className="mb-2 text-2xl font-bold text-slate-950">{STEPS[currentStep].title}</h2>
             <p className="mb-8 text-slate-600">{STEPS[currentStep].subtitle}</p>
@@ -321,10 +225,12 @@ export default function ProjectWizard() {
             {currentStep === 0 && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {PROJECT_TYPES.map((type) => (
-                  <div
+                  <button
+                    type="button"
+                    aria-pressed={formData.projectType === type.label}
                     key={type.id}
                     className={cn(
-                      "group cursor-pointer rounded-[24px] border p-6 transition-all",
+                      "choice-card group text-left rounded-[24px] border p-6",
                       formData.projectType === type.label 
                         ? "border-primary/40 bg-white/78 shadow-[0_24px_60px_rgba(103,88,255,0.16)]" 
                         : "glass-chip hover:border-primary/35 hover:bg-white/72"
@@ -335,9 +241,9 @@ export default function ProjectWizard() {
                       "mb-4 w-8 h-8",
                        formData.projectType === type.label ? "text-primary" : "text-slate-400 group-hover:text-primary"
                      )} />
-                    <h3 className="mb-1 text-lg font-bold text-slate-950">{type.label}</h3>
-                    <p className="text-sm text-slate-500">{type.desc}</p>
-                  </div>
+                    <span className="mb-1 block text-lg font-bold text-slate-950">{type.label}</span>
+                    <span className="block text-sm text-slate-500">{type.desc}</span>
+                  </button>
                 ))}
               </div>
             )}
@@ -398,19 +304,21 @@ export default function ProjectWizard() {
             {currentStep === 2 && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {BUDGET_RANGES.map((range) => (
-                  <div
+                  <button
+                    type="button"
+                    aria-pressed={formData.budget === range.label}
                     key={range.id}
                     className={cn(
-                      "cursor-pointer rounded-[24px] border p-6 transition-all",
+                      "choice-card text-left rounded-[24px] border p-6",
                       formData.budget === range.label 
                         ? "border-primary/40 bg-white/78 shadow-[0_24px_60px_rgba(103,88,255,0.16)]" 
                         : "glass-chip hover:border-primary/35 hover:bg-white/72"
                     )}
                     onClick={() => updateData('budget', range.label)}
                   >
-                    <div className="mb-1 text-2xl font-bold text-slate-950">{range.label}</div>
-                    <p className="text-sm text-slate-500">{range.desc}</p>
-                  </div>
+                    <span className="mb-1 block text-2xl font-bold text-slate-950">{range.label}</span>
+                    <span className="block text-sm text-slate-500">{range.desc}</span>
+                  </button>
                 ))}
               </div>
             )}

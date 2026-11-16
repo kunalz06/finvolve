@@ -55,7 +55,7 @@ export default function DashboardPage() {
         if (!["usage", "manage-subscription"].includes(targetId)) return;
 
         const target = document.getElementById(targetId);
-        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        target?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
     }, [subscription]);
 
     const handleLookup = async (e) => {
@@ -453,7 +453,7 @@ export default function DashboardPage() {
 
 function UsageBar({ label, used, total, unit }) {
     const pct = total > 0 ? Math.min((used / total) * 100, 100) : 0;
-    const barColor = pct > 90 ? "bg-red-500" : pct > 70 ? "bg-amber-500" : "bg-[var(--primary)]";
+    const barColor = pct > 90 ? "bg-[var(--danger-fill)]" : pct > 70 ? "bg-[var(--warning-fill)]" : "bg-[var(--primary)]";
 
     return (
         <div>
