@@ -277,3 +277,8 @@ html[data-theme="dark"] .dev-shell::before, html[data-theme="dark"] .dev-shell::
 .dev-shell :is([class*="bg-red-400"],[class*="bg-red-500"],[class*="bg-red-600"],[class*="bg-rose-500"],[class*="bg-rose-600"]) { background-color: var(--danger-fill) !important; }
 .dev-shell :is([class*="bg-amber-400"],[class*="bg-amber-500"],[class*="bg-amber-600"],[class*="bg-yellow-500"],[class*="bg-orange-500"]) { background-color: var(--warning-fill) !important; }
 .dev-shell [class~="bg-emerald-950/35"] { background-color: var(--overlay) !important; }
+
+/* Functional choices stay distinct from the informational pills removed above. */
+.dev-shell .choice-card { min-height: 112px; border: 1px solid var(--border-soft) !important; border-radius: 16px !important; background: var(--surface-subtle) !important; box-shadow: none !important; transition: background-color 180ms, border-color 180ms; }
+.dev-shell .choice-card:hover { border-color: var(--border) !important; }
+.dev-shell .choice-card[aria-pressed="true"] { background: var(--primary-soft) !important; border-color: var(--primary) !important; box-shadow: inset 3px 0 0 var(--primary) !important; }

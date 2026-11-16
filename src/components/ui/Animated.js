@@ -12,6 +12,7 @@ export const createAnimatedComponent = (tag, displayName) => {
     onAnimationComplete, onAnimationStart, style, ...props
   }, ref) {
     const localRef = useRef(null);
+    const previous = useRef(null);
     const callbacks = useRef({ onAnimationComplete, onAnimationStart });
     callbacks.current = { onAnimationComplete, onAnimationStart };
     const animationKey = JSON.stringify({ initial, animate, transition, whileInView, viewport });
@@ -25,10 +26,12 @@ export const createAnimatedComponent = (tag, displayName) => {
       const run = () => {
         animation?.cancel();
         if (preference.matches) return;
+        const target = motionStyle(config.whileInView || config.animate);
         animation = animateSurface(element, [
-          motionStyle(config.initial || {}),
-          motionStyle(config.whileInView || config.animate),
+          previous.current || motionStyle(config.initial || {}),
+          target,
         ], { duration: (config.transition.duration ?? .38) * 1000, delay: (config.transition.delay ?? 0) * 1000 });
+        previous.current = target;
         if (animation) {
           callbacks.current.onAnimationStart?.();
           animation.onfinish = () => callbacks.current.onAnimationComplete?.();
