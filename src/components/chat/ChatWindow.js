@@ -99,7 +99,7 @@ export default function ChatWindow({ onClose, onMinimize }) {
   }, [engine, restoredContext]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    messagesEndRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "end" });
   }, [messages, isTyping, pendingAction, actionStatus]);
 
   useEffect(() => {
@@ -144,13 +144,13 @@ export default function ChatWindow({ onClose, onMinimize }) {
       const element = document.getElementById(url.hash.slice(1));
       if (element) {
         window.history.replaceState(null, "", `${url.pathname}${url.search}${url.hash}`);
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        element.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
         return;
       }
     }
 
     if (isSamePage && !url.hash) {
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
       return;
     }
 

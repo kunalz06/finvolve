@@ -12,7 +12,7 @@ export default function Button({
   ...props
 }) {
   const baseStyles =
-    "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-center font-bold tracking-[0.01em] transition-[background-color,border-color,box-shadow,transform] duration-150 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-0";
+    "liquid-button inline-flex min-h-11 items-center justify-center gap-2 rounded-lg text-center font-bold tracking-[0.01em] transition-[background-color,border-color,box-shadow,transform] duration-150 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 active:translate-y-0";
 
   const variants = {
     primary:
@@ -47,7 +47,7 @@ export default function Button({
 
   if (href) {
     return (
-      <Link href={href} className={combinedClassName} {...props}>
+      <Link data-variant={variant} href={href} className={combinedClassName} {...props}>
         {children}
         {Icon && <Icon size={18} />}
       </Link>
@@ -55,7 +55,7 @@ export default function Button({
   }
 
   return (
-    <button className={combinedClassName} {...props}>
+    <button data-variant={variant} className={combinedClassName} {...props}>
       {children}
       {Icon && <Icon size={18} />}
     </button>

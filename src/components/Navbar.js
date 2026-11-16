@@ -59,7 +59,7 @@ export default function Navbar() {
           <div className="glass-surface-strong flex min-h-16 items-center justify-between rounded-2xl px-3 py-2.5 sm:px-4 md:px-5">
             <Link href="/dev" className="group flex min-w-0 items-center gap-3" aria-label="DEV Infinity home">
               <BrandMark withWordmark className="min-w-0" />
-              <span className="os-nav-id hidden xl:inline-flex" aria-hidden="true">001 / STUDIO</span>
+
             </Link>
 
             <div className="hidden items-center gap-1 lg:flex">
@@ -71,7 +71,7 @@ export default function Navbar() {
                       key={link.href}
                       href={link.href}
                       aria-current={active ? "page" : undefined}
-                      className={`rounded-md px-3 py-2 text-sm font-semibold transition-colors ${active
+                      className={`nav-link ${active
                         ? "bg-[var(--primary-soft)] text-[var(--primary)] shadow-sm"
                         : "text-[var(--muted)] hover:bg-[var(--surface-strong)] hover:text-[var(--heading)]"
                       }`}
@@ -123,7 +123,7 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     aria-current={active ? "page" : undefined}
-                    className={`rounded-lg px-4 py-3 text-sm font-semibold ${active
+                    className={`nav-link ${active
                       ? "bg-[var(--primary-soft)] text-[var(--primary)]"
                       : "text-[var(--foreground)] hover:bg-[var(--surface-muted)]"
                     }`}

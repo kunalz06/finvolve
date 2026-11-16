@@ -33,7 +33,7 @@ export default function ChatMessage({ message, onFeedback }) {
                   const isSamePage = url.pathname === window.location.pathname;
                   if (isSamePage && url.hash) {
                     const el = document.getElementById(url.hash.slice(1));
-                    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    if (el) el.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
                   } else {
                     window.location.href = card.link;
                   }
