@@ -117,7 +117,7 @@ test("all email templates use the shared current logo asset", () => {
   const newsletter = read("src/lib/server/newsletter.js");
   const logo = read("public/dev-infinity-email-logo.svg");
 
-  assert.match(newsletter, /dev-infinity-email-logo\.svg/);
+  assert.match(read("src/lib/server/email-layout.mjs"), /dev-infinity-email-logo\.png/);
   assert.match(newsletter, /renderEmailBrandLogo/);
   assert.match(newsletter, /ensureEmailBrandLogo/);
   assert.match(newsletter, /html:\s*ensureEmailBrandLogo\(html\)/);

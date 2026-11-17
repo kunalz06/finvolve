@@ -2,33 +2,11 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 import { getCanonicalApiUrl, getCanonicalSiteUrl } from "@/lib/server/site-url";
 import { SUPPORT_EMAIL } from "@/lib/site-contact";
+import { ensureEmailBrandLogo } from "./email-layout.mjs";
+export { EMAIL_LOGO_URL, renderEmailBrandLogo, ensureEmailBrandLogo } from "./email-layout.mjs";
+export { renderNewsletterHtml, renderProjectRequestAcknowledgementHtml, renderPaymentLinkHtml } from "./email-templates.mjs";
 
 export const NEWSLETTER_COLLECTION = "newsletter_subscribers";
-export const EMAIL_LOGO_URL = "https://devsoftwareai.live/dev-infinity-email-logo.svg";
-
-export function renderEmailBrandLogo({ width = 196, cloud = false } = {}) {
-    const label = cloud ? "DEV Infinity Cloud" : "DEV Infinity";
-    return `<img src="${EMAIL_LOGO_URL}" width="${width}" alt="${label}" style="display:block;width:${width}px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none;" />`;
-}
-
-export function ensureEmailBrandLogo(html) {
-    if (!html) return html;
-
-    const source = String(html);
-    if (
-        source.includes(EMAIL_LOGO_URL) ||
-        source.includes("dev-infinity-email-logo.svg")
-    ) {
-        return source;
-    }
-
-    const brand = `<div style="padding:20px 24px 0;text-align:center;">${renderEmailBrandLogo()}</div>`;
-    const bodyTag = source.match(/<body\b[^>]*>/i)?.[0];
-
-    return bodyTag
-        ? source.replace(bodyTag, `${bodyTag}${brand}`)
-        : `${brand}${source}`;
-}
 
 export function normalizeNewsletterEmail(email) {
     return String(email || "").trim().toLowerCase();
@@ -84,37 +62,6 @@ function getFromAddress() {
     return `"${fromName.replace(/"/g, "")}" <${fromEmail}>`;
 }
 
-function escapeHtml(value) {
-    return String(value || "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-}
-
-export function renderNewsletterHtml({ title, body, unsubscribeUrl }) {
-    const safeTitle = escapeHtml(title);
-    const safeBody = escapeHtml(body).replace(/\n/g, "<br />");
-    const safeUnsubscribeUrl = escapeHtml(unsubscribeUrl);
-
-    return `
-        <div style="margin:0;padding:32px;background:#eef3ff;font-family:Segoe UI,Arial,sans-serif;color:#142033;">
-            <div style="max-width:640px;margin:0 auto;background:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.8);border-radius:28px;padding:32px;box-shadow:0 24px 60px rgba(24,34,66,0.14);">
-                <div style="margin:0 0 18px;">${renderEmailBrandLogo()}</div>
-                <p style="margin:0 0 8px;color:#5b5cf0;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;font-weight:700;">Newsletter</p>
-                <h1 style="margin:0 0 20px;font-size:28px;line-height:1.2;color:#111827;">${safeTitle}</h1>
-                <div style="font-size:16px;line-height:1.75;color:#46556f;">${safeBody}</div>
-                <hr style="border:0;border-top:1px solid #e5e7eb;margin:32px 0 20px;" />
-                <p style="margin:0;color:#6b7280;font-size:13px;line-height:1.6;">
-                    You are receiving this because you subscribed to DEV♾️ updates.
-                    <a href="${safeUnsubscribeUrl}" style="color:#7c5cff;">Unsubscribe</a>
-                </p>
-            </div>
-        </div>
-    `;
-}
-
 export async function sendNewsletterMail({ to, subject, text, html, unsubscribeUrl }) {
     const transporter = nodemailer.createTransport(getTransportConfig());
     const from = getFromAddress();
@@ -128,53 +75,4 @@ export async function sendNewsletterMail({ to, subject, text, html, unsubscribeU
         text: textBody,
         html: ensureEmailBrandLogo(html),
     });
-}
-
-export function renderProjectRequestAcknowledgementHtml({ name, projectType, timeline, description }) {
-    const safeName = escapeHtml(name || "there");
-    const safeProjectType = escapeHtml(projectType || "your project");
-    const timelineLabel = typeof timeline === "number" ? `${timeline} weeks` : (timeline || "to be discussed");
-    const safeTimeline = escapeHtml(timelineLabel);
-    const safeDescription = escapeHtml(description).replace(/\n/g, "<br />");
-
-    return `
-        <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
-            <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
-                <div style="margin:0 0 20px;">${renderEmailBrandLogo()}</div>
-                <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">We received your project request</h1>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, thanks for sharing your idea. We have your request and will review it carefully before getting back to you.</p>
-                <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">
-                    <p style="margin:0 0 8px;"><strong>Project type:</strong> ${safeProjectType}</p>
-                    <p style="margin:0 0 8px;"><strong>Timespan:</strong> ${safeTimeline}</p>
-                    <p style="margin:0;"><strong>Description:</strong><br />${safeDescription}</p>
-                </div>
-                <p style="margin:22px 0 0;font-size:14px;line-height:1.7;color:#5e6773;">You do not need to do anything else right now. We will reply from this same email channel.</p>
-            </div>
-        </div>
-    `;
-}
-
-export function renderPaymentLinkHtml({ clientName, amount, currency = "INR", paymentUrl, expiresAt, notes }) {
-    const safeName = escapeHtml(clientName || "there");
-    const safeAmount = escapeHtml(`${currency} ${Number(amount || 0).toLocaleString("en-IN")}`);
-    const safePaymentUrl = escapeHtml(paymentUrl);
-    const safeExpiresAt = escapeHtml(expiresAt ? new Date(expiresAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" }) : "soon");
-    const safeNotes = notes ? escapeHtml(notes).replace(/\n/g, "<br />") : "";
-
-    return `
-        <div style="margin:0;padding:32px;background:#f5f2ea;font-family:Segoe UI,Arial,sans-serif;color:#101820;">
-            <div style="max-width:640px;margin:0 auto;background:#fffaf0;border:2px solid #101820;border-radius:18px;padding:32px;box-shadow:8px 8px 0 #101820;">
-                <div style="margin:0 0 20px;">${renderEmailBrandLogo()}</div>
-                <h1 style="margin:0 0 18px;font-size:28px;line-height:1.2;color:#101820;">Your secure payment link is ready</h1>
-                <p style="margin:0 0 18px;font-size:16px;line-height:1.7;color:#46515f;">Hi ${safeName}, please use the secure link below to complete your payment.</p>
-                <div style="border:2px solid #101820;border-radius:14px;padding:18px;background:#ffffff;">
-                    <p style="margin:0 0 8px;"><strong>Amount:</strong> ${safeAmount}</p>
-                    <p style="margin:0 0 16px;"><strong>Link expires:</strong> ${safeExpiresAt}</p>
-                    <a href="${safePaymentUrl}" style="display:inline-block;background:#2457ff;color:#ffffff;text-decoration:none;border:2px solid #101820;border-radius:12px;padding:12px 18px;font-weight:800;">Open payment link</a>
-                </div>
-                ${safeNotes ? `<p style="margin:20px 0 0;font-size:14px;line-height:1.7;color:#46515f;"><strong>Note:</strong><br />${safeNotes}</p>` : ""}
-                <p style="margin:22px 0 0;font-size:13px;line-height:1.7;color:#5e6773;">If the button does not open, paste this link into your browser:<br /><span style="word-break:break-all;">${safePaymentUrl}</span></p>
-            </div>
-        </div>
-    `;
 }
