@@ -12,6 +12,7 @@ const navLinks = [
   { name: "Home", href: "/dev" },
   { name: "Services", href: "/dev/services" },
   { name: "Cloud", href: "/dev/cloud" },
+  { name: "Courses", href: "/dev/course" },
   { name: "About", href: "/dev/about" },
   { name: "Contact", href: "/dev/contact" },
 ];
