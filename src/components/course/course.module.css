@@ -17,12 +17,13 @@
     grid-template-columns: 1.28fr 1fr;
     align-items: center;
     gap: clamp(26px, 4.5vw, 76px);
-    padding-block: 55px 64px;
+    padding-block: 65px 70px;
 }
 
 .course h1, .course h2, .course h3, .course p { margin: 0; }
 .hero h1 { font-size: clamp(42px, 5.35vw, 88px); line-height: 1.07; text-wrap: initial; }
 .hero h1 span { color: var(--course-brand); }
+.mobileFee, .mobileClosed { display: none; }
 .course .eyebrow { font-size: .98rem; font-weight: 800; letter-spacing: .085em; text-transform: uppercase; color: var(--course-brand); margin-bottom: 10px; }
 .course .intro { max-width: 36rem; font-size: clamp(18px, 1.65vw, 24px); margin-top: 24px; line-height: 1.42; }
 .dates, .dates > div { display: flex; align-items: center; gap: 12px; }
@@ -59,6 +60,10 @@
 .art { display: block; width: 100%; height: auto; aspect-ratio: 2 / 1; object-fit: cover; background: #80091f; }
 .offerBody { position: relative; margin-top: -13px; background: var(--course-panel); border-radius: 20px 20px 0 0; padding: 23px 30px 28px; }
 .offer .eyebrow { margin-bottom: 2px; }
+@media (min-width: 941px) {
+    .hero .actions :is(.primary, .secondary) { min-height: 56px; min-width: clamp(167px, 15vw, 225px); }
+    .offer .verticalActions .primary { min-height: 55px; }
+}
 .course .price { color: var(--course-text); font-size: clamp(38px, 4.6vw, 66px); line-height: 1.05; margin: 0 0 17px; font-weight: 800; }
 .course .offerNote { font-size: .92rem; margin-top: 8px; }
 .section { padding-block: 28px; scroll-margin-top: 100px; }
@@ -140,15 +145,22 @@
     .hero { padding-block: 27px 20px; gap: 26px; }
     .hero h1 { font-size: clamp(33px, 9.6vw, 60px); }
     .course .intro { margin-top: 15px; }
-    .dates { margin-block: 17px; }
-    .offerBody { padding-inline: 20px; }
+    .dates { display: grid; grid-template-columns: 1fr 1fr; margin-block: 17px; align-items: start; }
+    .dates > div { gap: 7px; }
+    .dates > div + div { border: 0; padding: 0; }
+    .dates svg { width: 28px; height: 28px; padding: 6px; }
+    .dates dt { font-size: .69rem; letter-spacing: .025em; white-space: nowrap; }
+    .dates dd { font-size: .97rem; }
+    .offerBody { display: none; }
+    .course .mobileFee { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+    .mobileFee strong { color: var(--course-text); font-size: 1.44rem; }
+    .course .mobileClosed { display: block; margin-top: 9px; }
     .formats { grid-template-columns: 1fr 1fr; }
     .internship { gap: 13px; padding: 18px; }
     .internship > svg { width: 25px; height: 25px; }
 }
 @media (max-width: 365px) {
-    .dates { align-items: flex-start; flex-direction: column; }
-    .dates > div + div { border: 0; padding: 0; }
+    .dates { grid-template-columns: 1fr; }
 }
 
 .adminList { list-style: none; padding: 0; }

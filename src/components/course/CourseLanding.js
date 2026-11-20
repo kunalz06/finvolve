@@ -36,7 +36,7 @@ export default function CourseLanding({ allowDraft }) {
         ["How do I enroll?", "Create an account or sign in, enter your registration details, choose your study materials, and complete checkout. Your dashboard unlocks after payment is confirmed."],
         ["What study materials are included?", "Digital study materials are included in the course fee. Printed copies can be purchased separately when the option is available."],
         ["When are live classes?", settings?.schedule || "The live class schedule is awaiting confirmation. Enrolled students can view class times and joining links in the portal."],
-        ["How is the internship awarded?", "Complete the course successfully and score at least 80% to qualify for a guaranteed paid internship with DEV Infinity."],
+        ["How is the internship awarded?", "Complete the course successfully and score at least 80% to qualify for a guaranteed paid internship with DEV Infinity. Your score is calculated from the total marks earned across assignments and projects."],
         ...(settings?.refundPolicy ? [["What is the refund policy?", settings.refundPolicy]] : []),
     ];
 
@@ -51,7 +51,9 @@ export default function CourseLanding({ allowDraft }) {
                         <div><CalendarDays aria-hidden="true" /><div><dt>Registration deadline</dt><dd><time dateTime="2026-11-26">{REGISTRATION_DEADLINE}</time></dd></div></div>
                         <div><CalendarDays aria-hidden="true" /><div><dt>Course starts</dt><dd><time dateTime="2026-12-01">{COURSE_START}</time></dd></div></div>
                     </dl>
+                    <p className={styles.mobileFee}>Course fee <strong>{inr(COURSE_FEE)}</strong></p>
                     <CourseActions closed={closed} />
+                    {closed && <p className={styles.mobileClosed}>Registration is currently closed.</p>}
                 </div>
                 <aside className={styles.offer} aria-label="Course enrollment">
                     <Image className={styles.art} src="/course/red-gears.webp" alt="" width={1000} height={500} priority />
