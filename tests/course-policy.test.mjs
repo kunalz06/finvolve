@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
-    canPublish, DEFAULT_SETTINGS, REGISTRATION_CLOSE, registrationOpen, summarizeProgress,
+    canPublish, courseCheckoutMode, courseCheckoutOpen, DEFAULT_SETTINGS, REGISTRATION_CLOSE, registrationOpen, summarizeProgress,
 } from "../src/lib/course.mjs";
 
 test("checkout requires published internship terms and closes at midnight IST", () => {
@@ -35,4 +35,18 @@ test("internship eligibility requires completion and all marks, with an inclusiv
     assert.deepEqual(summarizeProgress(items, { r: true }, marks, true), {
         finished: 3, total: 3, graded: 2, assessments: 2, score: 80, eligible: true,
     });
+});
+
+
+test("test checkout stays in Preview and requires a test credential pair", () => {
+    const beforeClose = REGISTRATION_CLOSE - 1;
+    assert.equal(courseCheckoutMode("preview", "rzp_live_public", "key"), null);
+    assert.equal(courseCheckoutMode("preview", "rzp_test_public", ""), null);
+    assert.equal(courseCheckoutMode("preview", "rzp_test_public", "key"), "test");
+    assert.equal(courseCheckoutMode("production", "rzp_test_public", "key"), null);
+    assert.equal(courseCheckoutMode("production", "rzp_live_public", "key"), "live");
+    assert.equal(courseCheckoutOpen(DEFAULT_SETTINGS, "preview", "test", beforeClose), true);
+    assert.equal(courseCheckoutOpen(DEFAULT_SETTINGS, "preview", "test", REGISTRATION_CLOSE), false);
+    assert.equal(courseCheckoutOpen(DEFAULT_SETTINGS, "preview", "live", beforeClose), false);
+    assert.equal(courseCheckoutOpen(DEFAULT_SETTINGS, "production", "live", beforeClose), false);
 });

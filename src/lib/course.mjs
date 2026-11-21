@@ -41,6 +41,21 @@ export function registrationOpen(settings, now = Date.now()) {
     return Boolean(settings.published && settings.enrollmentEnabled && canPublish(settings) && now < REGISTRATION_CLOSE);
 }
 
+export function courseCheckoutMode(environment, keyId, keySecret) {
+    if (!keySecret || !/^rzp_(test|live)_[a-zA-Z0-9]+$/.test(keyId || "")) return null;
+    const mode = keyId.startsWith("rzp_test_") ? "test" : "live";
+    if (environment === "preview" && mode !== "test") return null;
+    if (environment === "production" && mode !== "live") return null;
+    return mode;
+}
+
+export function courseCheckoutOpen(settings, environment, mode, now = Date.now()) {
+    if (!mode) return false;
+    if (environment === "preview") return mode === "test" && now < REGISTRATION_CLOSE;
+    if (environment === "production" && mode !== "live") return false;
+    return registrationOpen(settings, now);
+}
+
 export function isAssessment(item) {
     return item.type === "assignment" || item.type === "project";
 }

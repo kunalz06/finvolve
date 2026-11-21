@@ -1,9 +1,9 @@
 import { randomUUID } from "node:crypto";
 import Razorpay from "razorpay";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { COURSE_FEE, registrationOpen } from "@/lib/course.mjs";
+import { COURSE_FEE, canPublish, courseCheckoutMode, courseCheckoutOpen } from "@/lib/course.mjs";
 import { courseCollection } from "./course-environment";
-import { getRazorpayServerCredentials, verifyRazorpaySignature } from "./payments";
+import { verifyRazorpaySignature } from "./payments";
 
 const SOURCE = "professional_technology_course";
 const LEASE_MS = 60_000;
@@ -21,12 +21,31 @@ export function courseEnrollment(db, uid) {
 
 export const isEnrolled = (record) => record?.paymentStatus === "confirmed" && !record.suspended;
 
+const environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
+
+function paymentConfig() {
+    const keyId = (process.env.COURSE_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "").trim();
+    const keySecret = (process.env.COURSE_RAZORPAY_KEY_ID ? process.env.COURSE_RAZORPAY_KEY_SECRET : process.env.RAZORPAY_KEY_SECRET)?.trim();
+    return { keyId, keySecret, mode: courseCheckoutMode(environment, keyId, keySecret) };
+}
+
+export function enrollmentCheckout(settings) {
+    const { mode } = paymentConfig();
+    return {
+        enrollmentOpen: courseCheckoutOpen(settings, environment, mode),
+        preview: environment === "preview",
+        paymentMode: mode,
+    };
+}
+
 function paymentClient() {
-    const keys = getRazorpayServerCredentials();
-    if (process.env.VERCEL_ENV === "preview" && !keys.keyId.startsWith("rzp_test_")) {
-        throw new CourseError("Checkout requires Razorpay test credentials in Preview.", 503);
+    const { keyId, keySecret, mode } = paymentConfig();
+    if (!mode) {
+        throw new CourseError(environment === "preview"
+            ? "This preview needs Razorpay Test Mode credentials."
+            : "Course checkout is temporarily unavailable.", 503);
     }
-    return { ...keys, razorpay: new Razorpay({ key_id: keys.keyId, key_secret: keys.keySecret }) };
+    return { keyId, keySecret, razorpay: new Razorpay({ key_id: keyId, key_secret: keySecret }) };
 }
 
 function paymentDetails(record, keyId) {
@@ -53,11 +72,11 @@ export async function startCoursePayment(student, registration, settingsRef, quo
             return { existing: true, ...current };
         }
         const settings = config.data() || {};
-        if (!registrationOpen(settings)) throw new CourseError("Registration is currently closed.", 409);
+        if (!enrollmentCheckout(settings).enrollmentOpen) throw new CourseError("Registration is currently closed.", 409);
         if (current?.leaseExpires > Date.now()) {
             throw new CourseError("Checkout is being prepared. Please try again shortly.", 409);
         }
-        if (registration.hardcopy && (!Number.isSafeInteger(settings.hardcopyPrice) || settings.hardcopyPrice <= 0)) {
+        if (registration.hardcopy && (!settings.published || !canPublish(settings) || !Number.isSafeInteger(settings.hardcopyPrice) || settings.hardcopyPrice <= 0)) {
             throw new CourseError("Printed copies are currently unavailable.", 409);
         }
 
@@ -83,7 +102,7 @@ export async function startCoursePayment(student, registration, settingsRef, quo
         const settled = await reconcileCoursePayment(ref, reserved);
         if (settled.confirmed) return settled;
         const published = (await settingsRef.get()).data() || {};
-        if (settled.processing || settled.refunded || !registrationOpen(published)) {
+        if (settled.processing || settled.refunded || !enrollmentCheckout(published).enrollmentOpen) {
             throw new CourseError(settled.processing ? "Payment is being confirmed. Check its status shortly." : "Registration is currently closed for this order.", 409);
         }
         return paymentDetails(reserved, keyId);

@@ -21,3 +21,10 @@ export function apiUrl(path) {
 
     return apiBaseUrl ? `${apiBaseUrl}${normalizedPath}` : normalizedPath;
 }
+
+
+export function courseApiUrl() {
+    const path = "/dev/api/course";
+    // Keep Vercel Preview enrollment on its own API and Firestore collections.
+    return process.env.NEXT_PUBLIC_VERCEL_ENV ? path : apiUrl(path);
+}

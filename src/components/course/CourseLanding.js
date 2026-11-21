@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardCheck, Layers3, Laptop, Play, Shield, Video } from "lucide-react";
-import { apiUrl } from "@/lib/api";
+import { courseApiUrl } from "@/lib/api";
 import { COURSE_FEE, COURSE_START, COURSE_TITLE, MODULES, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
 import styles from "./course.module.css";
 
@@ -16,7 +16,7 @@ export default function CourseLanding({ allowDraft }) {
 
     useEffect(() => {
         const controller = new AbortController();
-        fetch(apiUrl("/dev/api/course"), { signal: controller.signal, cache: "no-store" })
+        fetch(courseApiUrl(), { signal: controller.signal, cache: "no-store" })
             .then((response) => response.ok ? response.json() : { published: false })
             .then(setSettings)
             .catch(() => { if (!controller.signal.aborted) setSettings({ published: false }); });

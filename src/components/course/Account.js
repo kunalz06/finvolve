@@ -6,7 +6,7 @@ import {
     sendPasswordResetEmail, signInWithEmailAndPassword, signOut,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
-import { apiUrl } from "@/lib/api";
+import { courseApiUrl } from "@/lib/api";
 import styles from "./course.module.css";
 
 export function useCourseAccount() {
@@ -24,7 +24,7 @@ export function useCourseAccount() {
 
 export async function courseRequest(user, action, payload) {
     const token = await user.getIdToken();
-    const response = await fetch(apiUrl("/dev/api/course"), {
+    const response = await fetch(courseApiUrl(), {
         method: "POST",
         cache: "no-store",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

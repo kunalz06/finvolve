@@ -121,12 +121,16 @@ function Enrollment({ user, data, update, refresh }) {
     }
 
     const unavailable = enrollment?.suspended || enrollment?.paymentStatus === "refunded";
+    const closedMessage = settings.preview && !settings.paymentMode
+        ? "Test checkout is unavailable until Razorpay Test Mode is configured."
+        : settings.published || settings.preview ? "Registration is currently closed." : "Registration will open once the course details are published.";
     return <section className={`${styles.panel} ${styles.narrow}`}>
         <h2>{COURSE_TITLE}</h2>
         <Notice error={error} message={message} />
         {unavailable && <p className={styles.banner}>This enrollment is unavailable. <Link href="/dev/contact">Contact DEV Infinity</Link> for help.</p>}
-        {!unavailable && !settings.enrollmentOpen && <p className={styles.banner}>{settings.published ? "Registration is currently closed." : "Registration will open once the course details are published."}</p>}
+        {!unavailable && !settings.enrollmentOpen && <p className={styles.banner}>{closedMessage}</p>}
         {!unavailable && settings.enrollmentOpen && <form className={styles.fields} onSubmit={pay}>
+            {settings.paymentMode === "test" && <p className={styles.banner}>Razorpay Test Mode. No real payment will be collected.</p>}
             {locked ? <p>Checkout details are saved for {enrollment.name}. Materials: {hardcopy ? "digital and printed copies" : "digital copies"}.</p> : <>
                 <label>Full name<input name="name" autoComplete="name" defaultValue={enrollment?.name || user.displayName || ""} required minLength={2} maxLength={120} /></label>
                 <label>Contact number<input name="phone" autoComplete="tel" type="tel" defaultValue={enrollment?.phone || ""} required minLength={7} maxLength={24} /></label>

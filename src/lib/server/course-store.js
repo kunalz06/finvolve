@@ -1,9 +1,9 @@
 import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
 import {
-    DEFAULT_SETTINGS, ITEM_TYPES, MODULES, canPublish, isAssessment, registrationOpen, summarizeProgress,
+    DEFAULT_SETTINGS, ITEM_TYPES, MODULES, canPublish, isAssessment, summarizeProgress,
 } from "@/lib/course.mjs";
 import { courseCollection, courseFilesRoot } from "./course-environment";
-import { CourseError, courseEnrollment, isEnrolled } from "./course-payments";
+import { CourseError, courseEnrollment, enrollmentCheckout, isEnrolled } from "./course-payments";
 
 const COURSE_CONFIG = courseCollection("course_config");
 export const COURSE_ITEMS = courseCollection("course_items");
@@ -32,8 +32,9 @@ export async function courseSettings(db) {
 }
 
 export function publicCourseSettings(settings) {
-    if (!settings.published || !canPublish(settings)) return { published: false, enrollmentOpen: false, hardcopyPrice: null };
-    return { ...settings, enrollmentOpen: registrationOpen(settings) };
+    const checkout = enrollmentCheckout(settings);
+    if (!settings.published || !canPublish(settings)) return { published: false, hardcopyPrice: null, ...checkout };
+    return { ...settings, ...checkout };
 }
 
 export const itemRef = (db, id) => db.collection(COURSE_ITEMS).doc(id);
