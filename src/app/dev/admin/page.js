@@ -459,10 +459,13 @@ export default function AdminPage() {
                             <h1 className="text-4xl font-bold tracking-tight text-slate-950 md:text-5xl">Workspace</h1>
                             <p className="mt-4 max-w-xl text-base text-slate-600">Review incoming project requests, open complete request details in-place, and keep payment links moving without leaving the dashboard.</p>
                         </div>
-                        <Button onClick={handleLogout} variant="secondary" className="w-full sm:w-auto">
-                            Sign Out
-                            <LogOut size={18} />
-                        </Button>
+                        <div className="flex flex-wrap gap-2">
+                            <Button href="/dev/course/admin" variant="secondary">Course administration</Button>
+                            <Button onClick={handleLogout} variant="secondary">
+                                Sign Out
+                                <LogOut size={18} />
+                            </Button>
+                        </div>
                     </div>
                 </section>
 

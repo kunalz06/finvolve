@@ -125,3 +125,17 @@ npm run set-admin -- FIREBASE_UID
 - Firestore rules are deny-by-default for sensitive reads/writes.
 - Payment links are tokenized and server-verified before marking paid.
 - Payment verification happens via `/dev/api/verify-payment`; signed Cashfree notifications use `/dev/api/cashfree/webhook`.
+
+## Professional Technology Training Program
+
+- Public course: `/dev/course`
+- Student login, registration, and dashboard: `/dev/course/portal`
+- Course administration: `/dev/course/admin`
+
+The course uses the site's Firebase Email/Password authentication, Firestore, and Razorpay credentials. Enable Email/Password sign-in and authorize the deployed domain in Firebase Auth. Course administrators use the existing admin custom claim. Course collections use the server SDK and are covered by the Firestore rules' default deny for direct client access.
+
+Use a private Cloud Storage bucket for learning files and uploads. Set `COURSE_STORAGE_BUCKET` to select a separate bucket or let it fall back to `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`. The Firebase service account needs read and create access to the objects and must be able to sign URLs. Configure bucket CORS for the approved site origins, with GET and PUT methods and the Content-Type, x-goog-if-generation-match, and x-goog-content-length-range headers. The browser uploads directly to Storage using a signed URL.
+
+For automatic payment confirmation and refund status, configure Razorpay to send `payment.captured` and `refund.processed` events to `/dev/api/course/webhook` with the existing `RAZORPAY_WEBHOOK_SECRET`, or set `COURSE_RAZORPAY_WEBHOOK_SECRET` for a separate webhook secret. Enable automatic capture in Razorpay. Students and administrators can also reconcile payment status from their portals. Production and Vercel Preview course data are separate when Vercel system environment variables are exposed. Vercel-hosted course pages use their own deployment’s API. To activate test enrollment on the protected Preview, add both `COURSE_RAZORPAY_KEY_ID` and `COURSE_RAZORPAY_KEY_SECRET` to the Preview environment for the course branch, then redeploy. Use a matching Razorpay Test Mode pair. Test enrollment is available through the registration deadline while course terms are still in draft. Production uses the existing live Razorpay keys and the publication and enrollment switches.
+
+The approved course terms are prefilled and live enrollment is enabled by default through the registration deadline. Course administration can pause enrollment or update publication settings. Students must accept the enrollment terms before payment. The portal provides a receipt after payment confirmation and a certificate after an administrator confirms course completion. The internship opportunity requires a score above 80%. The schedule, refund policy, and optional printed-copy price can be entered as they are confirmed. The printed option remains unavailable until a price is saved. Registration closes at the end of 26 November 2026 in India.
