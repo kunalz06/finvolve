@@ -5,7 +5,7 @@ import { reconcileCourseRefund, reconcileCourseWebhook } from "@/lib/server/cour
 export const runtime = "nodejs";
 
 export async function POST(request) {
-    const secret = process.env.COURSE_RAZORPAY_WEBHOOK_SECRET;
+    const secret = process.env.COURSE_RAZORPAY_WEBHOOK_SECRET || process.env.RAZORPAY_WEBHOOK_SECRET;
     if (!secret) return NextResponse.json({ error: "Webhook is unavailable." }, { status: 503 });
     const signature = request.headers.get("x-razorpay-signature") || "";
     const body = await request.text();

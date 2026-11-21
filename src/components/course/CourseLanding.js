@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardCheck, Layers3, Laptop, Play, Shield, Video } from "lucide-react";
 import { courseApiUrl } from "@/lib/api";
-import { COURSE_FEE, COURSE_START, COURSE_TITLE, MODULES, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
+import { COURSE_FEE, COURSE_START, COURSE_TITLE, DEFAULT_SETTINGS, MODULES, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
 import styles from "./course.module.css";
 
 const moduleIcons = [Laptop, Shield, Layers3];
@@ -36,7 +36,8 @@ export default function CourseLanding({ allowDraft }) {
         ["How do I enroll?", "Create an account or sign in, enter your registration details, choose your study materials, and complete checkout. Your dashboard unlocks after payment is confirmed."],
         ["What study materials are included?", "Digital study materials are included in the course fee. Printed copies can be purchased separately when the option is available."],
         ["When are live classes?", settings?.schedule || "The live class schedule is awaiting confirmation. Enrolled students can view class times and joining links in the portal."],
-        ["How is the internship awarded?", "Complete the course successfully and score at least 80% to qualify for a guaranteed paid internship with DEV Infinity. Your score is calculated from the total marks earned across assignments and projects."],
+        ["Will I receive a certificate?", "Every student who successfully completes the course receives a certificate of completion."],
+        ["How is the internship awarded?", `Students who successfully complete the course and score above 80% are eligible for a paid internship opportunity. Duration and mode: ${settings?.internshipDuration || DEFAULT_SETTINGS.internshipDuration}. Stipend: ${settings?.internshipStipend || DEFAULT_SETTINGS.internshipStipend}.`],
         ...(settings?.refundPolicy ? [["What is the refund policy?", settings.refundPolicy]] : []),
     ];
 
@@ -91,14 +92,14 @@ export default function CourseLanding({ allowDraft }) {
                     <BriefcaseBusiness aria-hidden="true" />
                     <div>
                         <h2 id="internship-heading">Paid Internship Opportunity</h2>
-                        <p>Complete the course successfully and score at least <strong>80%</strong> to qualify for a guaranteed paid internship with DEV Infinity.</p>
+                        <p>All students who successfully complete the course receive a certificate. Students who also score <strong>above 80%</strong> are eligible for a paid internship opportunity with DEV Infinity.</p>
                         {settings?.published ? <dl className={styles.terms}>
                             <div><dt>Course completion</dt><dd>{settings.completionCriteria}</dd></div>
                             <div><dt>Duration</dt><dd>{settings.internshipDuration}</dd></div>
                             <div><dt>Stipend</dt><dd>{settings.internshipStipend}</dd></div>
-                            <div><dt>Onboarding</dt><dd>{settings.internshipOnboarding}</dd></div>
-                            <div><dt>Other terms</dt><dd>{settings.internshipTerms}</dd></div>
-                        </dl> : <p className={styles.offerNote}>Internship terms are awaiting confirmation.</p>}
+                            {settings.internshipOnboarding && <div><dt>Onboarding</dt><dd>{settings.internshipOnboarding}</dd></div>}
+                            {settings.internshipTerms && <div><dt>Other terms</dt><dd>{settings.internshipTerms}</dd></div>}
+                        </dl> : <p>Three months, online. The stipend will be discussed with interested candidates.</p>}
                     </div>
                 </div>
             </section>

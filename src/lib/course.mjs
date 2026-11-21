@@ -4,7 +4,7 @@ export const REGISTRATION_DEADLINE = "26 November 2026";
 export const REGISTRATION_CLOSE = Date.parse("2026-11-27T00:00:00+05:30");
 export const COURSE_START = "1 December 2026";
 export const INTERNSHIP_THRESHOLD = 80;
-
+export const COURSE_TERMS_VERSION = "2026-11-21";
 export const MODULES = [
     { id: "machine-learning", title: "Machine Learning", description: "Explore how models learn from data, and put machine learning fundamentals into practice." },
     { id: "cybersecurity", title: "Cybersecurity", description: "Learn how to recognize common threats, protect systems, and apply core defensive security practices." },
@@ -20,20 +20,35 @@ export const ITEM_TYPES = {
 };
 
 export const DEFAULT_SETTINGS = {
-    published: false,
-    enrollmentEnabled: false,
+    published: true,
+    enrollmentEnabled: true,
     hardcopyPrice: null,
     schedule: "",
     refundPolicy: "",
-    internshipDuration: "",
-    internshipStipend: "",
+    internshipDuration: "3 months, online",
+    internshipStipend: "Discussed with interested candidates",
     internshipOnboarding: "",
     internshipTerms: "",
-    completionCriteria: "",
+    completionCriteria: "DEV Infinity confirms successful course completion.",
 };
 
+export function courseTerms(settings) {
+    const duration = settings.internshipDuration || DEFAULT_SETTINGS.internshipDuration;
+    const stipend = settings.internshipStipend || DEFAULT_SETTINGS.internshipStipend;
+    return [
+        "Students with backlogs may apply.",
+        "Enrollment is confirmed after Razorpay confirms the payment. Digital study materials are included. Printed copies are optional when available.",
+        "Students who successfully complete the course receive a certificate of completion.",
+        "Students who successfully complete the course and score above 80% are eligible for a paid internship opportunity with DEV Infinity.",
+        `Internship duration and mode: ${duration}`,
+        `Internship stipend: ${stipend}`,
+        settings.internshipOnboarding,
+        settings.internshipTerms,
+    ].filter(Boolean);
+}
+
 export function canPublish(settings) {
-    return ["internshipDuration", "internshipStipend", "internshipOnboarding", "internshipTerms", "completionCriteria"]
+    return ["internshipDuration", "internshipStipend", "completionCriteria"]
         .every((key) => settings[key]?.trim());
 }
 
@@ -74,7 +89,7 @@ export function summarizeProgress(items, progress = {}, submissions = {}, comple
         graded: graded.length,
         assessments: work.length,
         score,
-        eligible: completed && work.length > 0 && graded.length === work.length && earned * 100 >= possible * INTERNSHIP_THRESHOLD,
+        eligible: completed && work.length > 0 && graded.length === work.length && earned * 100 > possible * INTERNSHIP_THRESHOLD,
     };
 }
 

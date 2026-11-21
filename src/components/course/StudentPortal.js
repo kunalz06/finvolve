@@ -4,8 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { COURSE_FEE, COURSE_TITLE, ITEM_TYPES, MODULES, inr, isAssessment } from "@/lib/course.mjs";
+import { COURSE_FEE, COURSE_TERMS_VERSION, COURSE_TITLE, DEFAULT_SETTINGS, ITEM_TYPES, MODULES, courseTerms, inr, isAssessment } from "@/lib/course.mjs";
 import { AccountForm, Notice, SignOut, VerifyEmail, courseRequest, openFile, uploadCourseFile, useCourseAccount, useCourseActions } from "./Account";
+import { CourseDocuments } from "./CourseDocuments";
 import styles from "./course.module.css";
 
 let checkoutScript;
@@ -50,8 +51,14 @@ function StudentArea({ user }) {
 
     useEffect(() => {
         let active = true;
-        courseRequest(user, "student").then((next) => { if (active) setData(next); })
-            .catch((err) => { if (active) setError(err.message); });
+        courseRequest(user, "student").then(async (next) => {
+            if (!active) return;
+            setData(next);
+            if (next.enrollment?.orderId && next.enrollment.paymentStatus === "pending") {
+                const result = await courseRequest(user, "check-payment").catch(() => null);
+                if (active && result?.student.hasAccess) setData(result.student);
+            }
+        }).catch((err) => { if (active) setError(err.message); });
         return () => { active = false; };
     }, [user]);
 
@@ -75,6 +82,8 @@ function Enrollment({ user, data, update, refresh }) {
     const [checkoutOpen, setCheckoutOpen] = useState(false);
     const { busy, error, message, setMessage, run } = useCourseActions(user);
     const locked = Boolean(enrollment?.orderId);
+    const needsForm = !locked || !enrollment.termsAcceptedAt;
+    const terms = courseTerms(settings.published ? settings : DEFAULT_SETTINGS);
     const printedPrice = locked ? enrollment.hardcopyPrice : settings.hardcopyPrice;
     const hardcopy = locked ? enrollment.hardcopy : Boolean(printedPrice && selectedHardcopy);
     const amount = locked ? enrollment.amount : COURSE_FEE + (hardcopy ? printedPrice : 0);
@@ -93,10 +102,14 @@ function Enrollment({ user, data, update, refresh }) {
         run(async (request) => {
             await loadCheckout();
             const details = await request("start-payment", {
-                name: locked ? enrollment.name : form.get("name"),
-                phone: locked ? enrollment.phone : form.get("phone"),
-                address: locked ? enrollment.address : form.get("address") || "",
-                hardcopy,
+                registration: needsForm ? {
+                    name: form.get("name"), phone: form.get("phone"), dateOfBirth: form.get("dateOfBirth"),
+                    fieldOfStudy: form.get("fieldOfStudy"), graduationDate: form.get("graduationDate"),
+                    cgpa: form.get("cgpa"), experience: form.get("experience"),
+                    address: form.get("address") || "", hardcopy,
+                    termsVersion: COURSE_TERMS_VERSION, termsAccepted: form.has("termsAccepted"),
+                    refundPolicy: settings.refundPolicy || "", terms,
+                } : null,
                 quotedAmount: amount,
             }).catch(async (err) => {
                 await refresh().catch(() => {});
@@ -106,7 +119,7 @@ function Enrollment({ user, data, update, refresh }) {
             const razorpay = new window.Razorpay({
                 key: details.keyId, order_id: details.orderId, amount: details.amount, currency: details.currency,
                 name: "DEV Infinity", description: COURSE_TITLE,
-                prefill: { name: locked ? enrollment.name : form.get("name"), email: user.email, contact: locked ? enrollment.phone : form.get("phone") },
+                prefill: { name: needsForm ? form.get("name") : enrollment.name, email: user.email, contact: needsForm ? form.get("phone") : enrollment.phone },
                 theme: { color: "#ae1029" },
                 handler: (checkout) => {
                     setCheckoutOpen(false);
@@ -131,22 +144,37 @@ function Enrollment({ user, data, update, refresh }) {
         {!unavailable && !settings.enrollmentOpen && <p className={styles.banner}>{closedMessage}</p>}
         {!unavailable && settings.enrollmentOpen && <form className={styles.fields} onSubmit={pay}>
             {settings.paymentMode === "test" && <p className={styles.banner}>Razorpay Test Mode. No real payment will be collected.</p>}
-            {locked ? <p>Checkout details are saved for {enrollment.name}. Materials: {hardcopy ? "digital and printed copies" : "digital copies"}.</p> : <>
+            {!needsForm ? <p>Checkout details are saved for {enrollment.name}. Materials: {hardcopy ? "digital and printed copies" : "digital copies"}.</p> : <>
                 <label>Full name<input name="name" autoComplete="name" defaultValue={enrollment?.name || user.displayName || ""} required minLength={2} maxLength={120} /></label>
                 <label>Contact number<input name="phone" autoComplete="tel" type="tel" defaultValue={enrollment?.phone || ""} required minLength={7} maxLength={24} /></label>
-                <p>Confirmation will appear in your portal for <strong>{user.email}</strong>.</p>
+                <label>Email address<input name="email" type="email" value={user.email} readOnly /></label>
+                <div className={styles.split}>
+                    <label>Date of birth<input type="date" name="dateOfBirth" required max={new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10)} defaultValue={enrollment?.dateOfBirth || ""} /></label>
+                    <label>Expected graduation date<input type="date" name="graduationDate" required defaultValue={enrollment?.graduationDate || ""} /></label>
+                </div>
+                <label>Current field of study<input name="fieldOfStudy" maxLength={160} required defaultValue={enrollment?.fieldOfStudy || ""} /></label>
+                <label>Current CGPA<input name="cgpa" inputMode="decimal" pattern="[0-9]+(\.[0-9]+)?" maxLength={12} required defaultValue={enrollment?.cgpa || ""} /></label>
+                <p>Students with backlogs can apply.</p>
+                <label>Previous experience (optional)<textarea name="experience" maxLength={1500} defaultValue={enrollment?.experience || ""} /></label>
                 <fieldset className={styles.fields}>
                     <legend>Study materials</legend>
-                    <label className={styles.check}><input type="radio" name="materials" checked={!hardcopy} onChange={() => setHardcopy(false)} />Digital copies included</label>
-                    {printedPrice ? <label className={styles.check}><input type="radio" name="materials" checked={hardcopy} onChange={() => setHardcopy(true)} />Digital and printed copies · {inr(printedPrice)} extra</label> :
+                    <label className={styles.check}><input type="radio" name="materials" disabled={locked} checked={!hardcopy} onChange={() => setHardcopy(false)} />Digital copies included</label>
+                    {printedPrice ? <label className={styles.check}><input type="radio" name="materials" disabled={locked} checked={hardcopy} onChange={() => setHardcopy(true)} />Digital and printed copies · {inr(printedPrice)} extra</label> :
                         <p className={styles.offerNote}>Printed copies are currently unavailable at checkout.</p>}
                 </fieldset>
-                {hardcopy && <label>Delivery address<textarea name="address" autoComplete="street-address" required minLength={10} maxLength={600} /></label>}
+                {hardcopy && <label>Delivery address<textarea name="address" autoComplete="street-address" required minLength={10} maxLength={600} defaultValue={enrollment?.address || ""} /></label>}
             </>}
             <p><strong>Total {inr(amount)}</strong></p>
-            {settings.refundPolicy && <details><summary>Refund policy</summary><p className={styles.preline}>{settings.refundPolicy}</p></details>}
+            {needsForm && <fieldset>
+                <legend>Enrollment terms</legend>
+                <ul className={styles.enrollmentTerms}>{terms.map((term) => <li key={term}>{term}</li>)}</ul>
+                {settings.refundPolicy && <div><strong>Refund policy</strong><p className={styles.preline}>{settings.refundPolicy}</p></div>}
+                <p><Link href="/dev/privacy-policy" target="_blank" rel="noopener noreferrer">Privacy policy</Link></p>
+                <label className={styles.check}><input key={JSON.stringify([terms, settings.refundPolicy])} type="checkbox" name="termsAccepted" required /> I accept the enrollment terms.</label>
+            </fieldset>}
             <div><button type="submit" className={styles.primary} disabled={busy || checkoutOpen}>{busy || checkoutOpen ? "Please wait…" : `Pay ${inr(amount)} securely`}</button></div>
         </form>}
+        {unavailable && <CourseDocuments enrollment={enrollment} testMode={settings.preview} />}
         {locked && !unavailable && <button type="button" className={styles.secondary} disabled={busy || checkoutOpen} onClick={() => run((request) => check(request))}>Check payment status</button>}
     </section>;
 }
@@ -158,6 +186,7 @@ function Dashboard({ user, data, refresh }) {
 
     return <>
         <p className={styles.banner} role="status"><strong>Enrollment confirmed.</strong> Reference {enrollment.orderId}</p>
+        <CourseDocuments enrollment={enrollment} showCertificate testMode={data.settings.preview} />
         <div className={styles.split}>
             <section className={styles.panel}>
                 <h2>Your progress</h2>
@@ -167,8 +196,8 @@ function Dashboard({ user, data, refresh }) {
             </section>
             <section className={styles.panel}>
                 <h2>Internship eligibility</h2>
-                <p><strong>{summary.eligible ? "Eligible for a paid internship" : enrollment.courseCompleted && summary.assessments > 0 && summary.graded === summary.assessments ? "Score below the eligibility threshold" : "Eligibility pending"}</strong></p>
-                <p>Successful course completion and a score of at least 80% are required.</p>
+                <p><strong>{summary.eligible ? "Eligible for a paid internship opportunity" : enrollment.courseCompleted && summary.assessments > 0 && summary.graded === summary.assessments ? "Internship score requirement unmet" : "Eligibility pending"}</strong></p>
+                <p>Successful course completion and a score above 80% are required. Internship duration and mode: {data.settings.internshipDuration || DEFAULT_SETTINGS.internshipDuration}. Stipend: {data.settings.internshipStipend || DEFAULT_SETTINGS.internshipStipend}.</p>
                 {data.settings.completionCriteria && <p className={styles.preline}>{data.settings.completionCriteria}</p>}
             </section>
         </div>

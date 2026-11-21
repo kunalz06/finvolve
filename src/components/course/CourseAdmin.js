@@ -124,7 +124,7 @@ function SettingsForm({ user, settings, refresh }) {
 
     return <section className={styles.panel}>
         <h2>Publication settings</h2>
-        <p>Define the completion criteria and internship terms to publish. Add the schedule, refund policy, and printed-copy price as each is confirmed.</p>
+        <p>Update the course and internship details here. Add the schedule, refund policy, and printed-copy price as each is confirmed.</p>
         <Notice error={error} message={message} />
         <form className={styles.fields} onSubmit={save}>
             <label>Printed-copy price in rupees<input type="number" name="hardcopyPrice" step=".01" min=".01" max="1000000" defaultValue={settings.hardcopyPrice === null ? "" : settings.hardcopyPrice / 100} /></label>
@@ -234,6 +234,10 @@ function StudentRecord({ user, uid, items, refreshList }) {
         <h2>{enrollment.name}</h2>
         <dl className={styles.terms}>
             <div><dt>Contact</dt><dd>{enrollment.email} · {enrollment.phone}</dd></div>
+            {enrollment.dateOfBirth && <div><dt>Date of birth</dt><dd>{enrollment.dateOfBirth}</dd></div>}
+            {enrollment.fieldOfStudy && <div><dt>Academic details</dt><dd>{enrollment.fieldOfStudy} · Expected graduation {enrollment.graduationDate} · Current CGPA {enrollment.cgpa}</dd></div>}
+            {enrollment.experience && <div><dt>Previous experience</dt><dd>{enrollment.experience}</dd></div>}
+            {enrollment.termsAcceptedAt && <div><dt>Enrollment terms accepted</dt><dd>{new Date(enrollment.termsAcceptedAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST · Version {enrollment.termsVersion}</dd></div>}
             <div><dt>Payment</dt><dd>{enrollment.paymentStatus} · {inr(enrollment.amount)}{enrollment.orderId ? ` · ${enrollment.orderId}` : ""}{enrollment.paymentId ? ` · ${enrollment.paymentId}` : ""}</dd></div>
             <div><dt>Study materials</dt><dd>{enrollment.hardcopy ? `Digital and printed copies · ${inr(enrollment.hardcopyPrice)} add-on` : "Digital copies"}</dd></div>
             {enrollment.address && <div><dt>Delivery address</dt><dd>{enrollment.address}</dd></div>}
@@ -247,7 +251,7 @@ function StudentRecord({ user, uid, items, refreshList }) {
             setMessage(result.confirmed ? "Payment confirmed." : result.refunded ? "Payment refunded." : "Payment has yet to be confirmed.");
         })}>Check with Razorpay</button>}
         <form className={styles.fields} onSubmit={saveStatus}>
-            <label className={styles.check}><input type="checkbox" name="courseCompleted" defaultChecked={enrollment.courseCompleted} /> Successful course completion confirmed</label>
+            <label className={styles.check}><input type="checkbox" name="courseCompleted" defaultChecked={enrollment.courseCompleted} /> Successful course completion confirmed (issues the certificate)</label>
             <label className={styles.check}><input type="checkbox" name="suspended" defaultChecked={enrollment.suspended} /> Suspend paid course access</label>
             <div><button type="submit" className={styles.primary} disabled={busy}>Save student status</button></div>
         </form>

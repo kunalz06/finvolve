@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import Razorpay from "razorpay";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { COURSE_FEE, canPublish, courseCheckoutMode, courseCheckoutOpen } from "@/lib/course.mjs";
+import { COURSE_FEE, COURSE_TERMS_VERSION, DEFAULT_SETTINGS, canPublish, courseCheckoutMode, courseCheckoutOpen, courseTerms } from "@/lib/course.mjs";
 import { courseCollection } from "./course-environment";
 import { verifyRazorpaySignature } from "./payments";
 
@@ -24,8 +24,9 @@ export const isEnrolled = (record) => record?.paymentStatus === "confirmed" && !
 const environment = process.env.VERCEL_ENV || process.env.NODE_ENV;
 
 function paymentConfig() {
-    const keyId = (process.env.COURSE_RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "").trim();
-    const keySecret = (process.env.COURSE_RAZORPAY_KEY_ID ? process.env.COURSE_RAZORPAY_KEY_SECRET : process.env.RAZORPAY_KEY_SECRET)?.trim();
+    // Use the existing Razorpay credentials for production orders.
+    const keyId = ((environment === "preview" ? process.env.COURSE_RAZORPAY_KEY_ID : "") || process.env.RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "").trim();
+    const keySecret = (environment === "preview" && process.env.COURSE_RAZORPAY_KEY_ID ? process.env.COURSE_RAZORPAY_KEY_SECRET : process.env.RAZORPAY_KEY_SECRET)?.trim();
     return { keyId, keySecret, mode: courseCheckoutMode(environment, keyId, keySecret) };
 }
 
@@ -65,13 +66,41 @@ export async function startCoursePayment(student, registration, settingsRef, quo
         if (current?.paymentStatus === "refunded" || current?.suspended) {
             throw new CourseError("Contact course support about your enrollment.", 409);
         }
+        const settings = { ...DEFAULT_SETTINGS, ...config.data() };
+        const publicSettings = settings.published && canPublish(settings) ? settings : DEFAULT_SETTINGS;
+        const refundPolicy = publicSettings.refundPolicy;
+        const terms = courseTerms(publicSettings);
+        if (registration && (registration.refundPolicy !== refundPolicy || JSON.stringify(registration.terms) !== JSON.stringify(terms))) {
+            throw new CourseError("The enrollment terms changed. Review the updated terms before continuing.", 409);
+        }
+        const accepting = registration && {
+            name: registration.name,
+            phone: registration.phone,
+            dateOfBirth: registration.dateOfBirth,
+            fieldOfStudy: registration.fieldOfStudy,
+            graduationDate: registration.graduationDate,
+            cgpa: registration.cgpa,
+            experience: registration.experience,
+            hardcopy: registration.hardcopy,
+            address: registration.hardcopy ? registration.address : "",
+            email: student.email,
+            termsAcceptedAt: new Date().toISOString(),
+            termsVersion: COURSE_TERMS_VERSION,
+            acceptedTerms: terms,
+            refundPolicyAccepted: refundPolicy,
+        };
         if (current?.orderId) {
-            if (current.amount !== quotedAmount || current.hardcopy !== registration.hardcopy) {
+            if (current.amount !== quotedAmount || (registration && current.hardcopy !== registration.hardcopy)) {
                 throw new CourseError("An earlier checkout is saved. Reload the enrollment to review it.", 409);
+            }
+            if (!current.termsAcceptedAt) {
+                if (!accepting) throw new CourseError("Complete the enrollment form and accept the terms first.");
+                if (!enrollmentCheckout(settings).enrollmentOpen) throw new CourseError("Registration is currently closed.", 409);
+                tx.update(ref, accepting);
             }
             return { existing: true, ...current };
         }
-        const settings = config.data() || {};
+        if (!accepting) throw new CourseError("Complete the enrollment form and accept the terms first.");
         if (!enrollmentCheckout(settings).enrollmentOpen) throw new CourseError("Registration is currently closed.", 409);
         if (current?.leaseExpires > Date.now()) {
             throw new CourseError("Checkout is being prepared. Please try again shortly.", 409);
@@ -83,9 +112,7 @@ export async function startCoursePayment(student, registration, settingsRef, quo
         const hardcopyPrice = registration.hardcopy ? settings.hardcopyPrice : 0;
         if (COURSE_FEE + hardcopyPrice !== quotedAmount) throw new CourseError("The price changed. Reload the enrollment to review it.", 409);
         const details = {
-            ...registration,
-            address: registration.hardcopy ? registration.address : "",
-            email: student.email,
+            ...accepting,
             amount: COURSE_FEE + hardcopyPrice,
             hardcopyPrice,
             paymentStatus: "pending",
@@ -101,7 +128,7 @@ export async function startCoursePayment(student, registration, settingsRef, quo
     if (reserved.existing) {
         const settled = await reconcileCoursePayment(ref, reserved);
         if (settled.confirmed) return settled;
-        const published = (await settingsRef.get()).data() || {};
+        const published = { ...DEFAULT_SETTINGS, ...(await settingsRef.get()).data() };
         if (settled.processing || settled.refunded || !enrollmentCheckout(published).enrollmentOpen) {
             throw new CourseError(settled.processing ? "Payment is being confirmed. Check its status shortly." : "Registration is currently closed for this order.", 409);
         }

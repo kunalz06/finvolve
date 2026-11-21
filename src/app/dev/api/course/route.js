@@ -1,7 +1,7 @@
 import { FieldPath } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { canPublish, DEFAULT_SETTINGS, ITEM_TYPES, MODULES } from "@/lib/course.mjs";
+import { canPublish, COURSE_TERMS_VERSION, DEFAULT_SETTINGS, ITEM_TYPES, MODULES } from "@/lib/course.mjs";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { checkRateLimit } from "@/lib/server/rate-limit";
 import {
@@ -42,10 +42,25 @@ const itemSchema = z.object({
     asset: file.nullable(),
 });
 
+const enrollmentDetails = z.object({
+    name: text(120).min(2),
+    phone: text(24).regex(/^\+?[\d\s().-]{7,23}$/).refine((value) => value.replace(/\D/g, "").length >= 7),
+    dateOfBirth: z.iso.date().refine((date) => date <= new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10), { message: "Date of birth cannot be in the future." }),
+    fieldOfStudy: text(160).min(1),
+    graduationDate: z.iso.date(),
+    cgpa: text(12).regex(/^\d+(?:\.\d+)?$/),
+    experience: text(1500),
+    address: text(600),
+    hardcopy: z.boolean(),
+    termsVersion: z.literal(COURSE_TERMS_VERSION),
+    termsAccepted: z.literal(true),
+    refundPolicy: text(4000),
+    terms: z.array(text(4100)).min(6).max(8),
+}).refine((v) => !v.hardcopy || v.address.length >= 10, { message: "Enter the delivery address for printed copies." });
+
 const schema = z.discriminatedUnion("action", [
     z.object({ action: z.literal("student") }),
-    z.object({ action: z.literal("start-payment"), name: text(120).min(2), phone: text(24).regex(/^\+?[\d\s().-]{7,23}$/).refine((value) => value.replace(/\D/g, "").length >= 7), address: text(600), hardcopy: z.boolean(), quotedAmount: z.number().int().positive() })
-        .refine((v) => !v.hardcopy || v.address.length >= 10, { message: "Enter the delivery address for printed copies." }),
+    z.object({ action: z.literal("start-payment"), registration: enrollmentDetails.nullable(), quotedAmount: z.number().int().positive() }),
     z.object({ action: z.literal("check-payment"), checkout: z.object({
         razorpay_order_id: z.string().regex(/^order_[a-zA-Z0-9]+$/),
         razorpay_payment_id: z.string().regex(/^pay_[a-zA-Z0-9]+$/),
@@ -80,12 +95,12 @@ export function OPTIONS(request) {
 export async function GET(request) {
     try {
         if (process.env.NODE_ENV === "development" && !process.env.FIRESTORE_EMULATOR_HOST && !process.env.FIREBASE_PROJECT_ID && !process.env.FIREBASE_SERVICE_ACCOUNT_KEY && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
-            return response(request, publicCourseSettings(DEFAULT_SETTINGS));
+            return response(request, publicCourseSettings({ ...DEFAULT_SETTINGS, published: false, enrollmentEnabled: false }));
         }
         return response(request, publicCourseSettings(await courseSettings(getAdminDb())));
     } catch (error) {
         console.error("Course settings unavailable", error.code || error.name);
-        return response(request, publicCourseSettings(DEFAULT_SETTINGS), 503);
+        return response(request, { published: false, enrollmentOpen: false, hardcopyPrice: null }, 503);
     }
 }
 
@@ -119,8 +134,7 @@ async function studentAction(db, user, data) {
     const ref = courseEnrollment(db, user.uid);
     if (action === "student") return loadStudent(user.uid);
     if (action === "start-payment") {
-        const { name, phone, address, hardcopy, quotedAmount } = data;
-        return startCoursePayment(user, { name, phone, address, hardcopy }, configRef(db), quotedAmount);
+        return startCoursePayment(user, data.registration, configRef(db), data.quotedAmount);
     }
 
     const record = (await ref.get()).data();
@@ -173,7 +187,7 @@ async function adminAction(db, user, data) {
         return { students: page.map((doc) => ({ uid: doc.id, ...enrollmentView(doc.data()) })), nextCursor: students.size > 25 ? page.at(-1).id : null, items, settings };
     }
     if (action === "admin-settings") {
-        if (data.settings.published && !canPublish(data.settings)) throw new CourseError("Complete the eligibility criteria and all internship terms before publishing.");
+        if (data.settings.published && !canPublish(data.settings)) throw new CourseError("Provide the completion criteria, internship duration, and stipend arrangement before publishing.");
         await configRef(db).set(data.settings);
         return { ok: true };
     }
@@ -209,7 +223,11 @@ async function adminAction(db, user, data) {
             const record = (await tx.get(ref)).data();
             if (!record) throw new CourseError("Student not found.", 404);
             if (data.courseCompleted && record.paymentStatus !== "confirmed") throw new CourseError("Complete payment confirmation before marking the course complete.");
-            tx.update(ref, { courseCompleted: data.courseCompleted, suspended: data.suspended });
+            tx.update(ref, {
+                courseCompleted: data.courseCompleted,
+                courseCompletedAt: data.courseCompleted ? record.courseCompletedAt || new Date().toISOString() : null,
+                suspended: data.suspended,
+            });
         });
         return { ok: true };
     }

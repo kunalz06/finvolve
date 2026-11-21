@@ -168,3 +168,6 @@
 .fields fieldset { border: 1px solid var(--course-line); border-radius: 8px; padding: 9px 12px; }
 .fields legend { font-weight: 700; }
 .workspace summary { cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.enrollmentTerms { padding-inline-start: 1.3rem; }
+.enrollmentTerms li + li { margin-top: .35rem; }
