@@ -63,11 +63,13 @@ export default function Footer() {
             <div className="text-center md:text-left">
               <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted-strong)]">Services</h4>
               <ul className="space-y-3">
-                <FooterLink href="/dev/services">Web Development</FooterLink>
-                <FooterLink href="/dev/services">Mobile Apps</FooterLink>
-                <FooterLink href="/dev/services">AI Solutions</FooterLink>
+                <FooterLink href="/dev/services#machine-learning">Machine Learning</FooterLink>
+                <FooterLink href="/dev/services#automation">Workflow Automation</FooterLink>
+                <FooterLink href="/dev/services#llm-development">Custom LLM Development</FooterLink>
+                <FooterLink href="/dev/services#web-app">Web Development</FooterLink>
+                <FooterLink href="/dev/services#mobile-app">Mobile Apps</FooterLink>
                 <FooterLink href="/dev/cloud">Cloud & AI APIs</FooterLink>
-                <FooterLink href="/dev/services">Custom Software</FooterLink>
+                <FooterLink href="/dev/services#custom-software">Custom Software</FooterLink>
               </ul>
             </div>
 
