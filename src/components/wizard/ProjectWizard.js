@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { animateSurface } from "@/lib/ui/liquid-motion.mjs";
-import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle, Smartphone, Globe, Code, Cpu, BrainCircuit, Sparkles, Workflow, User, Mail, Loader2, AlertCircle, Zap } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { AnimatedDiv } from '@/components/ui/Animated';
@@ -18,6 +18,9 @@ const STEPS = [
 ];
 
 const PROJECT_TYPES = [
+  { id: 'machine-learning', label: 'Machine Learning', icon: BrainCircuit, desc: 'Forecasting, vision, and prediction' },
+  { id: 'automation', label: 'Workflow Automation', icon: Workflow, desc: 'Integrations and business processes' },
+  { id: 'llm-development', label: 'Custom LLM Development', icon: Sparkles, desc: 'Fine-tuning and knowledge assistants' },
   { id: 'web', label: 'Web Platform', icon: Globe, desc: 'SaaS, E-commerce, Marketing' },
   { id: 'mobile', label: 'Mobile App', icon: Smartphone, desc: 'iOS, Android, Cross-platform' },
   { id: 'custom', label: 'Custom Software', icon: Code, desc: 'Internal tools, Automation' },
@@ -31,12 +34,22 @@ const BUDGET_RANGES = [
   { id: 'custom', label: '\u20B950k+', desc: 'Complex Ecosystem' },
 ];
 
-export default function ProjectWizard() {
+const SERVICE_PROJECT_TYPES = {
+  "web-app": "web",
+  "mobile-app": "mobile",
+  saas: "web",
+  "custom-software": "custom",
+  database: "custom",
+  security: "custom",
+  design: "web",
+};
+
+export default function ProjectWizard({ service }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [direction, setDirection] = useState(0);
   const [timelineTouched, setTimelineTouched] = useState(false);
   const [formData, setFormData] = useState({
-    projectType: '',
+    projectType: PROJECT_TYPES.find(({ id }) => id === (SERVICE_PROJECT_TYPES[service] || service))?.label || '',
     timeline: 4,
     budget: '',
     name: '',
