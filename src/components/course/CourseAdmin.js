@@ -2,8 +2,9 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { ITEM_TYPES, MODULES, inr, isAssessment } from "@/lib/course.mjs";
+import { ITEM_TYPES, MODULES, REGISTRATION_DEADLINE, inr, isAssessment } from "@/lib/course.mjs";
 import { AccountForm, Notice, SignOut, courseRequest, openFile, uploadCourseFile, useCourseAccount, useCourseActions } from "./Account";
+import { plannedCourseItem, rubricMarks } from "@/lib/course-plan.mjs";
 import styles from "./course.module.css";
 
 const settingsFields = {
@@ -130,7 +131,7 @@ function SettingsForm({ user, settings, refresh }) {
             <label>Printed-copy price in rupees<input type="number" name="hardcopyPrice" step=".01" min=".01" max="1000000" defaultValue={settings.hardcopyPrice === null ? "" : settings.hardcopyPrice / 100} /></label>
             {Object.entries(settingsFields).map(([key, label]) => <label key={key}>{label}<textarea name={key} maxLength={4000} defaultValue={settings[key]} /></label>)}
             <label className={styles.check}><input type="checkbox" name="published" defaultChecked={settings.published} /> Publish course details</label>
-            <label className={styles.check}><input type="checkbox" name="enrollmentEnabled" defaultChecked={settings.enrollmentEnabled} /> Enable checkout through 26 November 2026 (IST)</label>
+            <label className={styles.check}><input type="checkbox" name="enrollmentEnabled" defaultChecked={settings.enrollmentEnabled} /> Enable checkout through {REGISTRATION_DEADLINE} (IST)</label>
             <div><button className={styles.primary} disabled={busy}>{busy ? "Saving…" : "Save settings"}</button></div>
         </form>
     </section>;
@@ -144,6 +145,7 @@ function ItemEditor({ user, item, done, cancel }) {
     const [type, setType] = useState(item.type || "live");
     const { busy, error, run } = useCourseActions(user);
     const assessment = isAssessment({ type });
+    const planned = plannedCourseItem(item.id);
     const usesAsset = type !== "live";
     const recording = type === "recording";
 
@@ -158,9 +160,9 @@ function ItemEditor({ user, item, done, cancel }) {
                 module: item.id ? item.module : form.get("module"),
                 type,
                 title: form.get("title"),
-                description: form.get("description"),
-                published: form.has("published"),
-                startsAt: type === "live" ? `${form.get("startsAt")}:00+05:30` : "",
+                description: planned ? item.description : form.get("description"),
+                published: planned ? true : form.has("published"),
+                startsAt: planned ? item.startsAt || "" : type === "live" ? `${form.get("startsAt")}:00+05:30` : "",
                 joinUrl: type === "live" ? form.get("joinUrl") : "",
                 maxMarks: assessment ? (item.id ? item.maxMarks : Number(form.get("maxMarks"))) : null,
                 asset,
@@ -175,20 +177,20 @@ function ItemEditor({ user, item, done, cancel }) {
         <form className={styles.fields} onSubmit={save}>
             <div className={styles.split}>
                 <label>Module<select name="module" defaultValue={item.module || MODULES[0].id} disabled={Boolean(item.id)}>{MODULES.map(({ id, title }) => <option value={id} key={id}>{title}</option>)}</select></label>
-                <label>Item type<select value={type} disabled={Boolean(item.id)} onChange={(event) => setType(event.target.value)}>{Object.entries(ITEM_TYPES).map(([key, label]) => <option value={key} key={key}>{label}</option>)}</select></label>
+                <label>Item type<select value={type} disabled={Boolean(item.id)} onChange={(event) => setType(event.target.value)}>{Object.entries(ITEM_TYPES).filter(([key]) => key !== "exam" || type === "exam").map(([key, label]) => <option value={key} key={key}>{label}</option>)}</select></label>
             </div>
-            <label>Title<input name="title" required minLength={2} maxLength={140} defaultValue={item.title || ""} /></label>
-            <label>{assessment ? "Instructions" : recording ? "Description and transcript" : "Description"}<textarea name="description" required={assessment} maxLength={8000} defaultValue={item.description || ""} /></label>
+            <label>Title<input name="title" readOnly={Boolean(planned)} required minLength={2} maxLength={140} defaultValue={item.title || ""} /></label>
+            <label>{assessment ? "Instructions" : recording ? "Description and transcript" : "Description"}<textarea name="description" readOnly={Boolean(planned)} required={assessment} maxLength={8000} defaultValue={item.description || ""} /></label>
             {type === "live" && <div className={styles.split}>
-                <label>Class date and time (IST)<input name="startsAt" type="datetime-local" required defaultValue={indiaDateTime(item.startsAt)} /></label>
+                <label>Class date and time (IST)<input name="startsAt" type="datetime-local" readOnly={Boolean(planned)} required defaultValue={indiaDateTime(item.startsAt)} /></label>
                 <label>Joining link<input name="joinUrl" type="url" placeholder="https://" required defaultValue={item.joinUrl || ""} /></label>
             </div>}
             {assessment && <label>Maximum marks<input type="number" name="maxMarks" required min="1" max="1000" disabled={Boolean(item.id)} defaultValue={item.maxMarks || ""} /></label>}
-            {usesAsset && <label>File {recording ? "(MP4 or WebM, up to 500 MB)" : "(PDF, ZIP, or TXT, up to 50 MB)"}
-                <input key={type} name="asset" type="file" accept={recording ? ".mp4,.webm" : ".pdf,.zip,.txt"} required={!assessment && !item.asset} />
+            {usesAsset && <label>{type === "exam" ? "Exam paper" : "File"} {recording ? "(MP4 or WebM, up to 500 MB)" : "(PDF, ZIP, or TXT, up to 50 MB)"}
+                <input key={type} name="asset" type="file" accept={recording ? ".mp4,.webm" : ".pdf,.zip,.txt"} required={(!assessment || type === "exam") && !item.asset} />
                 {item.asset && <small>Current file {item.asset.name}</small>}
             </label>}
-            <label className={styles.check}><input type="checkbox" name="published" defaultChecked={item.published} /> Show to enrolled students</label>
+            <label className={styles.check}><input type="checkbox" name="published" disabled={Boolean(planned)} defaultChecked={item.published} /> Show to enrolled students</label>
             <div className={styles.actions}>
                 <button className={styles.primary} disabled={busy}>{busy ? "Saving…" : "Save course item"}</button>
                 <button className={styles.secondary} type="button" disabled={busy} onClick={cancel}>Cancel</button>
@@ -257,7 +259,7 @@ function StudentRecord({ user, uid, items, refreshList }) {
         </form>
         <h3>Submissions and marks</h3>
         {Object.keys(submissions).length === 0 && <p>No work has been submitted.</p>}
-        {items.filter(({ id }) => submissions[id]).map((item) => <GradeForm key={`${item.id}-${submissions[item.id].revision}`} item={item} submission={submissions[item.id]} user={user} uid={uid} refresh={refresh} />)}
+        {items.filter(({ id, dueAt }) => submissions[id] || (dueAt && Date.now() > Date.parse(dueAt))).map((item) => <GradeForm key={`${item.id}-${submissions[item.id]?.revision || 0}`} item={item} submission={submissions[item.id] || { revision: 0, missing: true }} user={user} uid={uid} refresh={refresh} />)}
     </section>;
 }
 
@@ -268,7 +270,10 @@ function GradeForm({ item, submission, user, uid, refresh }) {
         event.preventDefault();
         const form = new FormData(event.currentTarget);
         run(async (request) => {
-            await request("admin-grade", { uid, itemId: item.id, marks: Number(form.get("marks")), feedback: form.get("feedback"), revision: submission.revision });
+            const grading = submission.missing ? {} : item.rubric
+                ? { completion: Number(form.get("completion")), quality: Number(form.get("quality")) }
+                : { marks: Number(form.get("marks")) };
+            await request("admin-grade", { uid, itemId: item.id, ...grading, feedback: form.get("feedback"), revision: submission.revision });
             await refresh(request);
             setMessage("Marks saved.");
         });
@@ -281,7 +286,11 @@ function GradeForm({ item, submission, user, uid, refresh }) {
             openFile((await request("admin-submission-file", { uid, itemId: item.id })).url);
         })}>Download {submission.file.name}</button></div>}
         <div className={styles.split}>
-            <label>Marks out of {item.maxMarks}<input name="marks" type="number" min="0" max={item.maxMarks} required defaultValue={submission.marks ?? ""} /></label>
+            {submission.missing ? <p>No submission. Record zero marks.</p> : item.rubric ? <>
+                <label>Completion out of {item.rubric.completion}<input name="completion" type="number" min="0" max={item.rubric.completion} required defaultValue={submission.rubric?.completion} /></label>
+                <label>Quality out of {item.rubric.quality}<input name="quality" type="number" min="0" max={item.rubric.quality} required defaultValue={submission.rubric?.quality} /></label>
+                <p>Timeliness {rubricMarks(item, submission, 0, 0).timeliness}/{item.rubric.timeliness} from the submission timestamp.</p>
+            </> : <label>Marks out of {item.maxMarks}<input name="marks" type="number" min="0" max={item.maxMarks} required defaultValue={submission.marks ?? ""} /></label>}
             <label>Feedback<textarea name="feedback" maxLength={6000} defaultValue={submission.feedback || ""} /></label>
         </div>
         <Notice error={error} message={message} />

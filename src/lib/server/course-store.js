@@ -2,6 +2,7 @@ import { getAdminAuth, getAdminDb } from "@/lib/firebase-admin";
 import {
     DEFAULT_SETTINGS, ITEM_TYPES, MODULES, canPublish, isAssessment, summarizeProgress,
 } from "@/lib/course.mjs";
+import { COURSE_PLAN_ITEMS, assessmentAvailability, plannedCourseItem } from "@/lib/course-plan.mjs";
 import { courseCollection, courseFilesRoot } from "./course-environment";
 import { CourseError, courseEnrollment, enrollmentCheckout, isEnrolled } from "./course-payments";
 
@@ -41,16 +42,26 @@ export const itemRef = (db, id) => db.collection(COURSE_ITEMS).doc(id);
 export const uploadPrefix = (uid, itemId) => `${courseFilesRoot}/submissions/${uid}/${itemId}`;
 export const assetPrefix = (uid) => `${courseFilesRoot}/assets/${uid}`;
 
+export function courseItem(id, stored) {
+    const planned = plannedCourseItem(id);
+    if (!planned) return stored ? { ...stored, id } : undefined;
+    if (planned.type === "live") return { ...planned, joinUrl: stored?.joinUrl || "", updatedAt: stored?.updatedAt };
+    return { ...planned, asset: stored?.asset || null, updatedAt: stored?.updatedAt };
+}
+
 export async function courseItems(db, includeUnpublished = false) {
     const collection = db.collection(COURSE_ITEMS);
-    const result = await (includeUnpublished ? collection : collection.where("published", "==", true)).get();
-    return result.docs.map((doc) => ({ ...doc.data(), id: doc.id })).sort((a, b) =>
-        MODULES.findIndex((module) => module.id === a.module) - MODULES.findIndex((module) => module.id === b.module) ||
-        (a.startsAt || a.createdAt).localeCompare(b.startsAt || b.createdAt));
+    const result = await collection.get();
+    const stored = Object.fromEntries(result.docs.map((doc) => [doc.id, doc.data()]));
+    return [...new Set([...Object.keys(stored), ...Object.keys(COURSE_PLAN_ITEMS)])]
+        .map((id) => courseItem(id, stored[id]))
+        .filter((item) => includeUnpublished || item.published)
+        .sort((a, b) => MODULES.findIndex((module) => module.id === a.module) - MODULES.findIndex((module) => module.id === b.module) ||
+            Date.parse(a.startsAt || a.opensAt || a.createdAt) - Date.parse(b.startsAt || b.opensAt || b.createdAt));
 }
 
 export async function requireItem(db, id, { admin = false, assessment = false } = {}) {
-    const item = (await itemRef(db, id).get()).data();
+    const item = courseItem(id, (await itemRef(db, id).get()).data());
     if (!item || (!admin && !item.published) || (assessment && !isAssessment(item))) {
         throw new CourseError("This course item is unavailable.", 404);
     }
@@ -88,7 +99,10 @@ export async function loadStudent(uid) {
     }));
     return {
         ...result,
-        items: items.map(({ asset, ...item }) => ({ ...item, assetName: asset?.name || null })),
+        items: items.map(({ asset, ...item }) => {
+            const availability = assessmentAvailability({ ...item, asset });
+            return { ...item, availability, assetName: item.type === "exam" && availability !== "open" ? null : asset?.name || null };
+        }),
         progress,
         submissions: visibleSubmissions,
         summary: summarizeProgress(items, progress, visibleSubmissions, record.courseCompleted),

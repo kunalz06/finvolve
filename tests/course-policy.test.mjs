@@ -62,3 +62,31 @@ test("enrollment terms include the confirmed internship arrangement and accept a
     assert.match(terms, /3 months, online/);
     assert.match(terms, /Discussed with interested candidates/);
 });
+
+test("four-week plan covers twelve live classes and 100 marks, including a timed final", async () => {
+    const { COURSE_PLAN_ITEMS, COURSE_ASSESSMENTS, assessmentAvailability, rubricMarks } = await import("../src/lib/course-plan.mjs");
+    const { COURSE_START_DATE, REGISTRATION_DATE } = await import("../src/lib/course.mjs");
+    const classes = Object.values(COURSE_PLAN_ITEMS).filter(({ type }) => type === "live");
+    const assessed = Object.values(COURSE_ASSESSMENTS);
+    const exam = COURSE_ASSESSMENTS["plan-final-exam"];
+    assert.equal(classes.length, 12);
+    assert.equal(classes[0].startsAt.slice(0, 10), COURSE_START_DATE);
+    assert.equal(REGISTRATION_DATE, "2026-12-03");
+    assert.equal(registrationOpen(DEFAULT_SETTINGS, Date.parse("2026-12-03T23:59:59+05:30")), true);
+    assert.equal(assessed.reduce((sum, item) => sum + item.maxMarks, 0), 100);
+    assert.deepEqual(assessed.filter((item) => item.type === "assignment").map((item) => item.maxMarks), [10, 10, 10]);
+    assert.deepEqual(assessed.filter((item) => item.type === "project").map((item) => item.maxMarks), [15, 15, 15]);
+    assert.equal(Date.parse(exam.dueAt) - Date.parse(exam.opensAt), 2 * 60 * 60_000);
+    assert.equal(assessmentAvailability(exam, Date.parse(exam.opensAt) - 1), "upcoming");
+    assert.equal(assessmentAvailability(exam, Date.parse(exam.opensAt)), "awaiting-paper");
+    assert.equal(assessmentAvailability({ ...exam, asset: {} }, Date.parse(exam.opensAt)), "open");
+    assert.equal(assessmentAvailability({ ...exam, asset: {} }, Date.parse(exam.dueAt) + 1), "closed");
+    const assignment = assessed[0];
+    assert.equal(rubricMarks(assignment, { submittedAt: assignment.dueAt }, 2, 5).marks, 9);
+    assert.equal(rubricMarks(assignment, { submittedAt: "2026-12-21T00:00:00+05:30" }, 2, 5).marks, 7);
+    assert.equal(rubricMarks(assignment, { submittedAt: assignment.dueAt }, 2, 7), null);
+    assert.equal(summarizeProgress(assessed, {}, { [exam.id]: { marks: 25 } }, true).score, 25);
+    const noSubmission = summarizeProgress(assessed, {}, { [exam.id]: { marks: 0, missing: true } }, true);
+    assert.equal(noSubmission.finished, 0);
+    assert.equal(noSubmission.graded, 1);
+});

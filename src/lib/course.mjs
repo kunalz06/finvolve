@@ -1,8 +1,10 @@
 export const COURSE_TITLE = "Professional Technology Training Program";
 export const COURSE_FEE = 1_630_000;
-export const REGISTRATION_DEADLINE = "26 November 2026";
-export const REGISTRATION_CLOSE = Date.parse("2026-11-27T00:00:00+05:30");
-export const COURSE_START = "1 December 2026";
+export const REGISTRATION_DATE = "2026-12-03";
+export const REGISTRATION_DEADLINE = "3 December 2026";
+export const REGISTRATION_CLOSE = Date.parse("2026-12-04T00:00:00+05:30");
+export const COURSE_START_DATE = "2026-12-14";
+export const COURSE_START = "14 December 2026";
 export const INTERNSHIP_THRESHOLD = 80;
 export const COURSE_TERMS_VERSION = "2026-11-21";
 export const MODULES = [
@@ -17,6 +19,7 @@ export const ITEM_TYPES = {
     material: "Study material",
     assignment: "Assignment",
     project: "Project",
+    exam: "Final exam",
 };
 
 export const DEFAULT_SETTINGS = {
@@ -72,17 +75,19 @@ export function courseCheckoutOpen(settings, environment, mode, now = Date.now()
 }
 
 export function isAssessment(item) {
-    return item.type === "assignment" || item.type === "project";
+    return ["assignment", "project", "exam"].includes(item.type);
 }
 
 export function summarizeProgress(items, progress = {}, submissions = {}, completed = false) {
-    const work = items.filter(isAssessment);
+    const assessments = items.filter(isAssessment);
+    const planned = assessments.filter((item) => item.opensAt);
+    const work = planned.length ? planned : assessments;
     const graded = work.filter(({ id, maxMarks }) => Number.isFinite(submissions[id]?.marks) &&
         submissions[id].marks >= 0 && submissions[id].marks <= maxMarks);
-    const possible = graded.reduce((sum, item) => sum + item.maxMarks, 0);
+    const possible = (planned.length ? work : graded).reduce((sum, item) => sum + item.maxMarks, 0);
     const earned = graded.reduce((sum, { id }) => sum + submissions[id].marks, 0);
-    const score = possible > 0 ? earned / possible * 100 : null;
-    const finished = items.filter((item) => isAssessment(item) ? Boolean(submissions[item.id]) : progress[item.id] === true).length;
+    const score = graded.length && possible > 0 ? earned / possible * 100 : null;
+    const finished = items.filter((item) => isAssessment(item) ? Boolean(submissions[item.id] && !submissions[item.id].missing) : progress[item.id] === true).length;
     return {
         finished,
         total: items.length,

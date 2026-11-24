@@ -1,14 +1,15 @@
 import { FieldPath } from "firebase-admin/firestore";
 import { z } from "zod";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { canPublish, COURSE_TERMS_VERSION, DEFAULT_SETTINGS, ITEM_TYPES, MODULES } from "@/lib/course.mjs";
+import { canPublish, COURSE_TERMS_VERSION, DEFAULT_SETTINGS, ITEM_TYPES, MODULES, isAssessment } from "@/lib/course.mjs";
+import { assessmentAvailability, plannedCourseItem, rubricMarks } from "@/lib/course-plan.mjs";
 import { corsJson, corsPreflight } from "@/lib/server/cors";
 import { checkRateLimit } from "@/lib/server/rate-limit";
 import {
     CourseError, courseEnrollment, isEnrolled, reconcileCoursePayment, startCoursePayment,
 } from "@/lib/server/course-payments";
 import {
-    COURSE_ITEMS, assetPrefix, configRef, courseItems, courseSettings, courseUser, enrollmentView,
+    COURSE_ITEMS, assetPrefix, configRef, courseItem, courseItems, courseSettings, courseUser, enrollmentView,
     itemRef, loadAdminStudent, loadStudent, publicCourseSettings, requireItem, uploadPrefix, validAssetMimes, validateItemFields,
 } from "@/lib/server/course-store";
 import { courseCollection } from "@/lib/server/course-environment";
@@ -80,7 +81,7 @@ const schema = z.discriminatedUnion("action", [
     z.object({ action: z.literal("admin-save-item"), item: itemSchema }),
     z.object({ action: z.literal("admin-reconcile"), uid: id }),
     z.object({ action: z.literal("admin-status"), uid: id, courseCompleted: z.boolean(), suspended: z.boolean() }),
-    z.object({ action: z.literal("admin-grade"), uid: id, itemId: id, marks: z.number().int().min(0).max(1000), feedback: text(6000), revision: z.number().int().positive() }),
+    z.object({ action: z.literal("admin-grade"), uid: id, itemId: id, marks: z.number().int().min(0).max(1000).optional(), completion: z.number().int().min(0).optional(), quality: z.number().int().min(0).optional(), feedback: text(6000), revision: z.number().int().min(0) }),
     z.object({ action: z.literal("admin-submission-file"), uid: id, itemId: id }),
 ]);
 
@@ -147,9 +148,12 @@ async function studentAction(db, user, data) {
     const assessment = ["prepare-submission", "submit", "get-submission"].includes(action);
     const item = await requireItem(db, itemId, { assessment });
     const submission = ref.collection("submissions").doc(itemId);
+    if (["prepare-submission", "submit"].includes(action) || (action === "get-asset" && item.type === "exam")) {
+        if (assessmentAvailability(item) !== "open") throw new CourseError("This assessment is not open.", 409);
+    }
     switch (action) {
         case "progress":
-            if (["assignment", "project"].includes(item.type)) throw new CourseError("Submit the assignment or project to update progress.");
+            if (isAssessment(item)) throw new CourseError("Submit the assessment to update progress.");
             await ref.collection("progress").doc(itemId).set({ completed: data.completed });
             return { ok: true };
         case "get-asset":
@@ -164,7 +168,10 @@ async function studentAction(db, user, data) {
             await db.runTransaction(async (tx) => {
                 const [enrollment, publishedItem, prior] = await Promise.all([tx.get(ref), tx.get(target), tx.get(submission)]);
                 if (!isEnrolled(enrollment.data())) throw new CourseError("Confirmed enrollment is required.", 403);
-                if (!publishedItem.data()?.published) throw new CourseError("This course item is unavailable.", 404);
+                const currentItem = courseItem(itemId, publishedItem.data());
+                if (!currentItem?.published || !isAssessment(currentItem) || assessmentAvailability(currentItem) !== "open") {
+                    throw new CourseError("This assessment is not open.", 409);
+                }
                 if (enrollment.data().courseCompleted || Number.isFinite(prior.data()?.marks)) throw new CourseError("This submission is closed for edits.", 409);
                 const savedFile = attachment || (data.keepFile ? prior.data()?.file : null) || null;
                 if (!data.response && !savedFile) throw new CourseError("Add a written submission or upload a file.");
@@ -201,16 +208,21 @@ async function adminAction(db, user, data) {
         const collection = db.collection(COURSE_ITEMS);
         const ref = existingId ? collection.doc(existingId) : collection.doc();
         const prior = existingId ? await requireItem(db, existingId, { admin: true }) : null;
+        const planned = plannedCourseItem(existingId);
         const asset = uploaded ? await confirmedCourseFile(assetPrefix(user.uid), "asset", uploaded, validAssetMimes(item.type)) : prior?.asset || null;
-        validateItemFields(item, asset);
+        if (!planned && item.type === "exam") throw new CourseError("Use the scheduled final exam item.");
+        if (!planned) validateItemFields(item, asset);
+        else if (planned.type === "live" && !item.joinUrl) throw new CourseError("Enter a class joining link.");
+        else if (planned.type === "exam" && !asset) throw new CourseError("Upload the exam paper.");
         await db.runTransaction(async (tx) => {
             const current = (await tx.get(ref)).data();
-            if (current && (current.type !== item.type || current.maxMarks !== item.maxMarks || current.module !== item.module)) {
+            if (current && !planned && (current.type !== item.type || current.maxMarks !== item.maxMarks || current.module !== item.module)) {
                 throw new CourseError("The module, item type, and maximum marks are fixed after creation.", 409);
             }
             if (prior && current?.updatedAt !== prior.updatedAt) throw new CourseError("This item changed. Reload it and try again.", 409);
             const updatedAt = new Date().toISOString();
-            tx.set(ref, { ...item, asset, createdAt: current?.createdAt || updatedAt, updatedAt });
+            tx.set(ref, planned ? { joinUrl: item.joinUrl, asset, updatedAt } :
+                { ...item, asset, createdAt: current?.createdAt || updatedAt, updatedAt });
         });
         return { ok: true };
     }
@@ -237,10 +249,19 @@ async function adminAction(db, user, data) {
 
     await db.runTransaction(async (tx) => {
         const [item, current] = await Promise.all([tx.get(target), tx.get(submission)]);
-        if (!current.exists || !item.exists) throw new CourseError("Submission not found.", 404);
-        if (current.data().revision !== data.revision) throw new CourseError("This submission changed. Reload it before grading.", 409);
-        if (data.marks > item.data().maxMarks) throw new CourseError("Marks exceed the maximum for this assignment or project.");
-        tx.update(submission, { marks: data.marks, feedback: data.feedback, gradedAt: new Date().toISOString() });
+        const assessmentItem = courseItem(itemId, item.data());
+        if (!assessmentItem || !isAssessment(assessmentItem)) throw new CourseError("Assessment not found.", 404);
+        const previous = current.data();
+        const work = previous?.missing ? null : previous;
+        if (!work && (!assessmentItem.dueAt || Date.now() <= Date.parse(assessmentItem.dueAt))) throw new CourseError("Submission not found.", 404);
+        if ((previous?.revision ?? 0) !== data.revision) throw new CourseError("This submission changed. Reload it before grading.", 409);
+        const rubric = assessmentItem.rubric && rubricMarks(assessmentItem, work || {}, data.completion, data.quality);
+        const marks = work ? (assessmentItem.rubric ? rubric?.marks : data.marks) : 0;
+        if (!Number.isInteger(marks) || marks < 0 || marks > assessmentItem.maxMarks) throw new CourseError("Enter valid marks for this assessment.");
+        tx.set(submission, {
+            ...(work ? {} : { revision: 0, missing: true }),
+            marks, ...(rubric ? { rubric } : {}), feedback: data.feedback, gradedAt: new Date().toISOString(),
+        }, { merge: true });
     });
     return { ok: true };
 }

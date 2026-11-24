@@ -192,7 +192,8 @@ function Dashboard({ user, data, refresh }) {
                 <h2>Your progress</h2>
                 <p>{summary.finished} of {summary.total} learning activities completed</p>
                 <progress className={styles.progress} aria-label="Course activities completed" max={summary.total || 1} value={summary.finished} />
-                <p>Marks <strong>{displayScore}</strong> · {summary.graded} of {summary.assessments} assessments graded</p>
+                <p>Assignments 30% · Project checkpoints 45% · Final exam 25%</p>
+                <p>Course score <strong>{displayScore}</strong> · {summary.graded} of {summary.assessments} assessments graded</p>
             </section>
             <section className={styles.panel}>
                 <h2>Internship eligibility</h2>
@@ -217,7 +218,8 @@ function LearningItem({ item, data, user, refresh }) {
     const submission = data.submissions[item.id];
     const assessment = isAssessment(item);
     const completed = Boolean(data.progress[item.id]);
-    const editable = !data.enrollment.courseCompleted && !Number.isFinite(submission?.marks);
+    const editable = item.availability === "open" && !data.enrollment.courseCompleted && !Number.isFinite(submission?.marks);
+    const formatDate = (date) => new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(date));
 
     function submit(event) {
         event.preventDefault();
@@ -238,6 +240,7 @@ function LearningItem({ item, data, user, refresh }) {
         {item.type === "live" && <p><time dateTime={item.startsAt}>{new Intl.DateTimeFormat("en-IN", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Kolkata" }).format(new Date(item.startsAt))} IST</time></p>}
         {media && <video className={styles.recording} src={media} controls preload="metadata" aria-label={item.title} />}
         <div className={styles.actions}>
+            {item.type === "live" && !item.joinUrl && <p>Joining link will appear here when posted.</p>}
             {item.joinUrl && <a className={styles.primary} href={item.joinUrl} target="_blank" rel="noopener noreferrer">Join live class</a>}
             {item.assetName && <button className={styles.secondary} disabled={busy} onClick={() => run(async (request) => {
                 const { url } = await request("get-asset", { itemId: item.id });
@@ -250,6 +253,12 @@ function LearningItem({ item, data, user, refresh }) {
             })}>{completed ? "Completed" : "Mark complete"}</button>}
         </div>
         {assessment && <>
+            {item.opensAt && <p>Opens {formatDate(item.opensAt)} IST.<br />{item.type === "exam" ? "Closes" : "Due"} {formatDate(item.dueAt)} IST.</p>}
+            {item.availability === "upcoming" && <p>Submissions open at the scheduled time. Refresh the portal at that time.</p>}
+            {item.availability === "awaiting-paper" && <p>The exam paper is awaiting upload.</p>}
+            {item.availability === "closed" && <p>The exam submission window has closed.</p>}
+            {item.rubric && <p>Completion {item.rubric.completion} · Timeliness {item.rubric.timeliness} · Quality {item.rubric.quality}</p>}
+            {submission?.rubric && <p>Marks awarded: completion {submission.rubric.completion}, timeliness {submission.rubric.timeliness}, quality {submission.rubric.quality}.</p>}
             <p>Maximum marks {item.maxMarks}. {submission ? Number.isFinite(submission.marks) ? `Received ${submission.marks}/${item.maxMarks}.` : "Submitted. Awaiting review." : "Awaiting submission."}</p>
             {submission?.feedback && <p className={styles.preline}><strong>Feedback</strong> {submission.feedback}</p>}
             {submission?.fileName && <button type="button" className={styles.secondary} disabled={busy} onClick={() => run(async (request) => {
