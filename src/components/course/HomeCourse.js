@@ -25,7 +25,7 @@ export default function HomeCourse() {
             <ul className={styles.modules} aria-label="Course modules">
               {MODULES.map(({ id, title }) => <li key={id}>{title}</li>)}
             </ul>
-            <p className={styles.courseDescription}>Learn through live classes, recordings, assignments, and practical projects. Digital study materials are included.</p>
+            <p className={styles.courseDescription}>Four weeks of live classes, recordings, assignments, and practical projects, ending with a final exam. Digital study materials are included.</p>
             <dl className={styles.courseFacts}>
               <div><dt>Course fee</dt><dd>{inr(COURSE_FEE)}</dd></div>
               <div><dt>Registration deadline</dt><dd>{REGISTRATION_DEADLINE}</dd></div>

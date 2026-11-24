@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardCheck, Layers3, Laptop, Play, Shield, Video } from "lucide-react";
 import usePublicCourseSettings from "@/hooks/usePublicCourseSettings";
-import { COURSE_FEE, COURSE_START, COURSE_TITLE, DEFAULT_SETTINGS, MODULES, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
+import { COURSE_FEE, COURSE_START, COURSE_START_DATE, COURSE_TITLE, DEFAULT_SETTINGS, MODULES, REGISTRATION_DATE, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
+import CoursePlan from "./CoursePlan";
 import styles from "./course.module.css";
 
 const moduleIcons = [Laptop, Shield, Layers3];
@@ -25,7 +26,7 @@ export default function CourseLanding({ allowDraft }) {
     const faqs = [
         ["How do I enroll?", "Create an account or sign in, enter your registration details, choose your study materials, and complete checkout. Your dashboard unlocks after payment is confirmed."],
         ["What study materials are included?", "Digital study materials are included in the course fee. Printed copies can be purchased separately when the option is available."],
-        ["When are live classes?", settings?.schedule || "The live class schedule is awaiting confirmation. Enrolled students can view class times and joining links in the portal."],
+        ["When are live classes?", settings?.schedule || "See the weekly plan for class dates and times in IST. Enrolled students can get joining links in the portal when they are posted."],
         ["Will I receive a certificate?", "Every student who successfully completes the course receives a certificate of completion."],
         ["How is the internship awarded?", `Students who successfully complete the course and score above 80% are eligible for a paid internship opportunity. Duration and mode: ${settings?.internshipDuration || DEFAULT_SETTINGS.internshipDuration}. Stipend: ${settings?.internshipStipend || DEFAULT_SETTINGS.internshipStipend}.`],
         ...(settings?.refundPolicy ? [["What is the refund policy?", settings.refundPolicy]] : []),
@@ -39,8 +40,8 @@ export default function CourseLanding({ allowDraft }) {
                     <h1 id="course-title" aria-label={COURSE_TITLE}>Professional<br />Technology<br /><span>Training Program</span></h1>
                     <p className={styles.intro}>Build practical technology skills through live classes, recorded lectures, assignments, and hands-on projects.</p>
                     <dl className={styles.dates}>
-                        <div><CalendarDays aria-hidden="true" /><div><dt>Registration deadline</dt><dd><time dateTime="2026-11-26">{REGISTRATION_DEADLINE}</time></dd></div></div>
-                        <div><CalendarDays aria-hidden="true" /><div><dt>Course starts</dt><dd><time dateTime="2026-12-01">{COURSE_START}</time></dd></div></div>
+                        <div><CalendarDays aria-hidden="true" /><div><dt>Registration deadline</dt><dd><time dateTime={REGISTRATION_DATE}>{REGISTRATION_DEADLINE}</time></dd></div></div>
+                        <div><CalendarDays aria-hidden="true" /><div><dt>Course starts</dt><dd><time dateTime={COURSE_START_DATE}>{COURSE_START}</time></dd></div></div>
                     </dl>
                     <p className={styles.mobileFee}>Course fee <strong>{inr(COURSE_FEE)}</strong></p>
                     <CourseActions closed={closed} />
@@ -67,6 +68,8 @@ export default function CourseLanding({ allowDraft }) {
                     })}
                 </div>
             </section>
+
+            <CoursePlan />
 
             <section className={styles.section} aria-labelledby="experience-heading">
                 <p className={styles.eyebrow}>Learning experience</p>

@@ -171,3 +171,6 @@
 
 .enrollmentTerms { padding-inline-start: 1.3rem; }
 .enrollmentTerms li + li { margin-top: .35rem; }
+
+.planList { margin: 12px 0; padding-inline-start: 1.4rem; list-style: disc; }
+.planList li + li { margin-top: 4px; }
