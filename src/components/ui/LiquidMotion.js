@@ -15,13 +15,14 @@ export default function LiquidMotion() {
     const setup = () => {
       cleanup();
       if (preference.matches) return;
-      const entry = animateSurface(main, [
+      const customIntro = main.querySelector("[data-home-intro]");
+      const entry = !customIntro && animateSurface(main, [
         { opacity: .7, transform: "translateY(8px)" },
         { opacity: 1, transform: "translateY(0)" },
       ]);
       const selectors = "section, [data-reveal], .card-shell";
       // Animate outer surfaces only, avoiding compounded nested transforms/blur.
-      const eligible = (node) => !node.parentElement?.closest(selectors);
+      const eligible = (node) => node !== customIntro && !node.parentElement?.closest(selectors);
       const reveals = revealSurfaces([...main.querySelectorAll(selectors)].filter(eligible), {
         Observer: window.IntersectionObserver,
       });
@@ -59,7 +60,7 @@ export default function LiquidMotion() {
       };
       document.addEventListener("pointerdown", press, { passive: true });
       cleanup = () => {
-        entry?.cancel();
+        entry && entry.cancel();
         reveals.disconnect();
         changes.disconnect();
         document.removeEventListener("pointerdown", press);

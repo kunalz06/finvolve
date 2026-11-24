@@ -1,8 +1,8 @@
 import DevHome from "@/components/DevHome";
 
 export const metadata = {
-  title: "DEV Infinity | Next Gen Engineering",
-  description: "A modern engineering agency helping you ship high-quality products at lightning speed.",
+  title: "DEV Infinity | Machine Learning, Automation & Custom LLMs",
+  description: "DEV Infinity develops machine learning models, workflow automation, and custom LLMs, and offers a Professional Technology Training Program.",
 };
 
 export default function DevIndexPage() {
