@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, BriefcaseBusiness, CalendarDays, ChevronDown, ClipboardCheck, Layers3, Laptop, Play, Shield, Video } from "lucide-react";
-import { courseApiUrl } from "@/lib/api";
+import usePublicCourseSettings from "@/hooks/usePublicCourseSettings";
 import { COURSE_FEE, COURSE_START, COURSE_TITLE, DEFAULT_SETTINGS, MODULES, REGISTRATION_DEADLINE, inr } from "@/lib/course.mjs";
 import styles from "./course.module.css";
 
@@ -12,16 +11,7 @@ const moduleIcons = [Laptop, Shield, Layers3];
 const formats = [[Video, "Live classes"], [Play, "Recorded lectures"], [ClipboardCheck, "Assignments"], [Layers3, "Practical projects"], [BookOpen, "Digital study materials"]];
 
 export default function CourseLanding({ allowDraft }) {
-    const [settings, setSettings] = useState(null);
-
-    useEffect(() => {
-        const controller = new AbortController();
-        fetch(courseApiUrl(), { signal: controller.signal, cache: "no-store" })
-            .then((response) => response.ok ? response.json() : { published: false })
-            .then(setSettings)
-            .catch(() => { if (!controller.signal.aborted) setSettings({ published: false }); });
-        return () => controller.abort();
-    }, []);
+    const settings = usePublicCourseSettings();
 
     if (!allowDraft && !settings?.published) {
         return <div className={styles.course}><section className={styles.workspace}>
