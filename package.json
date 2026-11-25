@@ -10,7 +10,8 @@
     "lint": "eslint",
     "migrate:payments": "node scripts/scrub-payment-credentials.mjs",
     "set-admin": "node scripts/set-admin-claim.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "prebuild": "node scripts/verify-course-download-preview.mjs"
   },
   "dependencies": {
     "animejs": "^4.5.0",
