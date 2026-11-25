@@ -132,7 +132,7 @@ npm run set-admin -- FIREBASE_UID
 - Student login, registration, and dashboard: `/dev/course/portal`
 - Course administration: `/dev/course/admin`
 
-The course uses the site's Firebase Email/Password authentication, Firestore, and Razorpay credentials. Enable Email/Password sign-in and authorize the deployed domain in Firebase Auth. Course administrators use the existing admin custom claim. Course collections use the server SDK and are covered by the Firestore rules' default deny for direct client access.
+The course uses Firebase Authentication, Firestore, and the site's Razorpay credentials. Enable the Email/Password and Google providers in Firebase Authentication and add each frontend hostname to Authorized domains. Students can use either provider to create and return to a course account. For a Google sign-in, the server uses the Google account's name and email for enrollment and checkout. If Google provides no name, the student enters one. Course administrators sign in with email and password and use the existing admin custom claim. Course collections use the server SDK and are covered by the Firestore rules' default deny for direct client access.
 
 Use a private Cloud Storage bucket for learning files and uploads. Set `COURSE_STORAGE_BUCKET` to select a separate bucket or let it fall back to `NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET`. The Firebase service account needs read and create access to the objects and must be able to sign URLs. Configure bucket CORS for the approved site origins, with GET and PUT methods and the Content-Type, x-goog-if-generation-match, and x-goog-content-length-range headers. The browser uploads directly to Storage using a signed URL.
 

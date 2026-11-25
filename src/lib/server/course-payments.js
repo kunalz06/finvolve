@@ -50,10 +50,13 @@ function paymentClient() {
 }
 
 function paymentDetails(record, keyId) {
-    return { orderId: record.orderId, amount: record.amount, currency: "INR", keyId };
+    return {
+        orderId: record.orderId, amount: record.amount, currency: "INR", keyId,
+        prefill: { name: record.name, email: record.email, contact: record.phone },
+    };
 }
 
-export async function startCoursePayment(student, registration, settingsRef, quotedAmount) {
+export async function startCoursePayment(student, identity, registration, settingsRef, quotedAmount) {
     const { razorpay, keyId } = paymentClient();
     const db = getAdminDb();
     const ref = courseEnrollment(db, student.uid);
@@ -73,8 +76,10 @@ export async function startCoursePayment(student, registration, settingsRef, quo
         if (registration && (registration.refundPolicy !== refundPolicy || JSON.stringify(registration.terms) !== JSON.stringify(terms))) {
             throw new CourseError("The enrollment terms changed. Review the updated terms before continuing.", 409);
         }
+        const name = identity?.name || registration?.name;
+        if (registration && !identity.name && (!name || name.length < 2)) throw new CourseError("Enter your full name.");
         const accepting = registration && {
-            name: registration.name,
+            name,
             phone: registration.phone,
             dateOfBirth: registration.dateOfBirth,
             fieldOfStudy: registration.fieldOfStudy,
@@ -83,7 +88,7 @@ export async function startCoursePayment(student, registration, settingsRef, quo
             experience: registration.experience,
             hardcopy: registration.hardcopy,
             address: registration.hardcopy ? registration.address : "",
-            email: student.email,
+            email: identity.email,
             termsAcceptedAt: new Date().toISOString(),
             termsVersion: COURSE_TERMS_VERSION,
             acceptedTerms: terms,
@@ -97,6 +102,7 @@ export async function startCoursePayment(student, registration, settingsRef, quo
                 if (!accepting) throw new CourseError("Complete the enrollment form and accept the terms first.");
                 if (!enrollmentCheckout(settings).enrollmentOpen) throw new CourseError("Registration is currently closed.", 409);
                 tx.update(ref, accepting);
+                return { ...current, ...accepting, existing: true };
             }
             return { existing: true, ...current };
         }

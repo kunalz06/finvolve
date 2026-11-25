@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import {
-    createUserWithEmailAndPassword, onIdTokenChanged, sendEmailVerification,
-    sendPasswordResetEmail, signInWithEmailAndPassword, signOut,
+    GoogleAuthProvider, createUserWithEmailAndPassword, onIdTokenChanged, sendEmailVerification,
+    sendPasswordResetEmail, signInWithEmailAndPassword, signInWithPopup, signOut,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { courseApiUrl } from "@/lib/api";
@@ -60,7 +60,10 @@ function authError(error) {
         "auth/email-already-in-use": "An account already uses this email. Sign in or reset your password.",
         "auth/too-many-requests": "Too many attempts. Please try again later.",
         "auth/network-request-failed": "Check your connection and try again.",
-        "auth/operation-not-allowed": "Email sign-in is temporarily unavailable.",
+        "auth/operation-not-allowed": "This sign-in method is temporarily unavailable.",
+        "auth/popup-blocked": "Allow pop-ups for this site and try Google sign-in again.",
+        "auth/unauthorized-domain": "Google sign-in is unavailable on this site address.",
+        "auth/account-exists-with-different-credential": "Sign in with the original method for this account.",
     };
     return messages[error.code] || "The account service could not complete your request. Try again.";
 }
@@ -107,18 +110,38 @@ export function AccountForm({ beginWithEnrollment = false, admin = false }) {
         }
     }
 
+    async function continueWithGoogle() {
+        if (!auth || busy) return;
+        setBusy(true);
+        setError("");
+        setMessage("");
+        try {
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: "select_account" });
+            await signInWithPopup(auth, provider);
+        } catch (err) {
+            if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") setError(authError(err));
+        } finally {
+            setBusy(false);
+        }
+    }
+
     return <section className={`${styles.panel} ${styles.narrow}`}>
         <h1>{title}</h1>
         <Notice error={error || (!auth ? "Account services are unavailable in this environment." : "")} message={message} />
+        {!admin && mode !== "reset" && <div className={styles.fields}>
+            <button className={styles.secondary} type="button" disabled={busy || !auth} onClick={continueWithGoogle}>Continue with Google</button>
+            <p>Or use your email and password.</p>
+        </div>}
         <form className={styles.fields} onSubmit={submit}>
             <label>Email address<input name="email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} /></label>
             {mode !== "reset" && <label>Password<input key={mode} name="password" type="password" autoComplete={mode === "signup" ? "new-password" : "current-password"} required minLength={mode === "signup" ? 8 : undefined} /></label>}
             <div><button className={styles.primary} disabled={busy || !auth}>{busy ? "Please wait…" : action}</button></div>
         </form>
         <div className={styles.actions}>
-            {mode !== "login" && <button className={styles.secondary} type="button" onClick={() => changeMode("login")}>Sign in</button>}
-            {!admin && mode !== "signup" && <button className={styles.secondary} type="button" onClick={() => changeMode("signup")}>Create an account</button>}
-            {mode === "login" && <button className={styles.secondary} type="button" onClick={() => changeMode("reset")}>Forgot your password?</button>}
+            {mode !== "login" && <button className={styles.secondary} type="button" disabled={busy} onClick={() => changeMode("login")}>Sign in</button>}
+            {!admin && mode !== "signup" && <button className={styles.secondary} type="button" disabled={busy} onClick={() => changeMode("signup")}>Create an account</button>}
+            {mode === "login" && <button className={styles.secondary} type="button" disabled={busy} onClick={() => changeMode("reset")}>Forgot your password?</button>}
         </div>
     </section>;
 }
