@@ -24,6 +24,15 @@ export async function courseUser(request) {
     return { ...user, isAdmin: user.admin === true || user.role === "admin" };
 }
 
+export async function courseEnrollmentIdentity(user) {
+    if (user.firebase.sign_in_provider !== "google.com") return { email: user.email, name: "" };
+    const account = await getAdminAuth().getUser(user.uid);
+    const google = account.providerData.find(({ providerId, uid }) =>
+        providerId === "google.com" && user.firebase.identities["google.com"]?.includes(uid));
+    if (!google?.email) throw new CourseError("Sign in again to load your Google account details.", 401);
+    return { email: google.email, name: google.displayName?.trim() || "", provider: "google.com" };
+}
+
 export function configRef(db) {
     return db.collection(COURSE_CONFIG).doc("professional-technology-2026");
 }
@@ -84,13 +93,13 @@ export function enrollmentView(record) {
     return view;
 }
 
-export async function loadStudent(uid) {
+export async function loadStudent(user) {
     const db = getAdminDb();
-    const ref = courseEnrollment(db, uid);
+    const ref = courseEnrollment(db, user.uid);
     const [snapshot, settings] = await Promise.all([ref.get(), courseSettings(db)]);
     const record = snapshot.data();
     const result = { settings: publicCourseSettings(settings), enrollment: enrollmentView(record), hasAccess: isEnrolled(record) };
-    if (!result.hasAccess) return result;
+    if (!result.hasAccess) return { ...result, identity: await courseEnrollmentIdentity(user) };
 
     const [items, { progress, submissions }] = await Promise.all([courseItems(db), studentWork(ref)]);
     const visibleSubmissions = Object.fromEntries(items.filter(isAssessment).filter(({ id }) => submissions[id]).map(({ id }) => {

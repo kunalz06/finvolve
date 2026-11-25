@@ -77,7 +77,8 @@ function StudentArea({ user }) {
 }
 
 function Enrollment({ user, data, update, refresh }) {
-    const { enrollment, settings } = data;
+    const { enrollment, identity, settings } = data;
+    const googleName = identity?.provider === "google.com" ? identity.name : "";
     const [selectedHardcopy, setHardcopy] = useState(false);
     const [checkoutOpen, setCheckoutOpen] = useState(false);
     const { busy, error, message, setMessage, run } = useCourseActions(user);
@@ -103,7 +104,7 @@ function Enrollment({ user, data, update, refresh }) {
             await loadCheckout();
             const details = await request("start-payment", {
                 registration: needsForm ? {
-                    name: form.get("name"), phone: form.get("phone"), dateOfBirth: form.get("dateOfBirth"),
+                    name: googleName ? undefined : form.get("name"), phone: form.get("phone"), dateOfBirth: form.get("dateOfBirth"),
                     fieldOfStudy: form.get("fieldOfStudy"), graduationDate: form.get("graduationDate"),
                     cgpa: form.get("cgpa"), experience: form.get("experience"),
                     address: form.get("address") || "", hardcopy,
@@ -119,7 +120,7 @@ function Enrollment({ user, data, update, refresh }) {
             const razorpay = new window.Razorpay({
                 key: details.keyId, order_id: details.orderId, amount: details.amount, currency: details.currency,
                 name: "DEV Infinity", description: COURSE_TITLE,
-                prefill: { name: needsForm ? form.get("name") : enrollment.name, email: user.email, contact: needsForm ? form.get("phone") : enrollment.phone },
+                prefill: details.prefill,
                 theme: { color: "#ae1029" },
                 handler: (checkout) => {
                     setCheckoutOpen(false);
@@ -145,9 +146,11 @@ function Enrollment({ user, data, update, refresh }) {
         {!unavailable && settings.enrollmentOpen && <form className={styles.fields} onSubmit={pay}>
             {settings.paymentMode === "test" && <p className={styles.banner}>Razorpay Test Mode. No real payment will be collected.</p>}
             {!needsForm ? <p>Checkout details are saved for {enrollment.name}. Materials: {hardcopy ? "digital and printed copies" : "digital copies"}.</p> : <>
-                <label>Full name<input name="name" autoComplete="name" defaultValue={enrollment?.name || user.displayName || ""} required minLength={2} maxLength={120} /></label>
+                {googleName
+                    ? <label>Full name<input name="name" autoComplete="name" value={googleName} readOnly /></label>
+                    : <label>Full name<input name="name" autoComplete="name" defaultValue={enrollment?.name || user.displayName || ""} required minLength={2} maxLength={120} /></label>}
                 <label>Contact number<input name="phone" autoComplete="tel" type="tel" defaultValue={enrollment?.phone || ""} required minLength={7} maxLength={24} /></label>
-                <label>Email address<input name="email" type="email" value={user.email} readOnly /></label>
+                <label>Email address<input name="email" type="email" value={identity?.email || user.email || ""} readOnly /></label>
                 <div className={styles.split}>
                     <label>Date of birth<input type="date" name="dateOfBirth" required max={new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10)} defaultValue={enrollment?.dateOfBirth || ""} /></label>
                     <label>Expected graduation date<input type="date" name="graduationDate" required defaultValue={enrollment?.graduationDate || ""} /></label>
@@ -267,7 +270,7 @@ function LearningItem({ item, data, user, refresh }) {
             {!editable && submission?.response && <p className={styles.preline}>{submission.response}</p>}
             {editable && <form key={submission?.revision || 0} className={styles.fields} onSubmit={submit}>
                 <label>Written response<textarea name="response" maxLength={6000} defaultValue={submission?.response || ""} /></label>
-                <label>Attachment <small>PDF, ZIP, or TXT up to 20 MB</small><input name="file" type="file" accept=".pdf,.zip,.txt" /></label>
+                <label>Attachment <small>PDF, ZIP, or TXT up to 10 MB</small><input name="file" type="file" accept=".pdf,.zip,.txt" /></label>
                 {submission?.fileName && <label className={styles.check}><input type="checkbox" name="keepFile" defaultChecked /> Keep existing attachment if no new file is selected</label>}
                 <div><button className={styles.primary} disabled={busy}>{busy ? "Saving…" : submission ? "Update submission" : "Submit work"}</button></div>
             </form>}

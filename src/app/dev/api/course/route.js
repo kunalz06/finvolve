@@ -9,7 +9,7 @@ import {
     CourseError, courseEnrollment, isEnrolled, reconcileCoursePayment, startCoursePayment,
 } from "@/lib/server/course-payments";
 import {
-    COURSE_ITEMS, assetPrefix, configRef, courseItem, courseItems, courseSettings, courseUser, enrollmentView,
+    COURSE_ITEMS, assetPrefix, configRef, courseEnrollmentIdentity, courseItem, courseItems, courseSettings, courseUser, enrollmentView,
     itemRef, loadAdminStudent, loadStudent, publicCourseSettings, requireItem, uploadPrefix, validAssetMimes, validateItemFields,
 } from "@/lib/server/course-store";
 import { courseCollection } from "@/lib/server/course-environment";
@@ -44,7 +44,7 @@ const itemSchema = z.object({
 });
 
 const enrollmentDetails = z.object({
-    name: text(120).min(2),
+    name: text(120).optional(),
     phone: text(24).regex(/^\+?[\d\s().-]{7,23}$/).refine((value) => value.replace(/\D/g, "").length >= 7),
     dateOfBirth: z.iso.date().refine((date) => date <= new Date(Date.now() + 330 * 60_000).toISOString().slice(0, 10), { message: "Date of birth cannot be in the future." }),
     fieldOfStudy: text(160).min(1),
@@ -133,15 +133,16 @@ export async function POST(request) {
 async function studentAction(db, user, data) {
     const { action, itemId } = data;
     const ref = courseEnrollment(db, user.uid);
-    if (action === "student") return loadStudent(user.uid);
+    if (action === "student") return loadStudent(user);
     if (action === "start-payment") {
-        return startCoursePayment(user, data.registration, configRef(db), data.quotedAmount);
+        const identity = data.registration ? await courseEnrollmentIdentity(user) : null;
+        return startCoursePayment(user, identity, data.registration, configRef(db), data.quotedAmount);
     }
 
     const record = (await ref.get()).data();
     if (action === "check-payment") {
         const result = await reconcileCoursePayment(ref, record, data.checkout);
-        return { ...result, student: await loadStudent(user.uid) };
+        return { ...result, student: await loadStudent(user) };
     }
     if (!isEnrolled(record)) throw new CourseError("Confirmed enrollment is required.", 403);
 

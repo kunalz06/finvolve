@@ -186,7 +186,7 @@ function ItemEditor({ user, item, done, cancel }) {
                 <label>Joining link<input name="joinUrl" type="url" placeholder="https://" required defaultValue={item.joinUrl || ""} /></label>
             </div>}
             {assessment && <label>Maximum marks<input type="number" name="maxMarks" required min="1" max="1000" disabled={Boolean(item.id)} defaultValue={item.maxMarks || ""} /></label>}
-            {usesAsset && <label>{type === "exam" ? "Exam paper" : "File"} {recording ? "(MP4 or WebM, up to 500 MB)" : "(PDF, ZIP, or TXT, up to 50 MB)"}
+            {usesAsset && <label>{type === "exam" ? "Exam paper" : "File"} {recording ? "(MP4 or WebM, up to 100 MB)" : "(PDF, ZIP, or TXT, up to 10 MB)"}
                 <input key={type} name="asset" type="file" accept={recording ? ".mp4,.webm" : ".pdf,.zip,.txt"} required={(!assessment || type === "exam") && !item.asset} />
                 {item.asset && <small>Current file {item.asset.name}</small>}
             </label>}
