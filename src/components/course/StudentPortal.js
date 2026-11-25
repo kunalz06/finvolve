@@ -270,7 +270,7 @@ function LearningItem({ item, data, user, refresh }) {
             {!editable && submission?.response && <p className={styles.preline}>{submission.response}</p>}
             {editable && <form key={submission?.revision || 0} className={styles.fields} onSubmit={submit}>
                 <label>Written response<textarea name="response" maxLength={6000} defaultValue={submission?.response || ""} /></label>
-                <label>Attachment <small>PDF, ZIP, or TXT up to 20 MB</small><input name="file" type="file" accept=".pdf,.zip,.txt" /></label>
+                <label>Attachment <small>PDF, ZIP, or TXT up to 10 MB</small><input name="file" type="file" accept=".pdf,.zip,.txt" /></label>
                 {submission?.fileName && <label className={styles.check}><input type="checkbox" name="keepFile" defaultChecked /> Keep existing attachment if no new file is selected</label>}
                 <div><button className={styles.primary} disabled={busy}>{busy ? "Saving…" : submission ? "Update submission" : "Submit work"}</button></div>
             </form>}

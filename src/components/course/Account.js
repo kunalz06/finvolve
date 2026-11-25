@@ -39,7 +39,10 @@ export async function uploadCourseFile(user, action, file, fields) {
     const mime = file.type === "application/x-zip-compressed" ? "application/zip" : file.type || ({ pdf: "application/pdf", zip: "application/zip", txt: "text/plain", mp4: "video/mp4", webm: "video/webm" })[file.name.split(".").at(-1).toLowerCase()];
     if (!mime) throw new Error("This file type is unsupported.");
     const signed = await courseRequest(user, action, { ...fields, mime, size: file.size });
-    const result = await fetch(signed.url, { method: "PUT", headers: signed.headers, body: file });
+    const body = new FormData();
+    for (const [key, value] of Object.entries(signed.fields)) body.append(key, value);
+    body.append("file", file);
+    const result = await fetch(signed.url, { method: "POST", body });
     if (!result.ok) throw new Error("The file upload failed. Try again.");
     return { path: signed.path, name: file.name.slice(0, 160) };
 }
