@@ -1,0 +1,1 @@
+{"name":"finvolve-email-previews","private":true,"scripts":{"dev":"node ../../scripts/preview-emails.mjs --serve"}}
